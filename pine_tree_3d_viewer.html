@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Realistic 3D Pine Tree - WebGL PBR Model</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: radial-gradient(circle at center, #f1f5f9 0%, #cbd5e1 100%);
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    #canvas-container {
+      width: 100%;
+      height: 100%;
+    }
+    .info-card {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      padding: 16px 20px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      max-width: 320px;
+    }
+    .info-card h1 {
+      font-size: 1.1rem;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+    .info-card p {
+      font-size: 0.82rem;
+      color: #475569;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+  
+  <div class="info-card">
+    <h1>🌲 Realistic 3D Pine Tree</h1>
+    <p>Procedural WebGL 3D Model with PBR Bark Textures, Layered Needle Clusters, Soft Shadows & Natural Sun Lighting.</p>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <script>
+    // --- 1. SCENE SETUP ---
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 4, 12);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+    container.appendChild(renderer.domElement);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.target.set(0, 3.5, 0);
+
+    // --- 2. BRIGHT NATURAL LIGHTING SETUP ---
+    const ambientLight = new THREE.AmbientLight(0xe0f2fe, 0.8);
+    scene.add(ambientLight);
+
+    const sunLight = new THREE.DirectionalLight(0xfffbeb, 2.2);
+    sunLight.position.set(8, 14, 10);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.width = 2048;
+    sunLight.shadow.mapSize.height = 2048;
+    sunLight.shadow.bias = -0.0001;
+    scene.add(sunLight);
+
+    const fillLight = new THREE.DirectionalLight(0x38bdf8, 0.6);
+    fillLight.position.set(-8, 6, -8);
+    scene.add(fillLight);
+
+    // --- 3. PROCEDURAL BARK TEXTURE GENERATION ---
+    function generateBarkTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#4a2c11';
+      ctx.fillRect(0, 0, 512, 512);
+
+      // Draw vertical bark grooves
+      for (let i = 0; i < 800; i++) {
+        const x = Math.random() * 512;
+        const y = Math.random() * 512;
+        const h = 20 + Math.random() * 80;
+        const w = 2 + Math.random() * 5;
+        
+        ctx.fillStyle = Math.random() > 0.4 ? '#2d1806' : '#6b421e';
+        ctx.beginPath();
+        ctx.ellipse(x, y, w, h / 2, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.wrapT = THREE.RepeatWrapping;
+      texture.repeat.set(1, 4);
+      return texture;
+    }
+
+    // --- 4. REALISTIC PINE TREE GEOMETRY & MATERIALS ---
+    const pineTreeGroup = new THREE.Group();
+
+    // Trunk Material (PBR)
+    const barkMaterial = new THREE.MeshStandardMaterial({
+      map: generateBarkTexture(),
+      roughness: 0.95,
+      metalness: 0.05,
+      bumpScale: 0.08
+    });
+
+    // Trunk Mesh
+    const trunkGeo = new THREE.CylinderGeometry(0.25, 0.5, 7, 12);
+    const trunkMesh = new THREE.Mesh(trunkGeo, barkMaterial);
+    trunkMesh.position.y = 3.5;
+    trunkMesh.castShadow = true;
+    trunkMesh.receiveShadow = true;
+    pineTreeGroup.add(trunkMesh);
+
+    // Foliage Needles Material (Rich Vibrant Green)
+    const needleMaterial = new THREE.MeshStandardMaterial({
+      color: 0x1b4d2e,
+      roughness: 0.6,
+      metalness: 0.1,
+      flatShading: true
+    });
+
+    // Multi-tiered dense pine needle cone clusters
+    const needleTiers = [
+      { radius: 2.6, height: 2.2, y: 2.5, count: 7 },
+      { radius: 2.2, height: 2.0, y: 3.8, count: 6 },
+      { radius: 1.7, height: 1.8, y: 5.0, count: 5 },
+      { radius: 1.2, height: 1.5, y: 6.0, count: 4 },
+      { radius: 0.7, height: 1.2, y: 6.8, count: 3 }
+    ];
+
+    needleTiers.forEach((tier) => {
+      const tierGroup = new THREE.Group();
+      tierGroup.position.y = tier.y;
+
+      for (let i = 0; i < tier.count; i++) {
+        const coneGeo = new THREE.ConeGeometry(tier.radius * (0.85 + Math.random() * 0.3), tier.height, 7);
+        const coneMesh = new THREE.Mesh(coneGeo, needleMaterial);
+        
+        const angle = (i / tier.count) * Math.PI * 2 + Math.random() * 0.3;
+        const offset = Math.random() * 0.2;
+        coneMesh.position.set(Math.cos(angle) * offset, 0, Math.sin(angle) * offset);
+        coneMesh.rotation.y = Math.random() * Math.PI;
+        coneMesh.rotation.z = (Math.random() - 0.5) * 0.1;
+        coneMesh.castShadow = true;
+        coneMesh.receiveShadow = true;
+        
+        tierGroup.add(coneMesh);
+      }
+      pineTreeGroup.add(tierGroup);
+    });
+
+    scene.add(pineTreeGroup);
+
+    // Ground Shadow Receiver Pedestal
+    const shadowGround = new THREE.Mesh(
+      new THREE.CircleGeometry(6, 32),
+      new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.9 })
+    );
+    shadowGround.rotation.x = -Math.PI / 2;
+    shadowGround.receiveShadow = true;
+    scene.add(shadowGround);
+
+    // --- 5. ANIMATION LOOP ---
+    function animate() {
+      requestAnimationFrame(animate);
+      pineTreeGroup.rotation.y += 0.003; // Gentle rotation showcase
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
