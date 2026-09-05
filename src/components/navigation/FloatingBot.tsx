@@ -37,7 +37,7 @@ export const FloatingBot: React.FC = () => {
 
   return (
     <>
-      <div className="fixed bottom-20 lg:bottom-6 right-6 z-40 flex flex-col items-end pointer-events-none">
+      <div className="fixed bottom-20 right-4 lg:bottom-[16px] lg:right-[20px] z-40 flex flex-col items-end pointer-events-none">
         {/* Friendly speech greeting bubble */}
         <AnimatePresence>
           {showBubble && !isOpen && (

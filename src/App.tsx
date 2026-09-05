@@ -10,6 +10,10 @@ import { LearnPage } from './pages/LearnPage';
 import { LessonView } from './pages/LessonView';
 import { PlayPage } from './pages/PlayPage';
 import { PracticePage } from './pages/PracticePage';
+import { AboutPage } from './pages/AboutPage';
+import { PrivacyPage } from './pages/PrivacyPage';
+import { TermsPage } from './pages/TermsPage';
+import { ContactPage } from './pages/ContactPage';
 import { ThemeProvider } from './context/ThemeContext';
 import { FloatingControls } from './components/navigation/FloatingControls';
 import { FloatingBot } from './components/navigation/FloatingBot';
@@ -27,6 +31,14 @@ function AnimatedRoutes() {
         <Route path="/learn/:lessonId" element={<LessonView />} />
         <Route path="/play" element={<PlayPage />} />
         <Route path="/practice" element={<PracticePage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/about-us" element={<AboutPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/privacy-policy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/terms-and-conditions" element={<TermsPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/contact-us" element={<ContactPage />} />
       </Routes>
     </AnimatePresence>
   );

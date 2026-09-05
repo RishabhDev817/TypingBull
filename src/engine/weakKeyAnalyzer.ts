@@ -169,7 +169,7 @@ export function analyzeWeakKeys(): WeakKeyRecommendation {
     message = 'Complete a few typing sessions to receive personalized recommendations.';
   }
 
-  // Generate mission if there are weak keys
+  // Generate mission if there are weak keys or tricky combos
   let mission: WeakKeyRecommendation['mission'] = null;
   const targetKeys = significantWeakKeys.map(k => k.key);
 
@@ -178,6 +178,13 @@ export function analyzeWeakKeys(): WeakKeyRecommendation {
       content: generateDrillContent(targetKeys),
       durationMinutes: Math.max(3, targetKeys.length),
       targetKeys,
+    };
+  } else if (significantBigrams.length > 0) {
+    const bigramKeys = Array.from(new Set(significantBigrams.flatMap(b => b.bigram.split(''))));
+    mission = {
+      content: generateDrillContent(bigramKeys),
+      durationMinutes: 5,
+      targetKeys: bigramKeys,
     };
   }
 

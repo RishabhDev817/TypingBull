@@ -1,13 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Sparkles, BookOpen, Lightbulb } from 'lucide-react';
+import { Send, Sparkles, BookOpen, Lightbulb, Bot } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { soundEngine } from '../utils/audio';
 import type { TutorReport } from '../engine/tutorDiagnostics';
+import type { SessionResult } from '../engine/typingEngine';
 
 export interface ChatMessage {
   id: string;
-  role: 'user' | 'assistant';
+  role: 'user' | 'model';
   content: string;
   timestamp: number;
   recommendationLink?: {
@@ -16,8 +17,36 @@ export interface ChatMessage {
   };
 }
 
+/** Gemini API chat history format */
+export interface GeminiHistoryMessage {
+  role: 'user' | 'model';
+  parts: Array<{ text: string }>;
+}
+
+export interface UserStatsPayload {
+  currentWPM?: number;
+  targetWPM?: number;
+  accuracy?: number;
+  grade?: string;
+  errorMap?: Record<string, number>;
+  flaws?: Array<{
+    id: string;
+    label: string;
+    keys: string[];
+    errorRate: number;
+    severity: string;
+    recommendation: string;
+  }>;
+  stamina?: {
+    dropOffPercent: number;
+    verdict: string;
+    message: string;
+  };
+}
+
 interface AITutorChatProps {
   report: TutorReport | null;
+  sessionResult?: SessionResult | null;
   onNavigateToLesson?: (lessonId: number) => void;
 }
 
@@ -28,16 +57,19 @@ const QUICK_PROMPTS = [
   'What is the correct finger posture?',
 ];
 
+const FALLBACK_ERROR_MESSAGE = "Oops, my circuits crossed. Let's try that again!";
+
 export const AITutorChat: React.FC<AITutorChatProps> = ({
   report,
+  sessionResult,
   onNavigateToLesson,
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome_msg',
-      role: 'assistant',
+      role: 'model',
       content:
-        "Hello! I'm your AI Typing Tutor. Ask me anything about finger placement, speed strategies, or your recent stats!",
+        "Hello! I'm BullBot, your personal AI typing coach 🐂⚡ Ask me anything about finger placement, speed strategies, or your recent stats!",
       timestamp: Date.now(),
     },
   ]);
@@ -47,7 +79,7 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-scroll to bottom of chat
+  // Auto-scroll to bottom of chat whenever messages or typing state updates
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -61,76 +93,59 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
     inputRef.current?.focus();
   }, []);
 
-  // Intelligent Contextual Response Generator
-  const generateMockAIResponse = (userPrompt: string): { content: string; lessonLink?: { lessonId: number; label: string } } => {
-    const p = userPrompt.toLowerCase();
+  /** Build live user typing statistics context payload for Gemini */
+  const buildUserStatsPayload = (): UserStatsPayload | undefined => {
+    if (!report && !sessionResult) return undefined;
 
-    // 1. Number row questions
-    if (p.includes('number') || p.includes('digit') || p.includes('123')) {
-      return {
-        content:
-          "To type numbers faster without looking down, use your home row as anchor points! Left Pinky reaches for 1, Left Ring for 2, Left Middle for 3, Left Index for 4 & 5. Right Index hits 6 & 7, Right Middle 8, Right Ring 9, and Right Pinky 0. Practice keeping your wrists steady rather than shifting your whole hand!",
-        lessonLink: { lessonId: 245, label: 'Number Row Drills' },
-      };
-    }
-
-    // 2. Weak key questions
-    if (p.includes('weak') || p.includes('flaw') || p.includes('struggle') || p.includes('error') || p.includes('stat')) {
-      if (report && report.flaws.length > 0) {
-        const topFlaw = report.flaws[0];
-        return {
-          content: `Looking at your diagnostic data, your primary weak spot is ${topFlaw.label} with a ${Math.round(topFlaw.errorRate * 100)}% miss rate on keys [${topFlaw.keys.join(', ').toUpperCase()}]. ${topFlaw.recommendation}`,
-          lessonLink: topFlaw.replayLessonStart
-            ? { lessonId: topFlaw.replayLessonStart, label: `Replay: ${topFlaw.replayLabel}` }
-            : undefined,
-        };
-      }
-      return {
-        content:
-          "Your current accuracy looks solid! To eliminate lingering weak keys, try slowing down by just 5 WPM to focus purely on 100% precision. Accuracy builds muscle memory, which creates effortless speed later.",
-      };
-    }
-
-    // 3. Speed / WPM questions
-    if (p.includes('fast') || p.includes('speed') || p.includes('wpm') || p.includes('stamina')) {
-      return {
-        content:
-          "Speed isn't about frantic finger sprinting — it's about rhythmic cadence! Consistent, uninterrupted typing at 50 WPM beats typing at 80 WPM with frequent backspaces. Focus on reading 1 to 2 words ahead of what your fingers are currently striking.",
-      };
-    }
-
-    // 4. Posture and ergonomics
-    if (p.includes('posture') || p.includes('finger') || p.includes('hand') || p.includes('wrist') || p.includes('pain')) {
-      return {
-        content:
-          "Keep your wrists hovering slightly above the keyboard or desk — never rest your wrists heavily while typing! Curve your fingers naturally as if holding a tennis ball, and strike keys with the fleshy pads of your fingertips.",
-      };
-    }
-
-    // 5. Pinky finger questions
-    if (p.includes('pinky') || p.includes('pinkie') || p.includes('q') || p.includes('p') || p.includes('shift')) {
-      return {
-        content:
-          "Pinkies are naturally the weakest fingers because they share tendons with the ring fingers. Strengthen them by pivoting lightly at the wrist when reaching for Q, P, or Shift rather than stretching the finger alone.",
-        lessonLink: { lessonId: 24, label: 'Top Row Reaches' },
-      };
-    }
-
-    // Fallback response
     return {
-      content:
-        `Great question! Consistent daily 15-minute practice sessions are 3x more effective than one long weekly marathon. Keep your eyes locked on the screen, trust your tactile muscle memory, and let the rhythm carry you! 🐂✨`,
+      currentWPM: report?.averageWpm ?? sessionResult?.wpm,
+      targetWPM: report?.targetWpm,
+      accuracy: sessionResult?.accuracy ?? (report ? 100 : undefined),
+      grade: report?.grade,
+      errorMap: report?.keyHeatmap ?? sessionResult?.perKeyErrors,
+      flaws: report?.flaws.map((f) => ({
+        id: f.id,
+        label: f.label,
+        keys: f.keys,
+        errorRate: f.errorRate,
+        severity: f.severity,
+        recommendation: f.recommendation,
+      })),
+      stamina: report?.stamina
+        ? {
+            dropOffPercent: report.stamina.dropOffPercent,
+            verdict: report.stamina.verdict,
+            message: report.stamina.message,
+          }
+        : undefined,
     };
   };
 
-  // Send message handler
+  /** Format conversation history into Gemini standard structure */
+  const formatHistoryForGemini = (
+    chatMessages: ChatMessage[]
+  ): GeminiHistoryMessage[] => {
+    const formatted = chatMessages.map((msg) => ({
+      role: (msg.role === 'user' ? 'user' : 'model') as 'user' | 'model',
+      parts: [{ text: msg.content }],
+    }));
+
+    // Gemini requires chat history to start with a user message
+    let startIdx = 0;
+    while (startIdx < formatted.length && formatted[startIdx].role !== 'user') {
+      startIdx++;
+    }
+    return formatted.slice(startIdx);
+  };
+
+  // Send message handler using real Google Gemini API
   const handleSendMessage = async (customText?: string) => {
     const textToSend = (customText !== undefined ? customText : inputValue).trim();
     if (!textToSend || isTyping) return;
 
     soundEngine.playPop();
 
-    // 1. Add user message
+    // 1. Add user message to UI state
     const userMsg: ChatMessage = {
       id: `user_${Date.now()}`,
       role: 'user',
@@ -138,26 +153,78 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
       timestamp: Date.now(),
     };
 
-    setMessages((prev) => [...prev, userMsg]);
+    const newHistory = [...messages, userMsg];
+    setMessages(newHistory);
     setInputValue('');
     setIsTyping(true);
 
-    // 2. Simulated Generative AI API Call with 1.5s delay
-    setTimeout(() => {
-      const { content, lessonLink } = generateMockAIResponse(textToSend);
+    // 2. Prepare Gemini payload with chat history and user typing stats
+    const chatHistory = formatHistoryForGemini(newHistory);
+    const userData = buildUserStatsPayload();
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chatHistory,
+          userData,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP_${response.status}`);
+      }
+
+      const data = await response.json();
+      const replyContent = data.reply || data.text;
+
+      if (!replyContent || typeof replyContent !== 'string') {
+        throw new Error('INVALID_RESPONSE');
+      }
+
+      // Check if message recommends a specific replay lesson from flaws
+      let matchedLesson: { lessonId: number; label: string } | undefined;
+      if (report && report.flaws.length > 0) {
+        const topFlaw = report.flaws[0];
+        if (
+          topFlaw.replayLessonStart &&
+          replyContent.toLowerCase().includes(topFlaw.label.toLowerCase())
+        ) {
+          matchedLesson = {
+            lessonId: topFlaw.replayLessonStart,
+            label: `Replay: ${topFlaw.replayLabel}`,
+          };
+        }
+      }
 
       const aiMsg: ChatMessage = {
         id: `ai_${Date.now()}`,
-        role: 'assistant',
-        content,
+        role: 'model',
+        content: replyContent,
         timestamp: Date.now(),
-        recommendationLink: lessonLink,
+        recommendationLink: matchedLesson,
       };
 
       setMessages((prev) => [...prev, aiMsg]);
-      setIsTyping(false);
       soundEngine.playStarEarn();
-    }, 1500);
+    } catch (err) {
+      console.error('[BullBot API Connection Error]:', err);
+
+      // Fallback message strictly required by specifications
+      const errorMsg: ChatMessage = {
+        id: `ai_err_${Date.now()}`,
+        role: 'model',
+        content: FALLBACK_ERROR_MESSAGE,
+        timestamp: Date.now(),
+      };
+
+      setMessages((prev) => [...prev, errorMsg]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -203,6 +270,9 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
                   <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-400 mb-1">
                     <Sparkles className="w-3 h-3 text-amber-500" />
                     <span>BullBot</span>
+                    <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 px-1 py-0.2 rounded bg-purple-100/60 dark:bg-purple-950/40">
+                      Gemini 1.5 Flash
+                    </span>
                   </div>
                 )}
 
@@ -225,37 +295,40 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
           );
         })}
 
-        {/* ─── Animated Typing Indicator ──────────────────────── */}
+        {/* ─── Animated Pulsing Typing Bubble Indicator ──────────────── */}
         <AnimatePresence>
           {isTyping && (
             <motion.div
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 6 }}
+              initial={{ opacity: 0, y: 6, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 6, scale: 0.95 }}
               className="flex items-start gap-2.5"
             >
               <div className="shrink-0 mt-0.5">
-                <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-950/60 border border-purple-300 dark:border-purple-600/50 flex items-center justify-center shadow-xs">
+                <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-950/60 border border-purple-300 dark:border-purple-600/50 flex items-center justify-center shadow-xs animate-pulse">
                   <Mascot mood="thinking" size="xs" />
                 </div>
               </div>
-              <div className="bg-white/85 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700/70 p-3.5 rounded-2xl rounded-tl-xs shadow-xs flex items-center gap-1.5">
-                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 mr-1.5">BullBot is thinking</span>
-                <motion.span
-                  animate={{ y: [0, -5, 0] }}
-                  transition={{ repeat: Infinity, duration: 0.6, delay: 0 }}
-                  className="w-1.5 h-1.5 rounded-full bg-purple-500"
-                />
-                <motion.span
-                  animate={{ y: [0, -5, 0] }}
-                  transition={{ repeat: Infinity, duration: 0.6, delay: 0.15 }}
-                  className="w-1.5 h-1.5 rounded-full bg-indigo-500"
-                />
-                <motion.span
-                  animate={{ y: [0, -5, 0] }}
-                  transition={{ repeat: Infinity, duration: 0.6, delay: 0.3 }}
-                  className="w-1.5 h-1.5 rounded-full bg-pink-500"
-                />
+              <div className="bg-white/85 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700/70 p-3.5 rounded-2xl rounded-tl-xs shadow-xs flex items-center gap-2 backdrop-blur-md">
+                <Bot className="w-3.5 h-3.5 text-purple-500 animate-spin" style={{ animationDuration: '3s' }} />
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400">BullBot is thinking</span>
+                <div className="flex items-center gap-1 ml-1">
+                  <motion.span
+                    animate={{ y: [0, -5, 0], opacity: [0.4, 1, 0.4] }}
+                    transition={{ repeat: Infinity, duration: 0.7, delay: 0 }}
+                    className="w-1.5 h-1.5 rounded-full bg-purple-500"
+                  />
+                  <motion.span
+                    animate={{ y: [0, -5, 0], opacity: [0.4, 1, 0.4] }}
+                    transition={{ repeat: Infinity, duration: 0.7, delay: 0.2 }}
+                    className="w-1.5 h-1.5 rounded-full bg-indigo-500"
+                  />
+                  <motion.span
+                    animate={{ y: [0, -5, 0], opacity: [0.4, 1, 0.4] }}
+                    transition={{ repeat: Infinity, duration: 0.7, delay: 0.4 }}
+                    className="w-1.5 h-1.5 rounded-full bg-pink-500"
+                  />
+                </div>
               </div>
             </motion.div>
           )}
@@ -292,7 +365,7 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={isTyping}
-            placeholder="Ask BullBot a question (e.g. 'How do I type numbers faster?')..."
+            placeholder="Ask BullBot anything (e.g. 'Analyze my weak keys', 'How to hit 80 WPM?')..."
             className="flex-1 bg-transparent text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none disabled:opacity-60"
           />
 

@@ -3,7 +3,6 @@ import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { LayoutDashboard, BookOpen, Gamepad2, Keyboard, Info, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Mascot } from '../Mascot';
-import { CoinCounter } from '../CoinCounter';
 import { soundEngine } from '../../utils/audio';
 
 const navItems = [
@@ -106,15 +105,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, 
         ))}
       </nav>
 
-      {/* Coin counter */}
-      <div className="px-4 py-3 border-t border-hairline/50">
-        <div className="flex items-center justify-between">
-          <div className="sidebar-coin-badge flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 dark:bg-amber-400/10 border border-amber-500/20 dark:border-amber-400/20 shadow-xs">
-            <CoinCounter className="text-amber-600 dark:text-amber-300" compact />
-          </div>
-          <span className="text-[10px] text-mute font-bold tracking-wider">v2.0</span>
-        </div>
-      </div>
     </aside>
   );
 };

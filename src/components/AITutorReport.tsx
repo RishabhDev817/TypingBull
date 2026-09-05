@@ -753,6 +753,7 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
             >
               <AITutorChat
                 report={report}
+                sessionResult={sessionResult}
                 onNavigateToLesson={(lessonId) => {
                   onClose();
                   navigate(`/learn/${lessonId}`);
