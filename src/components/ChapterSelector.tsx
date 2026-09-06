@@ -9,6 +9,8 @@ import { Lock, Star, CheckCircle2, ChevronRight } from 'lucide-react';
 import { SECTIONS, getChaptersInOrder } from '../data/curriculum';
 import type { Chapter } from '../data/lessons/types';
 import { getChapterProgress, isChapterUnlocked } from '../engine/sessionStore';
+import { useI18n } from '../context/I18nContext';
+import { getLocalizedChapter } from '../data/curriculumI18n';
 
 interface ChapterSelectorProps {
   selectedChapterId: string;
@@ -19,6 +21,7 @@ export const ChapterSelector: React.FC<ChapterSelectorProps> = ({
   selectedChapterId,
   onSelectChapter,
 }) => {
+  const { currentLang } = useI18n();
   const orderedChapters = getChaptersInOrder();
 
   // Group chapters by section for display
@@ -44,7 +47,7 @@ export const ChapterSelector: React.FC<ChapterSelectorProps> = ({
             {chapters.map(chapter => (
               <ChapterCard
                 key={chapter.id}
-                chapter={chapter}
+                chapter={getLocalizedChapter(chapter, currentLang)}
                 isSelected={chapter.id === selectedChapterId}
                 onSelect={() => onSelectChapter(chapter.id)}
               />
@@ -63,6 +66,7 @@ interface ChapterCardProps {
 }
 
 const ChapterCard: React.FC<ChapterCardProps> = ({ chapter, isSelected, onSelect }) => {
+  const { t } = useI18n();
   const unlocked = isChapterUnlocked(chapter.lessonRange[0]);
   const progress = getChapterProgress(chapter.lessonRange[0], chapter.lessonRange[1]);
   const isComplete = progress.completed === progress.total;
@@ -141,7 +145,7 @@ const ChapterCard: React.FC<ChapterCardProps> = ({ chapter, isSelected, onSelect
 
         {/* Lesson count */}
         <span className="text-[9px] text-slate-500 mt-0.5 block">
-          {progress.completed}/{progress.total} lessons
+          {progress.completed}/{progress.total} {t('learn.lessonsCount').toLowerCase()}
         </span>
       </div>
 

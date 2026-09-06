@@ -17,6 +17,8 @@ import { soundEngine } from '../../../utils/audio';
 import { AITutorReport } from '../../AITutorReport';
 import type { SessionResult } from '../../../engine/typingEngine';
 import { saveSession } from '../../../engine/sessionStore';
+import { useI18n } from '../../../context/I18nContext';
+import type { SupportedLocale } from '../../../i18n/ui';
 
 interface LilypadLeapGameProps {
   initialLevel?: number;
@@ -27,6 +29,7 @@ export const LilypadLeapGame: React.FC<LilypadLeapGameProps> = ({
   initialLevel = 1,
   onBackToHub,
 }) => {
+  const { t, currentLang } = useI18n();
   const [level, setLevel] = useState<number>(initialLevel);
   const currentConfig: LevelConfig = useMemo(() => {
     return LILYPAD_LEVELS.find((l) => l.level === level) || LILYPAD_LEVELS[0];
@@ -75,11 +78,12 @@ export const LilypadLeapGame: React.FC<LilypadLeapGameProps> = ({
 
   // Initialize or restart level with strict no-repetition word fetching
   const initGame = useCallback(
-    (lvl: number) => {
+    (lvl: number, lang?: SupportedLocale) => {
+      const targetLang = lang || currentLang;
       const cfg = LILYPAD_LEVELS.find((l) => l.level === lvl) || LILYPAD_LEVELS[0];
       const newWaypoints = generateZigzagWaypoints(cfg.leafCount);
       const wordCount = cfg.leafCount - 1; // Words needed to reach Lotus Flower finale
-      const newWords = getLevelWordsNoRepeat(lvl, wordCount);
+      const newWords = getLevelWordsNoRepeat(lvl, wordCount, targetLang);
 
       setLevel(lvl);
       setWordsList(newWords);
@@ -112,15 +116,15 @@ export const LilypadLeapGame: React.FC<LilypadLeapGameProps> = ({
         hiddenInputRef.current?.focus();
       }, 60);
     },
-    []
+    [currentLang]
   );
 
   useEffect(() => {
-    initGame(initialLevel);
+    initGame(initialLevel, currentLang);
     return () => {
       lilypadAudio.stopAmbient();
     };
-  }, [initialLevel, initGame]);
+  }, [initialLevel, currentLang, initGame]);
 
   // Execute Anti-Gravity 2D Parabolic Jump Animation between Zigzag Waypoints
   const executeJump = useCallback(
@@ -287,7 +291,7 @@ export const LilypadLeapGame: React.FC<LilypadLeapGameProps> = ({
         return;
       }
 
-      if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
+      if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey && e.key !== ' ') {
         e.preventDefault();
         handleCharInput(e.key);
       }
@@ -360,7 +364,7 @@ export const LilypadLeapGame: React.FC<LilypadLeapGameProps> = ({
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-2 border-slate-300 dark:border-slate-700 text-xs font-black shadow-sm hover:border-emerald-400 cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Hub (ESC)</span>
+            <span>{t('game.backToHub')}</span>
           </motion.button>
 
           {/* Level Switcher Dropdown */}
@@ -395,7 +399,7 @@ export const LilypadLeapGame: React.FC<LilypadLeapGameProps> = ({
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="text-right mr-1">
             <span className="text-[9px] font-black uppercase text-slate-400 block leading-tight">
-              Progress
+              {t('stats.progress')}
             </span>
             <span className="text-xs sm:text-sm font-black text-emerald-600 dark:text-emerald-400">
               {currentPadIndex + 1} / {currentConfig.leafCount}

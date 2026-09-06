@@ -3,6 +3,8 @@
  */
 
 import { getWeakKeys, getWeakBigrams, getSessions } from './sessionStore';
+import type { SupportedLocale } from '../i18n/ui';
+import { getLocalizedWeakKeyMessage } from '../i18n/tutorTranslations';
 
 export interface WeakKeyRecommendation {
   weakKeys: { key: string; errorRate: number }[];
@@ -16,37 +18,7 @@ export interface WeakKeyRecommendation {
   } | null;
 }
 
-// ─── Finger-to-key map for generating drills ──────────────────────
 
-const FINGER_NAMES: Record<string, string> = {
-  'a': 'left pinky',
-  's': 'left ring',
-  'd': 'left middle',
-  'f': 'left index',
-  'g': 'left index',
-  'h': 'right index',
-  'j': 'right index',
-  'k': 'right middle',
-  'l': 'right ring',
-  ';': 'right pinky',
-  'q': 'left pinky',
-  'w': 'left ring',
-  'e': 'left middle',
-  'r': 'left index',
-  't': 'left index',
-  'y': 'right index',
-  'u': 'right index',
-  'i': 'right middle',
-  'o': 'right ring',
-  'p': 'right pinky',
-  'z': 'left pinky',
-  'x': 'left ring',
-  'c': 'left middle',
-  'v': 'left index',
-  'b': 'left index',
-  'n': 'right index',
-  'm': 'right index',
-};
 
 /**
  * Generate drill content focusing on specific weak keys.
@@ -116,7 +88,7 @@ function generateDrillContent(weakKeys: string[]): string {
 /**
  * Analyze recent sessions and lifetime stats to produce a recommendation.
  */
-export function analyzeWeakKeys(): WeakKeyRecommendation {
+export function analyzeWeakKeys(lang: SupportedLocale = 'en'): WeakKeyRecommendation {
   const weakKeys = getWeakKeys(5);
   const weakBigrams = getWeakBigrams(5);
   const sessions = getSessions();
@@ -145,29 +117,19 @@ export function analyzeWeakKeys(): WeakKeyRecommendation {
     hesitationKeys.sort((a, b) => b.avgDelayMs - a.avgDelayMs);
   }
 
-  // Generate human-readable message
-  let message = '';
+  // Generate human-readable localized message
   const significantWeakKeys = weakKeys.filter(k => k.errorRate > 0.15);
   const significantBigrams = weakBigrams.filter(b => b.errorRate > 0.2);
 
-  if (significantWeakKeys.length > 0) {
-    const keyList = significantWeakKeys.map(k => k.key.toUpperCase()).join(', ');
-    const fingerSet = new Set(significantWeakKeys.map(k => FINGER_NAMES[k.key] || 'unknown').filter(Boolean));
-    const fingers = Array.from(fingerSet).join(' and ');
-
-    message = `Your ${fingers} finger${fingerSet.size > 1 ? 's' : ''} need${fingerSet.size === 1 ? 's' : ''} practice. Keys ${keyList} have high error rates. `;
-    message += `Try the ${Math.max(3, significantWeakKeys.length)}-minute ${keyList} mission before your next lesson.`;
-  } else if (significantBigrams.length > 0) {
-    const bigramList = significantBigrams.map(b => `"${b.bigram}"`).join(', ');
-    message = `Letter combinations ${bigramList} are tripping you up. Practice these transitions to improve your flow.`;
-  } else if (hesitationKeys.length > 0) {
-    const keyList = hesitationKeys.slice(0, 3).map(k => k.key.toUpperCase()).join(', ');
-    message = `You hesitate before pressing ${keyList}. Muscle memory drills for these keys will help build confidence.`;
-  } else if (sessions.length > 0) {
-    message = 'Looking good! No major weak spots detected. Keep practicing to maintain your accuracy.';
-  } else {
-    message = 'Complete a few typing sessions to receive personalized recommendations.';
-  }
+  const message = getLocalizedWeakKeyMessage(
+    {
+      significantWeakKeys,
+      significantBigrams,
+      hesitationKeys,
+      hasSessions: sessions.length > 0,
+    },
+    lang
+  );
 
   // Generate mission if there are weak keys or tricky combos
   let mission: WeakKeyRecommendation['mission'] = null;

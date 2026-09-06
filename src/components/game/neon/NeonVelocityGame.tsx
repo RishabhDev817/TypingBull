@@ -34,6 +34,7 @@ import { neonAudio } from './neonAudio';
 import { soundEngine } from '../../../utils/audio';
 import { Mascot } from '../../Mascot';
 import { AITutorReport } from '../../AITutorReport';
+import { useI18n } from '../../../context/I18nContext';
 
 interface NeonVelocityGameProps {
   onBackToHub?: () => void;
@@ -56,6 +57,12 @@ interface Star {
 }
 
 export const NeonVelocityGame: React.FC<NeonVelocityGameProps> = ({ onBackToHub }) => {
+  const { t, currentLang } = useI18n();
+  const currentLangRef = useRef(currentLang);
+  useEffect(() => {
+    currentLangRef.current = currentLang;
+  }, [currentLang]);
+
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   // High-level React State for UI & HUD
@@ -505,7 +512,7 @@ export const NeonVelocityGame: React.FC<NeonVelocityGameProps> = ({ onBackToHub 
           const selectedLane = Math.random() < 0.7 ? leastCrowdedLanes[0] : leastCrowdedLanes[1];
 
           const isTurboSpawn = engine.isTurboActive;
-          const wordText = getRandomWord(isTurboSpawn);
+          const wordText = getRandomWord(isTurboSpawn, currentLangRef.current);
 
           engine.words.push({
             id: Math.random().toString(),
@@ -1109,7 +1116,7 @@ export const NeonVelocityGame: React.FC<NeonVelocityGameProps> = ({ onBackToHub 
               title="Return to Game Hub"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Hub</span>
+              <span>{t('game.backToHub')}</span>
             </button>
           )}
 
@@ -1180,7 +1187,7 @@ export const NeonVelocityGame: React.FC<NeonVelocityGameProps> = ({ onBackToHub 
           {/* Score & High Score */}
           <div className="flex flex-col text-right">
             <div className="flex items-center justify-end gap-1.5 text-[10px] font-black tracking-widest uppercase text-cyan-400/80">
-              <span>Score</span>
+              <span>{t('game.score')}</span>
               {highScore > 0 && (
                 <span className="text-slate-400 font-bold">HI: {highScore.toLocaleString()}</span>
               )}
@@ -1327,7 +1334,7 @@ export const NeonVelocityGame: React.FC<NeonVelocityGameProps> = ({ onBackToHub 
                   className="w-full py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center justify-center gap-2 border border-slate-700 cursor-pointer active:scale-95 transition-all"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
-                  <span>Restart Session</span>
+                  <span>{t('lesson.restart')}</span>
                 </button>
 
                 {onBackToHub && (
@@ -1336,7 +1343,7 @@ export const NeonVelocityGame: React.FC<NeonVelocityGameProps> = ({ onBackToHub 
                     className="w-full py-3 rounded-2xl bg-transparent hover:bg-slate-800/50 text-slate-400 hover:text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all"
                   >
                     <ArrowLeft className="w-4 h-4" />
-                    <span>Exit to Game Hub</span>
+                    <span>{t('game.backToHub')}</span>
                   </button>
                 )}
               </div>
@@ -1459,7 +1466,7 @@ export const NeonVelocityGame: React.FC<NeonVelocityGameProps> = ({ onBackToHub 
                   className="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-cyan-500 text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/30 cursor-pointer hover:scale-[1.02] active:scale-95 transition-all"
                 >
                   <RotateCcw className="w-4 h-4" />
-                  <span>Re-Engage Highway</span>
+                  <span>{t('lesson.replay')}</span>
                 </button>
 
                 {onBackToHub && (
@@ -1468,7 +1475,7 @@ export const NeonVelocityGame: React.FC<NeonVelocityGameProps> = ({ onBackToHub 
                     className="py-3.5 px-6 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-sm flex items-center justify-center gap-2 border border-slate-700 cursor-pointer active:scale-95 transition-all"
                   >
                     <ArrowLeft className="w-4 h-4" />
-                    <span>Arcade Hub</span>
+                    <span>{t('game.backToHub')}</span>
                   </button>
                 )}
               </div>

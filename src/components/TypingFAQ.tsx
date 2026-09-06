@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, HelpCircle, Search, Sparkles, Gamepad2, Brain, BookOpen, Keyboard } from 'lucide-react';
 import { soundEngine } from '../utils/audio';
+import { useI18n } from '../context/I18nContext';
 
 export type FAQCategory = 'All' | 'Games' | 'AI Tutor' | 'Curriculum' | 'General Typing';
 
@@ -156,6 +157,7 @@ interface TypingFAQProps {
 }
 
 export const TypingFAQ: React.FC<TypingFAQProps> = ({ className = '' }) => {
+  const { t } = useI18n();
   const [activeCategory, setActiveCategory] = useState<FAQCategory>('All');
   const [openIds, setOpenIds] = useState<Set<string>>(new Set(['faq-1']));
   const [searchQuery, setSearchQuery] = useState('');
@@ -197,10 +199,10 @@ export const TypingFAQ: React.FC<TypingFAQProps> = ({ className = '' }) => {
           id="faq-section-title"
           className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-tight"
         >
-          Frequently Asked Questions
+          {t('dash.faqTitle')}
         </h2>
         <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 font-semibold mt-2 leading-relaxed">
-          Everything you need to know about TypingBull curriculum, arcade games, AI diagnostics, and speed benchmarks.
+          {t('dash.faqSubtitle')}
         </p>
       </div>
 

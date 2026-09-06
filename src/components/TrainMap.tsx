@@ -8,6 +8,8 @@ import { getChapterById } from '../data/curriculum';
 import type { LessonDef } from '../data/lessons/types';
 import { getLessonProgressById, isLessonUnlocked } from '../engine/sessionStore';
 import { soundEngine } from '../utils/audio';
+import { useI18n } from '../context/I18nContext';
+import { getLocalizedChapter, getLocalizedLesson } from '../data/curriculumI18n';
 
 /** Region definitions — now derived from the selected chapter */
 function buildRegionsForChapter(lessons: LessonDef[], chapterColor: string, chapterTitle: string) {
@@ -51,7 +53,9 @@ export const TrainMap: React.FC<TrainMapProps> = ({ className = '', chapterId = 
   const [tiePoints, setTiePoints] = useState<TiePoint[]>([]);
 
   // Get filtered lessons for the selected chapter
-  const chapterInfo = getChapterById(chapterId);
+  const { currentLang } = useI18n();
+  const rawChapterInfo = getChapterById(chapterId);
+  const chapterInfo = rawChapterInfo ? getLocalizedChapter(rawChapterInfo, currentLang) : undefined;
   const chapterLessons = useMemo(() => getLessonsForChapter(chapterId), [chapterId]);
   const REGIONS = useMemo(
     () => buildRegionsForChapter(chapterLessons, chapterInfo?.color ?? '#22C55E', chapterInfo?.title ?? 'Chapter'),
@@ -738,7 +742,7 @@ export const TrainMap: React.FC<TrainMapProps> = ({ className = '', chapterId = 
                         fontFamily="Nunito, system-ui, sans-serif"
                         letterSpacing="0.3"
                       >
-                        {lesson.title.split(':')[0]}
+                        {getLocalizedLesson(lesson, currentLang).title.split(':')[0]}
                       </text>
                     </g>
                   ) : null}

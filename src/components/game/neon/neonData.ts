@@ -65,7 +65,13 @@ export const TURBO_WORDS = [
   'singularity', 'nanosecond', 'interstellar', 'electromagnetic', 'hyperdrive'
 ];
 
-export function getRandomWord(isTurbo: boolean): string {
+import { getLocalizedNeonWord } from '../../../data/gameWordsI18n';
+import type { SupportedLocale } from '../../../i18n/ui';
+
+export function getRandomWord(isTurbo: boolean, lang?: SupportedLocale): string {
+  if (lang && lang !== 'en') {
+    return getLocalizedNeonWord(isTurbo, lang);
+  }
   if (isTurbo && Math.random() < 0.65) {
     return TURBO_WORDS[Math.floor(Math.random() * TURBO_WORDS.length)];
   }

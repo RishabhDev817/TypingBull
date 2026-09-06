@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { Target, Zap, AlertTriangle } from 'lucide-react';
 import { analyzeWeakKeys, type WeakKeyRecommendation } from '../engine/weakKeyAnalyzer';
 import { soundEngine } from '../utils/audio';
+import { useI18n } from '../context/I18nContext';
+import { WEAK_KEY_UI_I18N } from '../i18n/tutorTranslations';
 
 interface WeakKeyPanelProps {
   className?: string;
@@ -13,11 +15,13 @@ export const WeakKeyPanel: React.FC<WeakKeyPanelProps> = ({
   className = '',
   onStartMission,
 }) => {
+  const { currentLang } = useI18n();
+  const weakKeyUi = WEAK_KEY_UI_I18N[currentLang] || WEAK_KEY_UI_I18N.en;
   const [recommendation, setRecommendation] = React.useState<WeakKeyRecommendation | null>(null);
 
   React.useEffect(() => {
-    setRecommendation(analyzeWeakKeys());
-  }, []);
+    setRecommendation(analyzeWeakKeys(currentLang));
+  }, [currentLang]);
 
   if (!recommendation) return null;
 
@@ -33,7 +37,7 @@ export const WeakKeyPanel: React.FC<WeakKeyPanelProps> = ({
         {/* Header */}
         <div className="flex items-center gap-2 mb-2 shrink-0">
           <Target className="w-4 h-4 text-highlight-pink" />
-          <h3 className="text-sm font-extrabold text-ink">🎯 Weak-Key Analysis</h3>
+          <h3 className="text-sm font-extrabold text-ink">{weakKeyUi.title}</h3>
         </div>
 
         {/* Text-focused message */}
@@ -84,7 +88,7 @@ export const WeakKeyPanel: React.FC<WeakKeyPanelProps> = ({
           <div className="mb-2 shrink-0">
             <div className="flex items-center gap-1.5 mb-1">
               <AlertTriangle className="w-3 h-3 text-orange" />
-              <span className="text-[10px] font-extrabold text-orange uppercase tracking-wider">Tricky Combos</span>
+              <span className="text-[10px] font-extrabold text-orange uppercase tracking-wider">{weakKeyUi.trickyCombos}</span>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {recommendation.weakBigrams
@@ -121,7 +125,7 @@ export const WeakKeyPanel: React.FC<WeakKeyPanelProps> = ({
           className="w-full btn-chunky btn-chunky-orange text-xs py-2 cursor-pointer mt-1.5 shrink-0"
         >
           <Zap className="w-3.5 h-3.5" />
-          🚀 Start {recommendation.mission.durationMinutes}-min Mission
+          {weakKeyUi.startMission.replace('{min}', String(recommendation.mission.durationMinutes))}
         </motion.button>
       )}
     </motion.div>

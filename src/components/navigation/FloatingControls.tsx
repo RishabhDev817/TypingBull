@@ -2,15 +2,18 @@ import React, { useState } from 'react';
 import { Volume2, VolumeX, Sun, Moon, Clock } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { soundEngine } from '../../utils/audio';
+import { LanguageSwitcher } from '../LanguageSwitcher';
 
 interface FloatingControlsProps {
   className?: string;
   showLabel?: boolean;
+  showLanguageSwitcher?: boolean;
 }
 
 export const FloatingControls: React.FC<FloatingControlsProps> = ({
-  className = 'fixed top-4 right-4 lg:top-5 lg:right-5 z-50 flex flex-col items-center gap-3.5',
+  className = 'flex items-center gap-2',
   showLabel = false,
+  showLanguageSwitcher = true,
 }) => {
   const [muted, setMuted] = useState(soundEngine.muted);
   const { mode, setMode } = useTheme();
@@ -28,33 +31,41 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
     else setMode('auto');
   };
 
+  const hasPosition = /\b(fixed|absolute|sticky|relative|static)\b/.test(className);
+  const basePosition = hasPosition ? '' : 'relative';
+
   return (
-    <div className={className}>
-      {/* 1. Sound Mute Toggle */}
+    <div className={`${basePosition} z-50 flex items-center gap-2 ${className}`.trim()}>
+      {/* 1. Sound Toggle */}
       <button
+        type="button"
         onClick={toggleMute}
-        className="w-11 h-11 rounded-full border border-slate-200/80 dark:border-white/20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl hover:scale-105 active:scale-95 transition-all shadow-[0_8px_20px_rgba(0,0,0,0.3)] cursor-pointer flex items-center justify-center shrink-0"
+        className="h-10 w-10 rounded-full border border-slate-200/80 dark:border-white/20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl hover:scale-105 active:scale-95 transition-all shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_20px_rgba(59,130,246,0.15)] cursor-pointer flex items-center justify-center shrink-0"
         title={muted ? "Unmute sounds" : "Mute sounds"}
         aria-label={muted ? "Unmute sounds" : "Mute sounds"}
       >
         {muted ? (
-          <VolumeX className="w-5 h-5 text-rose-400" />
+          <VolumeX className="w-4.5 h-4.5 text-rose-400" />
         ) : (
-          <Volume2 className="w-5 h-5 text-emerald-400" />
+          <Volume2 className="w-4.5 h-4.5 text-emerald-500 dark:text-emerald-400" />
         )}
       </button>
 
-      {/* 2. Theme Mode Switcher */}
+      {/* 2. Timer / Zen Toggle */}
       <button
+        type="button"
         onClick={cycleTheme}
-        className="w-11 h-11 rounded-full border border-slate-200/80 dark:border-white/20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl hover:scale-105 active:scale-95 transition-all shadow-[0_8px_20px_rgba(0,0,0,0.3)] cursor-pointer flex items-center justify-center shrink-0"
-        title={`Theme: ${mode.toUpperCase()} mode (Click to switch Day/Night/Auto)`}
+        className="h-10 w-10 rounded-full border border-slate-200/80 dark:border-white/20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl hover:scale-105 active:scale-95 transition-all shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_20px_rgba(59,130,246,0.15)] cursor-pointer flex items-center justify-center shrink-0"
+        title={`Theme / Zen: ${mode.toUpperCase()} mode (Click to switch Day/Night/Auto)`}
         aria-label={`Toggle Theme Mode (Current: ${mode})`}
       >
-        {mode === 'day' && <Sun className="w-5 h-5 text-amber-400" />}
-        {mode === 'night' && <Moon className="w-5 h-5 text-indigo-300" />}
-        {mode === 'auto' && <Clock className="w-5 h-5 text-sky-400" />}
+        {mode === 'day' && <Sun className="w-4.5 h-4.5 text-amber-400" />}
+        {mode === 'night' && <Moon className="w-4.5 h-4.5 text-indigo-300" />}
+        {mode === 'auto' && <Clock className="w-4.5 h-4.5 text-sky-400" />}
       </button>
+
+      {/* 3. Language Selector ⌄ (Only on home dashboard) */}
+      {showLanguageSwitcher && <LanguageSwitcher variant="compact" />}
 
       {/* 4. Stat Overview Label (Bottom - when embedded in header block) */}
       {showLabel && (

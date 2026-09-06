@@ -1,4 +1,106 @@
 import React, { useState } from 'react';
+import { useI18n } from '../../context/I18nContext';
+import { LANGUAGES, type SupportedLocale } from '../../i18n/ui';
+
+// ─── International Keyboard Layout Mappings ─────────────────────────
+const JAPANESE_KANA_MAP: Record<string, string> = {
+  '1': 'ぬ', '2': 'ふ', '3': 'あ', '4': 'う', '5': 'え', '6': 'お', '7': 'や', '8': 'ゆ', '9': 'よ', '0': 'わ', '-': 'ほ', '=': 'へ',
+  'q': 'た', 'w': 'て', 'e': 'い', 'r': 'す', 't': 'か', 'y': 'ん', 'u': 'な', 'i': 'に', 'o': 'ら', 'p': 'せ', '[': '゛', ']': '゜',
+  'a': 'ち', 's': 'と', 'd': 'し', 'f': 'は', 'g': 'き', 'h': 'く', 'j': 'ま', 'k': 'の', 'l': 'り', ';': 'れ', "'": 'け',
+  'z': 'つ', 'x': 'さ', 'c': 'そ', 'v': 'ひ', 'b': 'こ', 'n': 'み', 'm': 'も', ',': 'ね', '.': 'る', '/': 'め',
+};
+
+const KOREAN_HANGUL_MAP: Record<string, string> = {
+  'q': 'ㅂ', 'w': 'ㅈ', 'e': 'ㄷ', 'r': 'ㄱ', 't': 'ㅅ', 'y': 'ㅛ', 'u': 'ㅕ', 'i': 'ㅑ', 'o': 'ㅐ', 'p': 'ㅔ',
+  'a': 'ㅁ', 's': 'ㄴ', 'd': 'ㅇ', 'f': 'ㄹ', 'g': 'ㅎ', 'h': 'ㅗ', 'j': 'ㅓ', 'k': 'ㅏ', 'l': 'ㅣ',
+  'z': 'ㅋ', 'x': 'ㅌ', 'c': 'ㅊ', 'v': 'ㅍ', 'b': 'ㅠ', 'n': 'ㅜ', 'm': 'ㅡ',
+};
+
+const HINDI_INSCRIPT_MAP: Record<string, string> = {
+  'q': 'ौ', 'w': 'ै', 'e': 'ा', 'r': 'ी', 't': 'ू', 'y': 'ब', 'u': 'ह', 'i': 'ग', 'o': 'द', 'p': 'ज', '[': 'ड', ']': '़',
+  'a': 'ो', 's': 'े', 'd': '्', 'f': 'ि', 'g': 'ु', 'h': 'प', 'j': 'र', 'k': 'क', 'l': 'त', ';': 'च', "'": 'ट',
+  'z': 'ॆ', 'x': 'ं', 'c': 'म', 'v': 'न', 'b': 'व', 'n': 'ल', 'm': 'स', ',': ',', '.': '.', '/': 'य',
+};
+
+const FRENCH_AZERTY_KEYS: Record<string, { primary: string; sub?: string }> = {
+  'q': { primary: 'A' }, 'w': { primary: 'Z' }, 'e': { primary: 'E' }, 'r': { primary: 'R' }, 't': { primary: 'T' },
+  'y': { primary: 'Y' }, 'u': { primary: 'U' }, 'i': { primary: 'I' }, 'o': { primary: 'O' }, 'p': { primary: 'P' },
+  'a': { primary: 'Q' }, 's': { primary: 'S' }, 'd': { primary: 'D' }, 'f': { primary: 'F' }, 'g': { primary: 'G' },
+  'h': { primary: 'H' }, 'j': { primary: 'J' }, 'k': { primary: 'K' }, 'l': { primary: 'L' }, ';': { primary: 'M' },
+  'z': { primary: 'W' }, 'x': { primary: 'X' }, 'c': { primary: 'C' }, 'v': { primary: 'V' }, 'b': { primary: 'B' },
+  'n': { primary: 'N' }, 'm': { primary: ',', sub: '?' }, ',': { primary: ';', sub: '.' }, '.': { primary: ':', sub: '/' }, '/': { primary: '!', sub: '§' },
+  '1': { primary: '&', sub: '1' }, '2': { primary: 'é', sub: '2' }, '7': { primary: 'è', sub: '7' }, '9': { primary: 'ç', sub: '9' }, '0': { primary: 'à', sub: '0' },
+};
+
+const GERMAN_QWERTZ_KEYS: Record<string, { primary: string; sub?: string }> = {
+  'y': { primary: 'Z' },
+  'z': { primary: 'Y' },
+  '[': { primary: 'Ü' },
+  ';': { primary: 'Ö' },
+  "'": { primary: 'Ä' },
+  '-': { primary: 'ß' },
+};
+
+const SPANISH_ISO_KEYS: Record<string, { primary: string; sub?: string }> = {
+  ';': { primary: 'Ñ' },
+  "'": { primary: '´', sub: '¨' },
+  '[': { primary: '`', sub: '^' },
+  ']': { primary: '+', sub: '*' },
+  '-': { primary: "'", sub: '?' },
+  '=': { primary: '¡', sub: '¿' },
+  '\\': { primary: 'Ç' },
+};
+
+const PORTUGUESE_ABNT_KEYS: Record<string, { primary: string; sub?: string }> = {
+  ';': { primary: 'Ç' },
+  "'": { primary: '~', sub: '^' },
+  '[': { primary: '´', sub: '`' },
+  ']': { primary: '[', sub: '{' },
+  '\\': { primary: ']', sub: '}' },
+};
+
+const ITALIAN_KEYS: Record<string, { primary: string; sub?: string }> = {
+  ';': { primary: 'ò', sub: 'ç' },
+  "'": { primary: 'à', sub: '°' },
+  '[': { primary: 'è', sub: 'é' },
+  ']': { primary: '+', sub: '*' },
+  '\\': { primary: 'ù', sub: '§' },
+};
+
+function getKeycapInfo(keyDef: KeyDef, lang: SupportedLocale): { primary: string; sub?: string } {
+  if (keyDef.isModifier) {
+    return { primary: keyDef.label || keyDef.key.toUpperCase() };
+  }
+
+  const k = keyDef.key.toLowerCase();
+
+  if (lang === 'fr' && FRENCH_AZERTY_KEYS[k]) {
+    return FRENCH_AZERTY_KEYS[k];
+  }
+  if (lang === 'de' && GERMAN_QWERTZ_KEYS[k]) {
+    return GERMAN_QWERTZ_KEYS[k];
+  }
+  if (lang === 'es' && SPANISH_ISO_KEYS[k]) {
+    return SPANISH_ISO_KEYS[k];
+  }
+  if (lang === 'pt' && PORTUGUESE_ABNT_KEYS[k]) {
+    return PORTUGUESE_ABNT_KEYS[k];
+  }
+  if (lang === 'it' && ITALIAN_KEYS[k]) {
+    return ITALIAN_KEYS[k];
+  }
+  if (lang === 'ja' && JAPANESE_KANA_MAP[k]) {
+    return { primary: k.toUpperCase(), sub: JAPANESE_KANA_MAP[k] };
+  }
+  if (lang === 'ko' && KOREAN_HANGUL_MAP[k]) {
+    return { primary: k.toUpperCase(), sub: KOREAN_HANGUL_MAP[k] };
+  }
+  if (lang === 'hi' && HINDI_INSCRIPT_MAP[k]) {
+    return { primary: k.toUpperCase(), sub: HINDI_INSCRIPT_MAP[k] };
+  }
+
+  return { primary: keyDef.label || keyDef.key.toUpperCase() };
+}
 
 /**
  * Finger assignment colors — 8 fingers + 2 thumbs.
@@ -170,6 +272,8 @@ interface KeyboardDiagramProps {
   showSymbols?: boolean;
   /** Show resting touch anchors on home row keys */
   showHandShadows?: boolean;
+  /** Force specific keyboard layout locale; defaults to active website language */
+  layoutLocale?: SupportedLocale;
 }
 
 export const KeyboardDiagram: React.FC<KeyboardDiagramProps> = ({
@@ -182,7 +286,12 @@ export const KeyboardDiagram: React.FC<KeyboardDiagramProps> = ({
   showPatterns = true,
   showSymbols = false,
   showHandShadows = true,
+  layoutLocale,
 }) => {
+  const i18n = useI18n();
+  const currentLang = (layoutLocale || i18n?.currentLang || 'en') as SupportedLocale;
+  const t = i18n?.t || ((k: string) => k);
+
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
 
   const highlightSet = new Set(highlightKeys.map(k => k.toLowerCase()));
@@ -199,6 +308,19 @@ export const KeyboardDiagram: React.FC<KeyboardDiagramProps> = ({
 
   return (
     <div className={`keyboard-diagram-wrapper relative ${className}`}>
+      {/* Dynamic Keyboard Layout Badge */}
+      <div className="flex items-center justify-between gap-2 px-1 mb-2.5">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-1 rounded-full text-[11px] font-extrabold tracking-wide bg-blue-500/15 border border-blue-400/30 text-blue-500 dark:text-blue-400 flex items-center gap-1.5 shadow-sm">
+            <span>⌨️</span>
+            <span>{t(`keyboard.${currentLang}`)}</span>
+          </span>
+          <span className="text-[10.5px] font-semibold text-slate-500 dark:text-slate-400 hidden sm:inline">
+            ({t('keyboard.autoAdapted')} {LANGUAGES[currentLang]?.nativeName || currentLang})
+          </span>
+        </div>
+      </div>
+
       <svg
         viewBox={`0 0 ${svgWidth} ${svgHeight}`}
         className="w-full h-auto max-w-3xl mx-auto drop-shadow-md select-none overflow-visible"
@@ -351,9 +473,9 @@ export const KeyboardDiagram: React.FC<KeyboardDiagramProps> = ({
             filterEffect = `drop-shadow(0 2px 8px ${fingerColor}80)`;
           }
 
-          // Font size adjustments for labels vs single characters
-          const labelText = keyDef.label || keyDef.key.toUpperCase();
-          const isLongLabel = labelText.length > 2;
+          // Localized Keycap representation
+          const keyCap = getKeycapInfo(keyDef, currentLang);
+          const isLongLabel = keyCap.primary.length > 2;
           const fontSize = isLongLabel ? 10 : 13;
 
           return (
@@ -449,23 +571,52 @@ export const KeyboardDiagram: React.FC<KeyboardDiagramProps> = ({
                 </text>
               )}
 
-              {/* Key Label Text */}
-              <text
-                x={px + keyWidthPx / 2}
-                y={py + KEY_SIZE / 2 + 1}
-                textAnchor="middle"
-                dominantBaseline="central"
-                fill={textColor}
-                fontSize={fontSize}
-                fontWeight={isActive || isHighlighted || isHovered ? 700 : keyDef.isModifier ? 500 : 600}
-                letterSpacing={keyDef.key === ' ' ? 2 : 0}
-                style={{
-                  pointerEvents: 'none',
-                  textShadow: isActive || isHighlighted ? '0 1px 2px rgba(0,0,0,0.5)' : 'none',
-                }}
-              >
-                {labelText}
-              </text>
+              {/* Key Label Text (Primary + Sub-character if applicable) */}
+              {keyCap.sub ? (
+                <>
+                  <text
+                    x={px + keyWidthPx / 2}
+                    y={py + KEY_SIZE / 2 - 5}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fill={textColor}
+                    fontSize={11}
+                    fontWeight={700}
+                    style={{ pointerEvents: 'none' }}
+                  >
+                    {keyCap.primary}
+                  </text>
+                  <text
+                    x={px + keyWidthPx / 2}
+                    y={py + KEY_SIZE / 2 + 7}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fill={isActive || isHighlighted ? '#ffffff' : '#38bdf8'}
+                    fontSize={11}
+                    fontWeight={800}
+                    style={{ pointerEvents: 'none' }}
+                  >
+                    {keyCap.sub}
+                  </text>
+                </>
+              ) : (
+                <text
+                  x={px + keyWidthPx / 2}
+                  y={py + KEY_SIZE / 2 + 1}
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fill={textColor}
+                  fontSize={fontSize}
+                  fontWeight={isActive || isHighlighted || isHovered ? 700 : keyDef.isModifier ? 500 : 600}
+                  letterSpacing={keyDef.key === ' ' ? 2 : 0}
+                  style={{
+                    pointerEvents: 'none',
+                    textShadow: isActive || isHighlighted ? '0 1px 2px rgba(0,0,0,0.5)' : 'none',
+                  }}
+                >
+                  {keyCap.primary}
+                </text>
+              )}
 
               {/* Home row indicator tactile bumps (F and J) */}
               {isHomeKey && (

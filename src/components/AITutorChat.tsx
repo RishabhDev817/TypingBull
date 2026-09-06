@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Sparkles, BookOpen, Lightbulb, Bot } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { soundEngine } from '../utils/audio';
+import { useI18n } from '../context/I18nContext';
+import { CHAT_I18N } from '../i18n/tutorTranslations';
 import type { TutorReport } from '../engine/tutorDiagnostics';
 import type { SessionResult } from '../engine/typingEngine';
 
@@ -50,31 +52,37 @@ interface AITutorChatProps {
   onNavigateToLesson?: (lessonId: number) => void;
 }
 
-const QUICK_PROMPTS = [
-  'How do I type numbers faster?',
-  'Why am I struggling with my weak keys?',
-  'How do I break past 60 WPM?',
-  'What is the correct finger posture?',
-];
-
-const FALLBACK_ERROR_MESSAGE = "Oops, my circuits crossed. Let's try that again!";
-
 export const AITutorChat: React.FC<AITutorChatProps> = ({
   report,
   sessionResult,
   onNavigateToLesson,
 }) => {
-  const [messages, setMessages] = useState<ChatMessage[]>([
+  const { currentLang } = useI18n();
+  const chatUi = CHAT_I18N[currentLang] || CHAT_I18N.en;
+
+  const [messages, setMessages] = useState<ChatMessage[]>(() => [
     {
       id: 'welcome_msg',
       role: 'model',
-      content:
-        "Hello! I'm BullBot, your personal AI typing coach 🐂⚡ Ask me anything about finger placement, speed strategies, or your recent stats!",
+      content: (CHAT_I18N[currentLang] || CHAT_I18N.en).welcome,
       timestamp: Date.now(),
     },
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+
+  // Update welcome message if language switches before user sends messages
+  useEffect(() => {
+    setMessages(prev => {
+      if (prev.length === 1 && prev[0].id === 'welcome_msg') {
+        return [{
+          ...prev[0],
+          content: chatUi.welcome,
+        }];
+      }
+      return prev;
+    });
+  }, [currentLang, chatUi.welcome]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -195,7 +203,7 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
         ) {
           matchedLesson = {
             lessonId: topFlaw.replayLessonStart,
-            label: `Replay: ${topFlaw.replayLabel}`,
+            label: `${chatUi.openLesson}: ${topFlaw.replayLabel}`,
           };
         }
       }
@@ -217,7 +225,7 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
       const errorMsg: ChatMessage = {
         id: `ai_err_${Date.now()}`,
         role: 'model',
-        content: FALLBACK_ERROR_MESSAGE,
+        content: chatUi.fallbackError,
         timestamp: Date.now(),
       };
 
@@ -268,7 +276,7 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
               >
                 {!isUser && (
                   <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-400 mb-1">
-                    <Sparkles className="w-3 h-3 text-amber-500" />
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                     <span>BullBot</span>
                     <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 px-1 py-0.2 rounded bg-purple-100/60 dark:bg-purple-950/40">
                       Gemini 1.5 Flash
@@ -287,7 +295,7 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
                     className="mt-2.5 w-full px-3 py-2 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-400/40 dark:border-purple-500/40 text-purple-700 dark:text-purple-300 text-xs font-black flex items-center justify-center gap-2 cursor-pointer transition-all"
                   >
                     <BookOpen className="w-3.5 h-3.5" />
-                    <span>Open {msg.recommendationLink.label}</span>
+                    <span>{msg.recommendationLink.label}</span>
                   </motion.button>
                 )}
               </div>
@@ -311,7 +319,7 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
               </div>
               <div className="bg-white/85 dark:bg-slate-800/80 border border-slate-200/90 dark:border-slate-700/70 p-3.5 rounded-2xl rounded-tl-xs shadow-xs flex items-center gap-2 backdrop-blur-md">
                 <Bot className="w-3.5 h-3.5 text-purple-500 animate-spin" style={{ animationDuration: '3s' }} />
-                <span className="text-xs font-bold text-slate-500 dark:text-slate-400">BullBot is thinking</span>
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400">{chatUi.thinking}</span>
                 <div className="flex items-center gap-1 ml-1">
                   <motion.span
                     animate={{ y: [0, -5, 0], opacity: [0.4, 1, 0.4] }}
@@ -340,10 +348,10 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
       {/* ─── Quick Suggestion Chips ───────────────────────────── */}
       <div className="pt-2 pb-2.5 overflow-x-auto no-scrollbar flex items-center gap-2 border-t border-slate-200/70 dark:border-slate-800/80">
         <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 shrink-0 flex items-center gap-1">
-          <Lightbulb className="w-3 h-3 text-amber-500" />
-          Suggestions:
+          <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
+          {chatUi.suggestions}
         </span>
-        {QUICK_PROMPTS.map((prompt) => (
+        {chatUi.quickPrompts.map((prompt) => (
           <button
             key={prompt}
             onClick={() => handleSendMessage(prompt)}
@@ -365,7 +373,7 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={isTyping}
-            placeholder="Ask BullBot anything (e.g. 'Analyze my weak keys', 'How to hit 80 WPM?')..."
+            placeholder={chatUi.placeholder}
             className="flex-1 bg-transparent text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none disabled:opacity-60"
           />
 

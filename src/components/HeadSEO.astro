@@ -1,0 +1,78 @@
+---
+/**
+ * Global HeadSEO Component for Astro
+ * Injects dynamic hreflang tags for all 9 supported locales + x-default
+ * along with canonical URL, localized meta title, and description.
+ */
+import { LANGUAGES, LOCALES, DEFAULT_LOCALE, type SupportedLocale } from '../i18n/ui';
+import { getLangFromUrl, generateHreflangLinks, useTranslations } from '../i18n/utils';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  canonicalUrl?: string;
+}
+
+const { title, description, image = '/og-image.png', canonicalUrl } = Astro.props;
+
+// Current route information
+const currentPathname = Astro.url.pathname;
+const currentLang = getLangFromUrl(Astro.url);
+const t = useTranslations(currentLang);
+
+const metaTitle = title || t('seo.defaultTitle');
+const metaDescription = description || t('seo.defaultDescription');
+
+// Site URL configuration (falls back to production domain)
+const siteUrl = Astro.site ? Astro.site.toString() : 'https://typingbull.com';
+
+// Generate dynamic hreflang alternate links (including x-default)
+const hreflangEntries = generateHreflangLinks(currentPathname, siteUrl);
+
+// Computed canonical link for this specific localized page
+const currentCanonical = canonicalUrl || new URL(currentPathname, siteUrl).href;
+---
+
+<!-- Character & Viewport -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<!-- Primary Meta Tags -->
+<title>{metaTitle}</title>
+<meta name="title" content={metaTitle} />
+<meta name="description" content={metaDescription} />
+<meta name="keywords" content={t('seo.keywords')} />
+
+<!-- Canonical URL -->
+<link rel="canonical" href={currentCanonical} />
+
+<!-- ================================================================= -->
+<!-- DYNAMIC HREFLANG ALTERNATE TAGS (Targeting International Keywords) -->
+<!-- ================================================================= -->
+{
+  hreflangEntries.map(({ locale, href }) => (
+    <link rel="alternate" hreflang={locale} href={href} />
+  ))
+}
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content={currentCanonical} />
+<meta property="og:title" content={metaTitle} />
+<meta property="og:description" content={metaDescription} />
+<meta property="og:image" content={new URL(image, siteUrl).href} />
+<meta property="og:locale" content={currentLang} />
+{
+  LOCALES.filter((l) => l !== currentLang).map((altLocale) => (
+    <meta property="og:locale:alternate" content={altLocale} />
+  ))
+}
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content={currentCanonical} />
+<meta property="twitter:title" content={metaTitle} />
+<meta property="twitter:description" content={metaDescription} />
+<meta property="twitter:image" content={new URL(image, siteUrl).href} />

@@ -6,69 +6,62 @@ import { KeyboardDiagram, FINGER_COLORS, FINGER_SYMBOLS } from '../components/ke
 import { FingerGuide } from '../components/keyboard/FingerGuide';
 import { Mascot } from '../components/Mascot';
 import { soundEngine } from '../utils/audio';
-
-const tips = [
-  { emoji: '🪑', title: 'Posture', text: 'Sit upright with feet flat on the floor. Keep your back straight and shoulders relaxed.', color: '#2196F3' },
-  { emoji: '🖐️', title: 'Wrist Position', text: 'Float your wrists slightly above the keyboard. Don\'t rest them on the desk while typing.', color: '#4CAF50' },
-  { emoji: '🏠', title: 'Home Row', text: 'Always return to F-D-S-A and J-K-L-; after each word. The bumps on F and J are your landmarks.', color: '#FF9800' },
-  { emoji: '👀', title: 'Eyes on Screen', text: 'Look at the screen, not the keyboard. Trust your fingers — muscle memory builds with practice.', color: '#9C27B0' },
-  { emoji: '🎯', title: 'Accuracy First', text: 'Focus on hitting the right keys before chasing speed. Speed comes naturally after accuracy.', color: '#FF4081' },
-];
+import { useI18n } from '../context/I18nContext';
 
 const FINGER_MAP_DATA = [
   {
     idx: 0,
-    hand: 'Left Hand',
-    finger: 'Pinky',
+    handKey: 'guide.leftHand',
+    fingerKey: 'guide.pinky',
     homeKey: 'A',
     keys: ['A', 'Q', 'Z', '1', '`', 'Tab', 'Caps', 'Shift'],
   },
   {
     idx: 1,
-    hand: 'Left Hand',
-    finger: 'Ring',
+    handKey: 'guide.leftHand',
+    fingerKey: 'guide.ring',
     homeKey: 'S',
     keys: ['S', 'W', 'X', '2'],
   },
   {
     idx: 2,
-    hand: 'Left Hand',
-    finger: 'Middle',
+    handKey: 'guide.leftHand',
+    fingerKey: 'guide.middle',
     homeKey: 'D',
     keys: ['D', 'E', 'C', '3'],
   },
   {
     idx: 3,
-    hand: 'Left Hand',
-    finger: 'Index',
+    handKey: 'guide.leftHand',
+    fingerKey: 'guide.index',
     homeKey: 'F',
     keys: ['F', 'R', 'T', 'V', 'B', 'G', '4', '5'],
   },
   {
     idx: 4,
-    hand: 'Right Hand',
-    finger: 'Index',
+    handKey: 'guide.rightHand',
+    fingerKey: 'guide.index',
     homeKey: 'J',
     keys: ['J', 'Y', 'U', 'N', 'M', 'H', '6', '7'],
   },
   {
     idx: 5,
-    hand: 'Right Hand',
-    finger: 'Middle',
+    handKey: 'guide.rightHand',
+    fingerKey: 'guide.middle',
     homeKey: 'K',
     keys: ['K', 'I', ',', '8'],
   },
   {
     idx: 6,
-    hand: 'Right Hand',
-    finger: 'Ring',
+    handKey: 'guide.rightHand',
+    fingerKey: 'guide.ring',
     homeKey: 'L',
     keys: ['L', 'O', '.', '9'],
   },
   {
     idx: 7,
-    hand: 'Right Hand',
-    finger: 'Pinky',
+    handKey: 'guide.rightHand',
+    fingerKey: 'guide.pinky',
     homeKey: ';',
     keys: [';', 'P', '/', '0', '-', '=', '[', ']', "'", 'Enter', 'Shift'],
   },
@@ -76,9 +69,18 @@ const FINGER_MAP_DATA = [
 
 export const GuidelinesPage: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const [hoveredFingerIdx, setHoveredFingerIdx] = useState<number | null>(null);
   const [colorblindAssist, setColorblindAssist] = useState(true);
   const [showHands, setShowHands] = useState(true);
+
+  const tips = [
+    { emoji: '🪑', title: t('guide.tip.posture.title'), text: t('guide.tip.posture.desc'), color: '#2196F3' },
+    { emoji: '🖐️', title: t('guide.tip.wrist.title'), text: t('guide.tip.wrist.desc'), color: '#4CAF50' },
+    { emoji: '🏠', title: t('guide.tip.homeRow.title'), text: t('guide.tip.homeRow.desc'), color: '#FF9800' },
+    { emoji: '👀', title: t('guide.tip.eyes.title'), text: t('guide.tip.eyes.desc'), color: '#9C27B0' },
+    { emoji: '🎯', title: t('guide.tip.accuracy.title'), text: t('guide.tip.accuracy.desc'), color: '#FF4081' },
+  ];
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -90,8 +92,8 @@ export const GuidelinesPage: React.FC = () => {
     visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 80, damping: 12 } },
   };
 
-  const leftHandFingers = FINGER_MAP_DATA.filter(f => f.hand === 'Left Hand');
-  const rightHandFingers = FINGER_MAP_DATA.filter(f => f.hand === 'Right Hand');
+  const leftHandFingers = FINGER_MAP_DATA.filter(f => f.handKey === 'guide.leftHand');
+  const rightHandFingers = FINGER_MAP_DATA.filter(f => f.handKey === 'guide.rightHand');
 
   return (
     <motion.div
@@ -104,10 +106,10 @@ export const GuidelinesPage: React.FC = () => {
       <motion.div variants={itemVariants} className="text-center mb-8">
         <Mascot mood="thinking" size="md" className="mb-2" />
         <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white drop-shadow-sm tracking-tight leading-tight">
-          ⌨️ How to Type Like a Pro
+          {t('guide.title')}
         </h1>
         <p className="text-slate-800 dark:text-slate-200 text-sm md:text-base mt-2 max-w-lg mx-auto font-bold leading-relaxed drop-shadow-sm">
-          Correct finger placement is the secret to fast, accurate typing. Learn the tactile anchors and key assignments below!
+          {t('guide.subtitle')}
         </p>
       </motion.div>
 
@@ -115,7 +117,7 @@ export const GuidelinesPage: React.FC = () => {
       <motion.div variants={itemVariants} className="card-frontlit p-5 md:p-8 mb-6">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-base font-extrabold text-ink">🎹 Interactive Keyboard Layout</span>
+            <span className="text-base font-extrabold text-ink">{t('guide.keyboardTitle')}</span>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -133,7 +135,7 @@ export const GuidelinesPage: React.FC = () => {
               title="Toggle home row resting touch anchors on keyboard"
             >
               <Hand className="w-3.5 h-3.5" />
-              <span>Touch Anchors: {showHands ? 'ON' : 'OFF'}</span>
+              <span>{t('guide.touchAnchors')}: {showHands ? 'ON' : 'OFF'}</span>
             </button>
 
             {/* Colorblind / Tactile Assist Toggle */}
@@ -150,7 +152,7 @@ export const GuidelinesPage: React.FC = () => {
               title="Toggle tactile patterns and shape symbols for colorblind accessibility"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Tactile Assist: {colorblindAssist ? 'ON' : 'OFF'}</span>
+              <span>{t('guide.tactileAssist')}: {colorblindAssist ? 'ON' : 'OFF'}</span>
             </button>
           </div>
         </div>
@@ -168,10 +170,10 @@ export const GuidelinesPage: React.FC = () => {
         <div className="flex flex-wrap items-center justify-center gap-3 text-xs font-semibold text-body mt-5 pt-3 border-t border-hairline/60">
           <span className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
-            Home Row (A–;) with Tactile Bumps on <strong>F &amp; J</strong>
+            {t('guide.homeRowNotice')}
           </span>
           <span className="text-hairline-strong">•</span>
-          <span>Each finger has a distinct color, texture pattern, and geometric symbol 🌈</span>
+          <span>{t('guide.distinctColors')}</span>
         </div>
       </motion.div>
 
@@ -180,17 +182,17 @@ export const GuidelinesPage: React.FC = () => {
         <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
           <div>
             <h2 className="text-base md:text-lg font-black text-ink flex items-center gap-2">
-              <span>🗺️ Finger → Key Map</span>
+              <span>🗺️ {t('guide.map.title')}</span>
               <span className="text-xs font-bold bg-primary/10 text-primary-dark dark:text-primary-light px-2.5 py-0.5 rounded-full border border-primary/20">
-                Accessible Guide
+                {t('guide.map.badge')}
               </span>
             </h2>
             <p className="text-xs text-body font-semibold mt-0.5">
-              Identifiable by Hand, Finger Name, Tactile Texture, and Home Anchor key.
+              {t('guide.map.desc')}
             </p>
           </div>
           <div className="text-xs font-mono text-mute hidden sm:block">
-            Hover any card to highlight keys
+            {t('guide.map.hover')}
           </div>
         </div>
 
@@ -200,9 +202,9 @@ export const GuidelinesPage: React.FC = () => {
           <div className="bg-canvas/60 rounded-2xl p-3.5 border border-hairline flex flex-col gap-2.5">
             <div className="flex items-center justify-between px-1 pb-1 border-b border-hairline/70">
               <span className="text-xs font-black text-ink uppercase tracking-wider flex items-center gap-1.5">
-                <span>🤚 Left Hand</span>
+                <span>🤚 {t('guide.leftHand')}</span>
               </span>
-              <span className="text-[11px] font-bold text-mute">Home Anchor: A - S - D - F</span>
+              <span className="text-[11px] font-bold text-mute">{t('guide.homeAnchor')}: A - S - D - F</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -233,15 +235,15 @@ export const GuidelinesPage: React.FC = () => {
                           >
                             {sym.symbol}
                           </span>
-                          <span className="text-xs font-extrabold text-ink">{f.finger}</span>
+                          <span className="text-xs font-extrabold text-ink">{t(f.fingerKey)}</span>
                         </div>
                         <span className="text-[10px] font-extrabold bg-canvas px-1.5 py-0.5 rounded-md border border-hairline text-ink">
-                          Home: <strong>{f.homeKey}</strong>
+                          {t('guide.home')}: <strong>{f.homeKey}</strong>
                         </span>
                       </div>
 
                       <div className="text-[10px] font-semibold text-mute mb-2">
-                        Pattern: {sym.patternLabel}
+                        {t('guide.pattern')}: {sym.patternLabel}
                       </div>
                     </div>
 
@@ -267,9 +269,9 @@ export const GuidelinesPage: React.FC = () => {
           <div className="bg-canvas/60 rounded-2xl p-3.5 border border-hairline flex flex-col gap-2.5">
             <div className="flex items-center justify-between px-1 pb-1 border-b border-hairline/70">
               <span className="text-xs font-black text-ink uppercase tracking-wider flex items-center gap-1.5">
-                <span>✋ Right Hand</span>
+                <span>✋ {t('guide.rightHand')}</span>
               </span>
-              <span className="text-[11px] font-bold text-mute">Home Anchor: J - K - L - ;</span>
+              <span className="text-[11px] font-bold text-mute">{t('guide.homeAnchor')}: J - K - L - ;</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -300,15 +302,15 @@ export const GuidelinesPage: React.FC = () => {
                           >
                             {sym.symbol}
                           </span>
-                          <span className="text-xs font-extrabold text-ink">{f.finger}</span>
+                          <span className="text-xs font-extrabold text-ink">{t(f.fingerKey)}</span>
                         </div>
                         <span className="text-[10px] font-extrabold bg-canvas px-1.5 py-0.5 rounded-md border border-hairline text-ink">
-                          Home: <strong>{f.homeKey}</strong>
+                          {t('guide.home')}: <strong>{f.homeKey}</strong>
                         </span>
                       </div>
 
                       <div className="text-[10px] font-semibold text-mute mb-2">
-                        Pattern: {sym.patternLabel}
+                        {t('guide.pattern')}: {sym.patternLabel}
                       </div>
                     </div>
 
@@ -335,7 +337,7 @@ export const GuidelinesPage: React.FC = () => {
         <div className="mt-3 p-2.5 rounded-xl bg-canvas border border-hairline flex items-center justify-between text-xs text-body font-semibold">
           <span className="flex items-center gap-2">
             <span className="w-4 h-4 rounded-full bg-slate-400 flex items-center justify-center text-[9px] font-black text-white">—</span>
-            <span><strong>Thumbs (Both Hands):</strong> Reserved exclusively for the <strong>Space Bar</strong></span>
+            <span><strong>{t('guide.thumbs')}:</strong> {t('guide.thumbsNote')}</span>
           </span>
           <span className="font-mono text-[11px] bg-canvas-soft-2 px-2 py-0.5 rounded border border-hairline">[SPACE]</span>
         </div>
@@ -346,10 +348,10 @@ export const GuidelinesPage: React.FC = () => {
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
             <Hand className="w-5 h-5 text-violet" />
-            <span className="text-sm font-extrabold text-ink">Natural Resting Posture &amp; Hand Anatomy</span>
+            <span className="text-sm font-extrabold text-ink">{t('guide.handAnatomy')}</span>
           </div>
           <span className="text-xs font-mono text-mute uppercase tracking-wider">
-            3D Anatomical Guide
+            {t('guide.anatomicalGuide')}
           </span>
         </div>
         <FingerGuide
@@ -384,7 +386,7 @@ export const GuidelinesPage: React.FC = () => {
             onClick={() => { soundEngine.playPop(); navigate('/learn'); }}
             className="btn-chunky btn-chunky-green text-lg cursor-pointer"
           >
-            🚂 Start Your Journey!
+            {t('guide.cta')}
             <ArrowRight className="w-5 h-5" />
           </motion.button>
         </motion.div>

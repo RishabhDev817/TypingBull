@@ -21,6 +21,8 @@ import { Mascot } from './Mascot';
 import { AITutorChat } from './AITutorChat';
 import { soundEngine } from '../utils/audio';
 import type { SessionResult } from '../engine/typingEngine';
+import { useI18n } from '../context/I18nContext';
+import { TUTOR_UI_STRINGS } from '../i18n/tutorTranslations';
 import {
   generateSessionReport,
   generateLifetimeReport,
@@ -135,19 +137,6 @@ function getHeatGlow(errorRate: number): string {
   return '0 0 18px rgba(220, 38, 38, 0.7)';
 }
 
-const GRADE_CONFIG = {
-  'excellent': { label: 'Excellent', emoji: '✨', color: '#22C55E', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.4)' },
-  'good': { label: 'Good', emoji: '👍', color: '#3B82F6', bg: 'rgba(59, 130, 246, 0.15)', border: 'rgba(59, 130, 246, 0.4)' },
-  'needs-work': { label: 'Needs Work', emoji: '💪', color: '#F59E0B', bg: 'rgba(245, 158, 11, 0.15)', border: 'rgba(245, 158, 11, 0.4)' },
-  'struggling': { label: 'Keep Trying', emoji: '🔧', color: '#EF4444', bg: 'rgba(239, 68, 68, 0.15)', border: 'rgba(239, 68, 68, 0.4)' },
-};
-
-const SEVERITY_CONFIG = {
-  'high': { label: 'High', color: '#EF4444', bg: 'rgba(239, 68, 68, 0.15)', border: 'rgba(239, 68, 68, 0.35)' },
-  'medium': { label: 'Medium', color: '#F59E0B', bg: 'rgba(245, 158, 11, 0.15)', border: 'rgba(245, 158, 11, 0.35)' },
-  'low': { label: 'Low', color: '#22C55E', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
-};
-
 const STAMINA_COLORS = {
   'strong': '#22C55E',
   'moderate': '#F59E0B',
@@ -164,20 +153,35 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
   showReplayButtons = true,
 }) => {
   const navigate = useNavigate();
+  const { currentLang } = useI18n();
+  const ui = TUTOR_UI_STRINGS[currentLang] || TUTOR_UI_STRINGS.en;
   const [report, setReport] = useState<TutorReport | null>(null);
   const [typewriterText, setTypewriterText] = useState('');
   const [activeTab, setActiveTab] = useState<'analytics' | 'chat'>('analytics');
+
+  const gradeConfig = {
+    'excellent': { label: ui.grades.excellent, emoji: '✨', color: '#22C55E', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.4)' },
+    'good': { label: ui.grades.good, emoji: '👍', color: '#3B82F6', bg: 'rgba(59, 130, 246, 0.15)', border: 'rgba(59, 130, 246, 0.4)' },
+    'needs-work': { label: ui.grades.needsWork, emoji: '💪', color: '#F59E0B', bg: 'rgba(245, 158, 11, 0.15)', border: 'rgba(245, 158, 11, 0.4)' },
+    'struggling': { label: ui.grades.struggling, emoji: '🔧', color: '#EF4444', bg: 'rgba(239, 68, 68, 0.15)', border: 'rgba(239, 68, 68, 0.4)' },
+  };
+
+  const severityConfig = {
+    'high': { label: ui.severities.high, color: '#EF4444', bg: 'rgba(239, 68, 68, 0.15)', border: 'rgba(239, 68, 68, 0.35)' },
+    'medium': { label: ui.severities.medium, color: '#F59E0B', bg: 'rgba(245, 158, 11, 0.15)', border: 'rgba(245, 158, 11, 0.35)' },
+    'low': { label: ui.severities.low, color: '#22C55E', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
+  };
 
   // Generate report
   useEffect(() => {
     if (!isOpen) return;
     const r = sessionResult
-      ? generateSessionReport(sessionResult, targetWpm)
-      : generateLifetimeReport(targetWpm);
+      ? generateSessionReport(sessionResult, targetWpm, currentLang)
+      : generateLifetimeReport(targetWpm, currentLang);
     setReport(r);
     setTypewriterText('');
     setActiveTab('analytics');
-  }, [isOpen, sessionResult, targetWpm]);
+  }, [isOpen, sessionResult, targetWpm, currentLang]);
 
   // Typewriter effect for mascot message
   useEffect(() => {
@@ -207,7 +211,7 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
 
   if (!report) return null;
 
-  const gradeInfo = GRADE_CONFIG[report.grade];
+  const gradeInfo = gradeConfig[report.grade];
 
   // ─── Heatmap sub-component ─────────────────────────────────
   // ─── Heatmap sub-component ─────────────────────────────────
@@ -389,7 +393,7 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
 
   // ─── Flaw card sub-component ───────────────────────────────
   const renderFlawCard = (flaw: FlawDiagnosis) => {
-    const sevInfo = SEVERITY_CONFIG[flaw.severity];
+    const sevInfo = severityConfig[flaw.severity];
 
     return (
       <motion.div
@@ -412,7 +416,7 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
             <span className="text-xs font-extrabold text-slate-900 dark:text-white">{flaw.label}</span>
           </div>
           <span className="text-xs font-black" style={{ color: sevInfo.color }}>
-            {Math.round(flaw.errorRate * 100)}% err
+            {Math.round(flaw.errorRate * 100)}% {ui.errSuffix}
           </span>
         </div>
 
@@ -466,7 +470,7 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
             }}
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            🔄 Replay Lesson: {flaw.replayLabel}
+            🔄 {ui.replayLesson}: {flaw.replayLabel}
           </motion.button>
         )}
       </motion.div>
@@ -515,10 +519,10 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
                 <div>
                   <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
                     <Brain className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                    AI Typing Tutor
+                    {ui.title}
                   </h2>
                   <p className="text-xs text-slate-500 dark:text-slate-400 font-bold mt-0.5">
-                    {sessionResult ? 'Session Analysis' : 'Lifetime Overview'}
+                    {sessionResult ? ui.sessionAnalysis : ui.lifetimeOverview}
                   </p>
                 </div>
 
@@ -556,7 +560,7 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
                   )}
                   <span className="relative z-10 flex items-center gap-1.5">
                     <span>📊</span>
-                    <span>Analytics</span>
+                    <span>{ui.tabs.analytics}</span>
                   </span>
                 </button>
 
@@ -577,7 +581,7 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
                   )}
                   <span className="relative z-10 flex items-center gap-1.5">
                     <span>💬</span>
-                    <span>Chat Tutor</span>
+                    <span>{ui.tabs.chat}</span>
                   </span>
                 </button>
               </div>
@@ -616,7 +620,7 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                     <TrendingUp className="w-3.5 h-3.5 text-sky-500" />
-                    Average WPM vs Target
+                    {ui.wpmVsTarget}
                   </span>
                   <span className="text-xs font-black text-slate-900 dark:text-white">
                     {report.averageWpm} <span className="text-slate-500 dark:text-slate-400">/ {report.targetWpm} WPM</span>
@@ -640,7 +644,7 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
                 {report.averageWpm >= report.targetWpm && (
                   <div className="flex items-center gap-1.5 mt-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Target reached! Time to level up.</span>
+                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">{ui.targetReached}</span>
                   </div>
                 )}
               </div>
@@ -650,7 +654,7 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
                 <div className="mb-5">
                   <h3 className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
                     <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
-                    Identified Weaknesses ({report.flaws.length})
+                    {ui.identifiedWeaknesses} ({report.flaws.length})
                   </h3>
                   <div className="space-y-3">
                     {report.flaws.map(renderFlawCard)}
@@ -663,7 +667,7 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
                   className="p-4 rounded-2xl mb-5 text-center bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-300/80 dark:border-emerald-600/40"
                 >
                   <Sparkles className="w-6 h-6 text-emerald-500 mx-auto mb-1" />
-                  <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300">No major weaknesses detected — great job!</p>
+                  <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300">{ui.noFlaws}</p>
                 </div>
               )}
 
@@ -671,7 +675,7 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
               <div className="mb-5">
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
                   <Zap className="w-3.5 h-3.5 text-amber-500" />
-                  Weak Key Heatmap
+                  {ui.weakKeyHeatmap}
                 </h3>
                 <div
                   className="p-4 md:p-5 rounded-2xl flex justify-center bg-white/75 dark:bg-slate-800/60 border border-slate-200/90 dark:border-slate-700/60 shadow-xs overflow-visible"
@@ -681,10 +685,10 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
                 {/* Heatmap legend */}
                 <div className="flex items-center justify-center gap-4 mt-2.5">
                   {[
-                    { label: 'No Errors', color: 'rgba(241, 245, 249, 0.95)', border: '1px solid rgba(203, 213, 225, 0.9)' },
-                    { label: 'Low', color: 'rgba(250, 204, 21, 0.45)', border: '1px solid rgba(250, 204, 21, 0.6)' },
-                    { label: 'Medium', color: 'rgba(251, 146, 60, 0.65)', border: '1px solid rgba(251, 146, 60, 0.8)' },
-                    { label: 'High', color: 'rgba(239, 68, 68, 0.75)', border: '1px solid rgba(239, 68, 68, 0.9)' },
+                    { label: ui.heatmapLegend.noErrors, color: 'rgba(241, 245, 249, 0.95)', border: '1px solid rgba(203, 213, 225, 0.9)' },
+                    { label: ui.heatmapLegend.low, color: 'rgba(250, 204, 21, 0.45)', border: '1px solid rgba(250, 204, 21, 0.6)' },
+                    { label: ui.heatmapLegend.medium, color: 'rgba(251, 146, 60, 0.65)', border: '1px solid rgba(251, 146, 60, 0.8)' },
+                    { label: ui.heatmapLegend.high, color: 'rgba(239, 68, 68, 0.75)', border: '1px solid rgba(239, 68, 68, 0.9)' },
                   ].map(l => (
                     <div key={l.label} className="flex items-center gap-1.5">
                       <div className="w-3 h-3 rounded shadow-2xs" style={{ background: l.color, border: l.border }} />
@@ -699,7 +703,7 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
                 <div className="mb-5">
                   <h3 className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
                     <BarChart3 className="w-3.5 h-3.5 text-sky-500" />
-                    Typing Stamina
+                    {ui.typingStamina}
                     <span
                       className="ml-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase"
                       style={{
@@ -708,7 +712,7 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
                         border: `1px solid ${STAMINA_COLORS[report.stamina.verdict]}40`,
                       }}
                     >
-                      {report.stamina.verdict} {report.stamina.dropOffPercent > 0 && `(-${report.stamina.dropOffPercent}%)`}
+                      {ui.staminaVerdicts[report.stamina.verdict]} {report.stamina.dropOffPercent > 0 && `(-${report.stamina.dropOffPercent}%)`}
                     </span>
                   </h3>
 
@@ -736,7 +740,7 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
                   }}
                   className="px-9 py-3 rounded-2xl text-sm font-black text-white cursor-pointer bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 hover:from-purple-500 hover:to-indigo-500 shadow-lg shadow-purple-500/25 transition-all"
                 >
-                  Got It 👍
+                  {ui.gotIt}
                 </motion.button>
               </div>
             </motion.div>

@@ -4,14 +4,7 @@ import { motion } from 'framer-motion';
 import { LayoutDashboard, BookOpen, Gamepad2, Keyboard, Info, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Mascot } from '../Mascot';
 import { soundEngine } from '../../utils/audio';
-
-const navItems = [
-  { to: '/', icon: LayoutDashboard, label: 'Home', color: '#2196F3' },
-  { to: '/guidelines', icon: Info, label: 'Guide', color: '#9C27B0' },
-  { to: '/learn', icon: BookOpen, label: 'Learn', color: '#4CAF50' },
-  { to: '/play', icon: Gamepad2, label: 'Play', color: '#FF4081' },
-  { to: '/practice', icon: Keyboard, label: 'Practice', color: '#FF9800' },
-];
+import { useI18n } from '../../context/I18nContext';
 
 interface SidebarProps {
   collapsed?: boolean;
@@ -19,8 +12,17 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, onToggle }) => {
+  const { t } = useI18n();
   const [internalCollapsed, setInternalCollapsed] = useState(false);
   const isCollapsed = externalCollapsed !== undefined ? externalCollapsed : internalCollapsed;
+
+  const navItems = [
+    { to: '/', icon: LayoutDashboard, label: t('nav.home'), color: '#2196F3' },
+    { to: '/guidelines', icon: Info, label: t('nav.guidelines'), color: '#9C27B0' },
+    { to: '/learn', icon: BookOpen, label: t('nav.learn'), color: '#4CAF50' },
+    { to: '/play', icon: Gamepad2, label: t('nav.play'), color: '#FF4081' },
+    { to: '/practice', icon: Keyboard, label: t('nav.practice'), color: '#FF9800' },
+  ];
 
   const toggleSidebar = () => {
     soundEngine.playPop();
@@ -104,7 +106,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, 
           </NavLink>
         ))}
       </nav>
-
     </aside>
   );
 };

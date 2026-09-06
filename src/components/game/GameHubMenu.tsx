@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Play, Lock, Sparkles, Zap, Code2, Trophy } from 'lucide-react';
 import { Mascot } from '../Mascot';
+import { useI18n } from '../../context/I18nContext';
 
 interface GameHubMenuProps {
   onSelectKidsGame: (level?: number) => void;
@@ -9,6 +10,7 @@ interface GameHubMenuProps {
 }
 
 export const GameHubMenu: React.FC<GameHubMenuProps> = ({ onSelectKidsGame, onSelectNeonVelocity }) => {
+  const { t } = useI18n();
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -41,21 +43,21 @@ export const GameHubMenu: React.FC<GameHubMenuProps> = ({ onSelectKidsGame, onSe
 
         <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 text-xs font-extrabold uppercase tracking-wider mb-3">
           <Trophy className="w-3.5 h-3.5" />
-          <span>Typing Arcade & Game Hub</span>
+          <span>{t('game.hub.title')}</span>
         </motion.div>
 
         <motion.h1
           variants={itemVariants}
           className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight"
         >
-          Choose Your Arena
+          {t('game.hub.title')}
         </motion.h1>
 
         <motion.p
           variants={itemVariants}
           className="text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-xl mx-auto mt-2 font-bold leading-relaxed"
         >
-          Gamified typing challenges tailored for every age group — from fun vocabulary adventures for kids to high-speed reflex drills and developer syntax battles.
+          {t('game.hub.subtitle')}
         </motion.p>
       </motion.div>
 
@@ -100,13 +102,13 @@ export const GameHubMenu: React.FC<GameHubMenuProps> = ({ onSelectKidsGame, onSe
 
             {/* Title & Description */}
             <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              Lilypad Leap
+              {t('game.lilypad.title')}
             </h3>
             <p className="text-xs font-black text-emerald-800 dark:text-emerald-300 mt-0.5">
-              Focus: Core Vocabulary & Nouns
+              {t('game.lilypad.focus')}
             </p>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-semibold mt-2.5 leading-relaxed">
-              Help the friendly frog leap across floating lilypads by typing meaningful 3-letter to 6-letter educational nouns. Features joyful parabolic jump physics!
+              {t('game.lilypad.desc')}
             </p>
 
             {/* Level Pills */}
@@ -138,7 +140,7 @@ export const GameHubMenu: React.FC<GameHubMenuProps> = ({ onSelectKidsGame, onSe
               className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 text-white font-black text-base shadow-lg shadow-emerald-500/30 border-b-4 border-emerald-700 flex items-center justify-center gap-2 cursor-pointer"
             >
               <Play className="w-5 h-5 fill-current" />
-              <span>Play Lilypad Leap</span>
+              <span>{t('game.lilypad.play')}</span>
             </motion.button>
           </div>
         </motion.div>
@@ -181,13 +183,13 @@ export const GameHubMenu: React.FC<GameHubMenuProps> = ({ onSelectKidsGame, onSe
 
             {/* Title & Description */}
             <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-              <span>Neon Velocity</span>
+              <span>{t('game.neon.title')}</span>
             </h3>
             <p className="text-xs font-black text-cyan-700 dark:text-cyan-300 mt-0.5">
-              Focus: Pure WPM Speed & Reflexes
+              {t('game.neon.focus')}
             </p>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-semibold mt-2.5 leading-relaxed">
-              High-intensity synthwave gauntlet. Lock onto incoming multi-lane word obstacles, fire laser blasts, rack up streak multipliers, and survive sudden death!
+              {t('game.neon.desc')}
             </p>
 
             {/* Features pills */}
@@ -216,7 +218,7 @@ export const GameHubMenu: React.FC<GameHubMenuProps> = ({ onSelectKidsGame, onSe
               className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 text-white font-black text-base shadow-lg shadow-cyan-500/30 border-b-4 border-cyan-700 flex items-center justify-center gap-2 cursor-pointer"
             >
               <Zap className="w-5 h-5 fill-current" />
-              <span>Launch Neon Velocity</span>
+              <span>{t('game.neon.play')}</span>
             </motion.button>
           </div>
         </motion.div>

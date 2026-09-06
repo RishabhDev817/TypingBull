@@ -9,8 +9,10 @@ import { ChapterSelector } from '../components/ChapterSelector';
 import { Mascot } from '../components/Mascot';
 import { CoinCounter } from '../components/CoinCounter';
 import { FloatingControls } from '../components/navigation/FloatingControls';
+import { useI18n } from '../context/I18nContext';
 
 export const LearnPage: React.FC = () => {
+  const { t } = useI18n();
   const totalStars = getTotalStars();
   const completedCount = getCompletedLessonCount();
 
@@ -55,13 +57,13 @@ export const LearnPage: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-xl md:text-2xl lg:text-3xl font-extrabold tracking-tight flex items-center gap-2 text-white">
-                🚂 The Great Typing Railway
+                {t('learn.title')}
               </h1>
             </div>
             <p className="text-xs md:text-sm font-bold mt-0.5 text-slate-300">
               {completedCount >= LESSONS.length
-                ? '🎉 All 685 Lessons Mastered! You are a legendary Typing Champion!'
-                : `Currently exploring: ${selectedChapter.icon} ${selectedChapter.title} (${selectedChapter.lessonRange[0]}–${selectedChapter.lessonRange[1]})`}
+                ? t('learn.allMastered')
+                : `${t('learn.exploring')} ${selectedChapter.icon} ${selectedChapter.title} (${selectedChapter.lessonRange[0]}–${selectedChapter.lessonRange[1]})`}
             </p>
           </div>
         </div>
@@ -74,19 +76,19 @@ export const LearnPage: React.FC = () => {
             className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-2xl border border-sky-400/40 bg-sky-500/20 text-sky-300 text-xs font-extrabold hover:bg-sky-500/30 transition-all cursor-pointer"
           >
             <Layers className="w-3.5 h-3.5" />
-            <span>Chapters</span>
+            <span>{t('learn.chapters')}</span>
           </button>
 
           {/* Station Count Chip */}
           <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl border-2 font-extrabold text-xs md:text-sm shadow-sm bg-emerald-500/20 border-emerald-400/50 text-emerald-300">
             <Train className="w-4 h-4 text-emerald-400" />
-            <span>{completedCount}/{LESSONS.length} Lessons</span>
+            <span>{completedCount}/{LESSONS.length} {t('learn.lessonsCount')}</span>
           </div>
 
           {/* Stars Chip */}
           <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl border-2 font-extrabold text-xs md:text-sm shadow-sm bg-amber-500/20 border-amber-400/50 text-amber-300">
             <Star className="w-4 h-4 fill-amber-400 text-amber-500" />
-            <span>{totalStars}/{LESSONS.length * 3} Stars</span>
+            <span>{totalStars}/{LESSONS.length * 3} {t('learn.starsCount')}</span>
           </div>
 
           {/* Coin Counter Pill Badge */}
@@ -97,7 +99,7 @@ export const LearnPage: React.FC = () => {
           {/* Quick Progress Bar with High-Visibility Lightened Track */}
           <div className="w-full md:w-32 lg:w-40 flex flex-col gap-1">
             <div className="flex justify-between text-[11px] font-extrabold text-slate-300">
-              <span>Curriculum</span>
+              <span>{t('learn.curriculum')}</span>
               <span>{Math.round((completedCount / LESSONS.length) * 100)}%</span>
             </div>
             <div

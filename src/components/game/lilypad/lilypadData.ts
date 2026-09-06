@@ -317,6 +317,9 @@ export const NOUN_POOLS: Record<number, string[]> = {
 
 const sessionUsedWords = new Set<string>();
 
+import { getLocalizedLilypadWords } from '../../../data/gameWordsI18n';
+import type { SupportedLocale } from '../../../i18n/ui';
+
 export function resetSessionUsedWords(): void {
   sessionUsedWords.clear();
 }
@@ -324,7 +327,11 @@ export function resetSessionUsedWords(): void {
 /**
  * Retrieves a list of unique nouns for the specific level with STRICT NO REPETITION.
  */
-export function getLevelWordsNoRepeat(level: number, count: number): string[] {
+export function getLevelWordsNoRepeat(level: number, count: number, lang?: SupportedLocale): string[] {
+  if (lang && lang !== 'en') {
+    return getLocalizedLilypadWords(level, count, lang);
+  }
+
   let pool: string[] = [];
 
   if (level === 1) {

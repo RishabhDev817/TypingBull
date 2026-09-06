@@ -15,14 +15,19 @@ import { Mascot } from '../components/Mascot';
 import type { MascotMood } from '../components/Mascot';
 import { AITutorReport } from '../components/AITutorReport';
 import type { SessionResult } from '../engine/typingEngine';
+import { useI18n } from '../context/I18nContext';
+import { getLocalizedLesson, getLocalizedChapter } from '../data/curriculumI18n';
 
 type LessonState = 'ready' | 'typing' | 'completed';
 
 export const LessonView: React.FC = () => {
   const { lessonId } = useParams<{ lessonId: string }>();
   const navigate = useNavigate();
-  const lesson = getLessonById(Number(lessonId));
-  const chapter = lesson ? getChapterByLessonId(lesson.id) : undefined;
+  const { t, currentLang } = useI18n();
+  const rawLesson = getLessonById(Number(lessonId));
+  const rawChapter = rawLesson ? getChapterByLessonId(rawLesson.id) : undefined;
+  const lesson = rawLesson ? getLocalizedLesson(rawLesson, currentLang) : undefined;
+  const chapter = rawChapter ? getLocalizedChapter(rawChapter, currentLang) : undefined;
 
   const isReadingLesson = lesson?.type === 'introduction' || lesson?.type === 'tip' || (lesson?.type === 'travel' && !lesson.content);
 
@@ -194,19 +199,19 @@ export const LessonView: React.FC = () => {
   const getTypeBadge = () => {
     switch (lesson.type) {
       case 'introduction':
-        return { label: 'Introduction', icon: <BookOpen className="w-3.5 h-3.5" />, color: 'bg-sky-500/20 text-sky-300 border-sky-400/40' };
+        return { label: t('lesson.introduction'), icon: <BookOpen className="w-3.5 h-3.5" />, color: 'bg-sky-500/20 text-sky-300 border-sky-400/40' };
       case 'tip':
-        return { label: 'Ergonomic & Mind Tip', icon: <Lightbulb className="w-3.5 h-3.5" />, color: 'bg-amber-500/20 text-amber-300 border-amber-400/40' };
+        return { label: t('lesson.introduction'), icon: <Lightbulb className="w-3.5 h-3.5" />, color: 'bg-amber-500/20 text-amber-300 border-amber-400/40' };
       case 'travel':
-        return { label: 'Finger Travel', icon: <Compass className="w-3.5 h-3.5" />, color: 'bg-indigo-500/20 text-indigo-300 border-indigo-400/40' };
+        return { label: t('lesson.fingerTravel'), icon: <Compass className="w-3.5 h-3.5" />, color: 'bg-indigo-500/20 text-indigo-300 border-indigo-400/40' };
       case 'play':
-        return { label: 'Gamified Play', icon: <Sparkles className="w-3.5 h-3.5" />, color: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40' };
+        return { label: t('lesson.gamifiedPlay'), icon: <Sparkles className="w-3.5 h-3.5" />, color: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40' };
       case 'paragraph':
-        return { label: 'Thematic Paragraph', icon: <BookOpen className="w-3.5 h-3.5" />, color: 'bg-purple-500/20 text-purple-300 border-purple-400/40' };
+        return { label: t('lesson.thematicParagraph'), icon: <BookOpen className="w-3.5 h-3.5" />, color: 'bg-purple-500/20 text-purple-300 border-purple-400/40' };
       case 'test':
-        return { label: 'Speed & Accuracy Assessment', icon: <Trophy className="w-3.5 h-3.5" />, color: 'bg-rose-500/20 text-rose-300 border-rose-400/40' };
+        return { label: t('lesson.speedAssessment'), icon: <Trophy className="w-3.5 h-3.5" />, color: 'bg-rose-500/20 text-rose-300 border-rose-400/40' };
       default:
-        return { label: 'Skill Drill', icon: <Zap className="w-3.5 h-3.5" />, color: 'bg-blue-500/20 text-blue-300 border-blue-400/40' };
+        return { label: t('lesson.skillDrill'), icon: <Zap className="w-3.5 h-3.5" />, color: 'bg-blue-500/20 text-blue-300 border-blue-400/40' };
     }
   };
 
@@ -223,14 +228,14 @@ export const LessonView: React.FC = () => {
           onClick={() => { soundEngine.playPop(); navigate('/learn'); }}
           className="flex items-center gap-1.5 text-xs text-slate-300 hover:text-white font-bold transition-all bg-slate-900/80 px-3.5 py-2 rounded-xl border border-white/15 backdrop-blur-md cursor-pointer shadow-md"
         >
-          <ArrowLeft className="w-3.5 h-3.5" /> Back to Map
+          <ArrowLeft className="w-3.5 h-3.5" /> {t('lesson.backToMap')}
         </motion.button>
 
         <div className="flex items-center gap-3">
           <Mascot mood={getMascotMood()} size="xs" />
           <div className="text-right">
             <span className="text-xs font-extrabold text-white block">
-              Lesson {lesson.id} <span className="text-slate-400 font-normal">/ {LESSONS.length}</span>
+              {t('lesson.lessonNum', { n: lesson.id })} <span className="text-slate-400 font-normal">/ {LESSONS.length}</span>
             </span>
             {chapter && (
               <span className="text-[10px] font-bold text-sky-300 block">
@@ -246,7 +251,7 @@ export const LessonView: React.FC = () => {
               onClick={handleRestart}
               className="flex items-center gap-1.5 text-xs text-slate-300 hover:text-white font-bold bg-slate-900/80 px-3 py-2 rounded-xl border border-white/15 backdrop-blur-md cursor-pointer shadow-md"
             >
-              <RotateCcw className="w-3.5 h-3.5" /> Restart
+              <RotateCcw className="w-3.5 h-3.5" /> {t('lesson.restart')}
             </motion.button>
           )}
         </div>
@@ -260,7 +265,7 @@ export const LessonView: React.FC = () => {
           </span>
           {lesson.wpmGoal && (
             <span className="px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 font-extrabold">
-              Goal: {lesson.wpmGoal} WPM
+              {t('lesson.goal', { wpm: lesson.wpmGoal })}
             </span>
           )}
         </div>
@@ -297,14 +302,14 @@ export const LessonView: React.FC = () => {
           {lesson.fingerGuide && (
             <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-indigo-950/40 border border-indigo-400/30 text-indigo-200 text-xs font-bold">
               <Compass className="w-4 h-4 text-indigo-400" />
-              <span>Assigned Finger: <strong className="text-white">{lesson.fingerGuide}</strong></span>
+              <span>{t('lesson.assignedFinger')} <strong className="text-white">{lesson.fingerGuide}</strong></span>
             </div>
           )}
 
           {lesson.targetKeys.length > 0 && (
             <div className="p-4 rounded-2xl bg-slate-950/50 border border-white/10">
               <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 mb-3 text-center">
-                Target Keyboard Coordinates
+                {t('lesson.targetCoordinates')}
               </div>
               <KeyboardDiagram
                 highlightKeys={lesson.targetKeys}
@@ -318,10 +323,10 @@ export const LessonView: React.FC = () => {
             <div className="text-xs text-slate-400">
               {existingProgress?.completed ? (
                 <span className="flex items-center gap-1.5 text-emerald-400 font-bold">
-                  <CheckCircle2 className="w-4 h-4" /> Completed (+3 Stars)
+                  <CheckCircle2 className="w-4 h-4" /> {t('lesson.completedStars')}
                 </span>
               ) : (
-                <span>Read the guideline above to proceed.</span>
+                <span>{t('lesson.readGuideline')}</span>
               )}
             </div>
 
@@ -331,7 +336,7 @@ export const LessonView: React.FC = () => {
               onClick={handleCompleteReadingLesson}
               className="btn-chunky btn-chunky-green text-sm px-6 py-3 flex items-center gap-2 cursor-pointer"
             >
-              <span>{hasNextLesson ? 'Got It & Continue' : 'Finish Chapter'}</span>
+              <span>{hasNextLesson ? t('lesson.gotIt') : t('lesson.finishChapter')}</span>
               <ArrowRight className="w-4 h-4" />
             </motion.button>
           </div>
@@ -456,13 +461,29 @@ export const LessonView: React.FC = () => {
             >
               <Mascot mood={passed ? 'cheering' : 'sad'} size="lg" className="mx-auto mb-3" />
 
-              <h3 className="text-2xl font-black mb-1 text-white">
-                {passed ? '🎉 Awesome Job!' : '😅 Almost There!'}
-              </h3>
-              <p className="text-xs text-slate-300 font-semibold mb-5">
+              <h2 className="text-2xl font-black text-white mb-1">
+                {passed ? `🎉 ${t('lesson.completedStars')}` : `💪 ${t('practice.practice')}`}
+              </h2>
+              <p className="text-xs text-slate-400 mb-5">
                 {passed
-                  ? `Mastered with ${engine.metrics.accuracy.toFixed(1)}% accuracy at ${engine.metrics.wpm} WPM!`
-                  : `You need ${lesson.passingAccuracy}% accuracy to pass. You got ${engine.metrics.accuracy.toFixed(1)}%.`}
+                  ? (currentLang === 'es' ? '¡Excelente digitación! Sigue con ese ritmo.' :
+                     currentLang === 'ja' ? '素晴らしいタイピングです！その調子で続けましょう。' :
+                     currentLang === 'fr' ? 'Superbe frappe ! Gardez le rythme.' :
+                     currentLang === 'de' ? 'Hervorragendes Tippen! Weiter so.' :
+                     currentLang === 'pt' ? 'Ótima digitação! Mantenha o ritmo.' :
+                     currentLang === 'ko' ? '훌륭한 타이핑입니다! 계속 힘내세요.' :
+                     currentLang === 'it' ? 'Ottima digitazione! Continua così.' :
+                     currentLang === 'hi' ? 'शानदार टाइपिंग! इसी गति को बनाए रखें।' :
+                     'Great typing! Keep up the momentum.')
+                  : (currentLang === 'es' ? `Necesitas ${lesson.passingAccuracy}% de precisión para aprobar. Obtuviste ${engine.metrics.accuracy.toFixed(1)}%.` :
+                     currentLang === 'ja' ? `合格には精度 ${lesson.passingAccuracy}% が必要です。結果: ${engine.metrics.accuracy.toFixed(1)}%` :
+                     currentLang === 'fr' ? `Vous avez besoin de ${lesson.passingAccuracy}% de précision pour réussir. Obtenu : ${engine.metrics.accuracy.toFixed(1)}%.` :
+                     currentLang === 'de' ? `Sie benötigen ${lesson.passingAccuracy}% Genauigkeit. Erreicht: ${engine.metrics.accuracy.toFixed(1)}%.` :
+                     currentLang === 'pt' ? `Você precisa de ${lesson.passingAccuracy}% de precisão para passar. Conseguiu ${engine.metrics.accuracy.toFixed(1)}%.` :
+                     currentLang === 'ko' ? `통과하려면 ${lesson.passingAccuracy}% 정확도가 필요합니다. 달성: ${engine.metrics.accuracy.toFixed(1)}%.` :
+                     currentLang === 'it' ? `Serve il ${lesson.passingAccuracy}% di precisione per superare. Ottenuto: ${engine.metrics.accuracy.toFixed(1)}%.` :
+                     currentLang === 'hi' ? `पास होने के लिए ${lesson.passingAccuracy}% सटीकता चाहिए। आपने प्राप्त किया ${engine.metrics.accuracy.toFixed(1)}%।` :
+                     `You need ${lesson.passingAccuracy}% accuracy to pass. You got ${engine.metrics.accuracy.toFixed(1)}%.`)}
               </p>
 
               {/* Stars */}
@@ -485,9 +506,9 @@ export const LessonView: React.FC = () => {
               {/* Stats */}
               <div className="grid grid-cols-3 gap-3 mb-6">
                 {[
-                  { label: 'WPM', value: engine.metrics.wpm, color: '#38BDF8' },
-                  { label: 'Accuracy', value: `${engine.metrics.accuracy.toFixed(1)}%`, color: '#4ADE80' },
-                  { label: 'Streak', value: engine.maxStreak, color: '#FBBF24' },
+                  { label: t('lesson.speed'), value: `${engine.metrics.wpm} WPM`, color: '#38BDF8' },
+                  { label: t('lesson.accuracy'), value: `${engine.metrics.accuracy.toFixed(1)}%`, color: '#4ADE80' },
+                  { label: t('lesson.streak'), value: engine.maxStreak, color: '#FBBF24' },
                 ].map(({ label, value, color }) => (
                   <div key={label} className="p-3 rounded-2xl bg-slate-800/80 border border-white/10">
                     <span className="text-[10px] font-extrabold uppercase block" style={{ color }}>{label}</span>
@@ -508,7 +529,7 @@ export const LessonView: React.FC = () => {
                 }}
               >
                 <Brain className="w-3.5 h-3.5" />
-                📊 View AI Report
+                📊 {t('lesson.aiReport')}
               </motion.button>
 
               {/* Action buttons */}
@@ -519,7 +540,7 @@ export const LessonView: React.FC = () => {
                   onClick={handleRestart}
                   className="flex-1 btn-chunky btn-chunky-orange text-sm py-3 cursor-pointer"
                 >
-                  <RotateCcw className="w-4 h-4 inline mr-1" /> Retry
+                  <RotateCcw className="w-4 h-4 inline mr-1" /> {t('lesson.replay')}
                 </motion.button>
                 {passed && hasNextLesson ? (
                   <motion.button
@@ -535,7 +556,7 @@ export const LessonView: React.FC = () => {
                     }}
                     className="flex-1 btn-chunky btn-chunky-green text-sm py-3 cursor-pointer flex items-center justify-center gap-1"
                   >
-                    <span>Next</span>
+                    <span>{t('lesson.nextLesson')}</span>
                     <ArrowRight className="w-4 h-4" />
                   </motion.button>
                 ) : (
@@ -545,7 +566,7 @@ export const LessonView: React.FC = () => {
                     onClick={() => { soundEngine.playPop(); navigate('/learn'); }}
                     className="flex-1 btn-chunky btn-chunky-blue text-sm py-3 cursor-pointer"
                   >
-                    Map 🗺️
+                    {t('lesson.backToMap')} 🗺️
                   </motion.button>
                 )}
               </div>

@@ -2,25 +2,30 @@ import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
 import { RotateCcw, ArrowRight, AlertTriangle, BookOpen, Clock, Brain } from 'lucide-react';
 import { Mascot } from '../components/Mascot';
-import { PRACTICE_LEVELS, calculateAllocatedTime, type PracticeLevel, type PracticePassage } from '../data/practiceLevels';
+import { calculateAllocatedTime, type PracticeLevel, type PracticePassage } from '../data/practiceLevels';
+import { getLocalizedPracticeLevels } from '../data/practicePassagesI18n';
 import { soundEngine } from '../utils/audio';
 import { ConfettiFireworks } from '../components/game/ConfettiFireworks';
 import { FloatingControls } from '../components/navigation/FloatingControls';
 import { AITutorReport } from '../components/AITutorReport';
 import type { SessionResult, WpmWindow } from '../engine/typingEngine';
 import { saveSession } from '../engine/sessionStore';
+import { useI18n } from '../context/I18nContext';
 
 type PracticeStatus = 'idle' | 'typing' | 'completed' | 'failed';
 
 export const PracticePage: React.FC = () => {
+  const { t, currentLang } = useI18n();
   // Level & Passage State (12 Levels)
   const [currentLevelNum, setCurrentLevelNum] = useState<number>(1);
   const [passageIndex, setPassageIndex] = useState<number>(0);
   const [tierFilter, setTierFilter] = useState<'all' | 'story' | 'stamina-essay'>('all');
 
+  const practiceLevels = useMemo(() => getLocalizedPracticeLevels(currentLang), [currentLang]);
+
   const currentLevel: PracticeLevel = useMemo(() => {
-    return PRACTICE_LEVELS.find((l) => l.level === currentLevelNum) || PRACTICE_LEVELS[0];
-  }, [currentLevelNum]);
+    return practiceLevels.find((l) => l.level === currentLevelNum) || practiceLevels[0];
+  }, [practiceLevels, currentLevelNum]);
 
   const currentPassage: PracticePassage = useMemo(() => {
     return currentLevel.passages[passageIndex] || currentLevel.passages[0];
@@ -116,7 +121,7 @@ export const PracticePage: React.FC = () => {
     }
 
     const nextLvlNum = levelNum !== undefined ? levelNum : currentLevelNum;
-    const nextLvl = PRACTICE_LEVELS.find((l) => l.level === nextLvlNum) || PRACTICE_LEVELS[0];
+    const nextLvl = practiceLevels.find((l) => l.level === nextLvlNum) || practiceLevels[0];
     const nextPIdx = pIdx !== undefined ? pIdx : passageIndex;
     const nextPassage = nextLvl.passages[nextPIdx] || nextLvl.passages[0];
     const calculatedTime = calculateAllocatedTime(nextPassage.text, nextLvl.targetWPM);
@@ -150,7 +155,12 @@ export const PracticePage: React.FC = () => {
     setTimeout(() => {
       hiddenInputRef.current?.focus();
     }, 60);
-  }, [currentLevelNum, passageIndex]);
+  }, [practiceLevels, currentLevelNum, passageIndex]);
+
+  // Re-sync on language change
+  useEffect(() => {
+    initLevel(currentLevelNum, passageIndex);
+  }, [currentLang]);
 
   // Switch level
   const handleSelectLevel = (lvlNum: number) => {
@@ -328,9 +338,9 @@ export const PracticePage: React.FC = () => {
 
   // Filtered levels based on category
   const filteredLevels = useMemo(() => {
-    if (tierFilter === 'all') return PRACTICE_LEVELS;
-    return PRACTICE_LEVELS.filter((l) => l.type === tierFilter);
-  }, [tierFilter]);
+    if (tierFilter === 'all') return practiceLevels;
+    return practiceLevels.filter((l) => l.type === tierFilter);
+  }, [practiceLevels, tierFilter]);
 
   return (
     <div className="w-full max-w-6xl mx-auto px-3 sm:px-6 py-4 md:py-8 flex flex-col items-center select-none">
@@ -342,7 +352,7 @@ export const PracticePage: React.FC = () => {
         {/* Left: Practice Section Badge */}
         <div className="flex items-center gap-2">
           <span className="px-3.5 py-1.5 rounded-2xl bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
-            ⌨️ Practice Arena
+            {t('practice.title')}
           </span>
         </div>
 
@@ -474,7 +484,7 @@ export const PracticePage: React.FC = () => {
           className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 text-xs font-black text-slate-700 dark:text-slate-200 hover:border-emerald-400 shadow-sm cursor-pointer"
         >
           <RotateCcw className="w-3.5 h-3.5" />
-          <span>Reset Level (ESC)</span>
+          <span>{t('practice.restart')} (ESC)</span>
         </button>
       </div>
 
@@ -566,14 +576,14 @@ export const PracticePage: React.FC = () => {
                     className="px-5 py-3 rounded-2xl bg-purple-500/20 hover:bg-purple-500/30 text-purple-200 font-black text-sm border border-purple-500/30 flex items-center gap-1.5 cursor-pointer transition-all"
                   >
                     <Brain className="w-4 h-4" />
-                    <span>AI Report</span>
+                    <span>{t('lesson.aiReport')}</span>
                   </button>
-                  {currentLevelNum < PRACTICE_LEVELS.length && (
+                  {currentLevelNum < practiceLevels.length && (
                     <button
                       onClick={() => handleSelectLevel(currentLevelNum + 1)}
                       className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-sm shadow-xl flex items-center gap-2 cursor-pointer hover:scale-105 transition-all"
                     >
-                      <span>Next Level ({currentLevelNum + 1})</span>
+                      <span>{t('lesson.nextLesson')} ({currentLevelNum + 1})</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
                   )}
@@ -582,7 +592,7 @@ export const PracticePage: React.FC = () => {
                     className="px-5 py-3 rounded-2xl bg-white/20 hover:bg-white/30 text-white font-black text-sm border border-white/30 flex items-center gap-1.5 cursor-pointer"
                   >
                     <RotateCcw className="w-4 h-4" />
-                    <span>Replay</span>
+                    <span>{t('lesson.replay')}</span>
                   </button>
                 </div>
               </motion.div>
@@ -705,7 +715,7 @@ export const PracticePage: React.FC = () => {
           {/* Live Speed & Accuracy Gauges */}
           <div className="p-5 rounded-3xl bg-white/90 dark:bg-slate-900/90 border-2 border-slate-200 dark:border-slate-700 shadow-xl flex flex-col gap-3.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-black uppercase text-slate-400">Live Speed</span>
+              <span className="text-xs font-black uppercase text-slate-400">{t('dash.speed')}</span>
               <span className="text-xl font-black text-amber-500">
                 {currentWpm} <span className="text-xs font-bold text-slate-400">WPM</span>
               </span>
@@ -713,7 +723,7 @@ export const PracticePage: React.FC = () => {
             <div className="h-[1px] bg-slate-200 dark:bg-slate-800" />
 
             <div className="flex items-center justify-between">
-              <span className="text-xs font-black uppercase text-slate-400">Accuracy</span>
+              <span className="text-xs font-black uppercase text-slate-400">{t('dash.accuracy')}</span>
               <span className="text-xl font-black text-emerald-500">
                 {accuracy}%
               </span>
@@ -721,7 +731,7 @@ export const PracticePage: React.FC = () => {
             <div className="h-[1px] bg-slate-200 dark:bg-slate-800" />
 
             <div className="flex items-center justify-between">
-              <span className="text-xs font-black uppercase text-slate-400">Mistakes</span>
+              <span className="text-xs font-black uppercase text-slate-400">{t('practice.errors')}</span>
               <span className={`text-xl font-black ${mistakesCount > 0 ? 'text-rose-500' : 'text-slate-400'}`}>
                 {mistakesCount}
               </span>

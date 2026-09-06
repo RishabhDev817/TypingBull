@@ -1,0 +1,140 @@
+---
+/**
+ * Astro Native Glassmorphic Language Switcher Component
+ * Usage: <LanguageSwitcher />
+ */
+import { LANGUAGES, LOCALES, DEFAULT_LOCALE, type SupportedLocale } from '../i18n/ui';
+import { getLangFromUrl, getLocalizedPathname } from '../i18n/utils';
+
+interface Props {
+  className?: string;
+  variant?: 'compact' | 'full';
+}
+
+const { className = '', variant = 'compact' } = Astro.props;
+const currentPathname = Astro.url.pathname;
+const currentLang = getLangFromUrl(Astro.url);
+const currentMeta = LANGUAGES[currentLang] || LANGUAGES[DEFAULT_LOCALE];
+---
+
+<div class={`relative inline-block text-left select-none language-switcher-root ${className}`}>
+  <!-- Trigger Button -->
+  <button
+    type="button"
+    class="lang-trigger-btn group flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/10 dark:bg-slate-900/60 hover:bg-white/20 dark:hover:bg-slate-800/80 backdrop-blur-md border border-white/20 dark:border-slate-700/60 text-slate-800 dark:text-slate-200 text-xs font-semibold shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_20px_rgba(59,130,246,0.15)] transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 cursor-pointer"
+    aria-haspopup="listbox"
+    aria-expanded="false"
+    aria-label="Select website language"
+  >
+    <span class="text-base leading-none" aria-hidden="true">{currentMeta.flag}</span>
+    {variant === 'full' && <span class="tracking-wide">{currentMeta.nativeName}</span>}
+    <span class="uppercase text-[11px] font-bold text-slate-500 dark:text-slate-400 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
+      {currentLang}
+    </span>
+    <svg
+      class="lang-chevron w-3.5 h-3.5 text-slate-400 transition-transform duration-200"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2.5"
+      aria-hidden="true"
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+    </svg>
+  </button>
+
+  <!-- Glassmorphic Dropdown Menu -->
+  <div
+    class="lang-dropdown-menu hidden absolute right-0 mt-2 w-52 origin-top-right rounded-2xl bg-white/80 dark:bg-slate-900/90 backdrop-blur-xl border border-white/30 dark:border-slate-700/70 shadow-[0_12px_40px_rgba(0,0,0,0.18)] p-1.5 z-50 transition-all duration-150"
+    role="listbox"
+    aria-label="Available languages"
+  >
+    <div class="px-2.5 py-1.5 border-b border-slate-200/50 dark:border-slate-800/80 mb-1">
+      <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+        Languages ({LOCALES.length})
+      </span>
+    </div>
+
+    <div class="max-h-64 overflow-y-auto space-y-0.5">
+      {LOCALES.map((locale) => {
+        const langMeta = LANGUAGES[locale];
+        const isSelected = locale === currentLang;
+        const targetUrl = getLocalizedPathname(currentPathname, locale);
+
+        return (
+          <a
+            href={targetUrl}
+            role="option"
+            aria-selected={isSelected ? 'true' : 'false'}
+            class={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-left text-xs transition-all duration-150 text-decoration-none ${
+              isSelected
+                ? 'bg-blue-500/15 text-blue-600 dark:text-blue-400 font-semibold border border-blue-500/20'
+                : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100/70 dark:hover:bg-slate-800/60 font-medium'
+            }`}
+          >
+            <div class="flex items-center gap-2.5">
+              <span class="text-base" aria-hidden="true">{langMeta.flag}</span>
+              <div class="flex flex-col">
+                <span class="text-xs">{langMeta.nativeName}</span>
+                <span class="text-[10px] text-slate-400 dark:text-slate-500">{langMeta.name}</span>
+              </div>
+            </div>
+
+            {isSelected && (
+              <svg class="w-4 h-4 text-blue-500 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fill-rule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            )}
+          </a>
+        );
+      })}
+    </div>
+  </div>
+</div>
+
+<script>
+  // Client-side toggle & accessible keyboard handler
+  document.querySelectorAll('.language-switcher-root').forEach((root) => {
+    const btn = root.querySelector('.lang-trigger-btn');
+    const menu = root.querySelector('.lang-dropdown-menu');
+    const chevron = root.querySelector('.lang-chevron');
+
+    const toggle = () => {
+      const isHidden = menu?.classList.contains('hidden');
+      if (isHidden) {
+        menu?.classList.remove('hidden');
+        btn?.setAttribute('aria-expanded', 'true');
+        chevron?.classList.add('rotate-180', 'text-blue-500');
+      } else {
+        menu?.classList.add('hidden');
+        btn?.setAttribute('aria-expanded', 'false');
+        chevron?.classList.remove('rotate-180', 'text-blue-500');
+      }
+    };
+
+    btn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggle();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!root.contains(e.target as Node)) {
+        menu?.classList.add('hidden');
+        btn?.setAttribute('aria-expanded', 'false');
+        chevron?.classList.remove('rotate-180', 'text-blue-500');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        menu?.classList.add('hidden');
+        btn?.setAttribute('aria-expanded', 'false');
+        chevron?.classList.remove('rotate-180', 'text-blue-500');
+      }
+    });
+  });
+</script>

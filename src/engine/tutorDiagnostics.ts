@@ -9,6 +9,13 @@
 import type { SessionResult, WpmWindow } from './typingEngine';
 import { getLifetimeKeyStats, getSessions, getWeakKeys } from './sessionStore';
 import { CHAPTERS } from '../data/curriculum';
+import type { SupportedLocale } from '../i18n/ui';
+import {
+  TUTOR_REGIONS_I18N,
+  getLocalizedRecommendation,
+  getLocalizedStaminaMessage,
+  getLocalizedMascotMessage,
+} from '../i18n/tutorTranslations';
 
 // ─── Types ─────────────────────────────────────────────────────────
 
@@ -132,18 +139,10 @@ function getSeverity(errorRate: number): 'low' | 'medium' | 'high' {
   return 'low';
 }
 
-function getRecommendation(region: RegionDef, severity: string): string {
-  const severityText = severity === 'high'
-    ? 'significantly struggling with'
-    : severity === 'medium'
-      ? 'having some trouble with'
-      : 'slightly underperforming on';
-  return `You're ${severityText} the ${region.label}. Replay the "${region.replayLabel}" drills to build muscle memory for these keys.`;
-}
-
 function analyzeFlaws(
   errors: Record<string, number>,
   totals: Record<string, number>,
+  lang: SupportedLocale = 'en',
 ): FlawDiagnosis[] {
   const flaws: FlawDiagnosis[] = [];
 
@@ -158,16 +157,21 @@ function analyzeFlaws(
     const severity = getSeverity(errorRate);
     const chapter = CHAPTERS.find(c => c.id === region.chapterId);
 
+    const regionI18n = TUTOR_REGIONS_I18N[lang]?.[region.id] || {
+      label: region.label,
+      replayLabel: region.replayLabel,
+    };
+
     flaws.push({
       id: region.id,
-      label: region.label,
+      label: regionI18n.label,
       keys: region.keys.filter(k => (totals[k] || 0) >= 1),
       errorRate: Math.round(errorRate * 100) / 100,
       severity,
-      recommendation: getRecommendation(region, severity),
+      recommendation: getLocalizedRecommendation(regionI18n.label, regionI18n.replayLabel, severity, lang),
       replayChapterId: region.chapterId,
       replayLessonStart: chapter?.lessonRange[0],
-      replayLabel: region.replayLabel,
+      replayLabel: regionI18n.replayLabel,
     });
   }
 
@@ -184,13 +188,14 @@ function analyzeFlaws(
 
 // ─── Stamina Analysis ──────────────────────────────────────────────
 
-function analyzeStamina(wpmWindows: WpmWindow[]): StaminaAnalysis {
+function analyzeStamina(wpmWindows: WpmWindow[], lang: SupportedLocale = 'en'): StaminaAnalysis {
   if (wpmWindows.length < 2) {
+    const staminaRes = getLocalizedStaminaMessage(0, true, lang);
     return {
       wpmWindows,
       dropOffPercent: 0,
-      verdict: 'strong',
-      message: 'Session was too short to measure stamina. Keep it up!',
+      verdict: staminaRes.verdict,
+      message: staminaRes.message,
     };
   }
 
@@ -205,21 +210,14 @@ function analyzeStamina(wpmWindows: WpmWindow[]): StaminaAnalysis {
     ? Math.round(((peakWpm - tailWpm) / peakWpm) * 100)
     : 0;
 
-  let verdict: StaminaAnalysis['verdict'];
-  let message: string;
+  const staminaRes = getLocalizedStaminaMessage(dropOffPercent, false, lang);
 
-  if (dropOffPercent <= 10) {
-    verdict = 'strong';
-    message = 'Your typing speed stayed consistent throughout — impressive stamina! 💪';
-  } else if (dropOffPercent <= 25) {
-    verdict = 'moderate';
-    message = `Your speed dipped ${dropOffPercent}% toward the end. Try taking micro-breaks between paragraphs to sustain your pace.`;
-  } else {
-    verdict = 'weak';
-    message = `Your speed dropped ${dropOffPercent}% from peak to finish. Practice with longer passages and focus on maintaining a steady rhythm.`;
-  }
-
-  return { wpmWindows, dropOffPercent, verdict, message };
+  return {
+    wpmWindows,
+    dropOffPercent,
+    verdict: staminaRes.verdict,
+    message: staminaRes.message,
+  };
 }
 
 // ─── Key Heatmap ───────────────────────────────────────────────────
@@ -258,42 +256,19 @@ function generateMascotMessage(
   grade: TutorReport['grade'],
   accuracy: number,
   wpm: number,
+  lang: SupportedLocale = 'en',
 ): string {
-  const greetings = [
-    'Hey champ! 🐂',
-    'Howdy, typist! 🤠',
-    'Let\'s see how you did! 📊',
-    'Bully here with your report! 🐂',
-  ];
-  const greeting = greetings[Math.floor(Math.random() * greetings.length)];
-
-  if (grade === 'excellent') {
-    return `${greeting} Incredible work — ${accuracy}% accuracy at ${wpm} WPM! You're typing like a pro. Keep pushing those speed limits!`;
-  }
-
-  const parts: string[] = [greeting];
-
-  if (flaws.length > 0) {
-    const topFlaw = flaws[0];
-    const keyList = topFlaw.keys.slice(0, 4).map(k => k.toUpperCase()).join(', ');
-    parts.push(`I noticed you're struggling with the ${topFlaw.label} — keys ${keyList} had a ${Math.round(topFlaw.errorRate * 100)}% error rate.`);
-
-    if (flaws.length > 1) {
-      parts.push(`Plus ${flaws.length - 1} more area${flaws.length > 2 ? 's' : ''} to work on.`);
-    }
-  }
-
-  if (stamina.verdict === 'weak') {
-    parts.push(stamina.message);
-  } else if (flaws.length === 0) {
-    parts.push(`${accuracy}% accuracy at ${wpm} WPM — solid session! A few more reps and you'll be unstoppable.`);
-  }
-
-  if (flaws.length > 0) {
-    parts.push('Hit the replay buttons below to drill your weak spots! 🚀');
-  }
-
-  return parts.join(' ');
+  const topFlaw = flaws.length > 0 ? flaws[0] : null;
+  return getLocalizedMascotMessage(
+    flaws.length,
+    topFlaw ? { label: topFlaw.label, keys: topFlaw.keys, errorRate: topFlaw.errorRate } : null,
+    stamina.verdict,
+    stamina.message,
+    grade,
+    accuracy,
+    wpm,
+    lang,
+  );
 }
 
 // ─── Public API ────────────────────────────────────────────────────
@@ -304,12 +279,13 @@ function generateMascotMessage(
 export function generateSessionReport(
   session: SessionResult,
   targetWpm: number = 40,
+  lang: SupportedLocale = 'en',
 ): TutorReport {
-  const flaws = analyzeFlaws(session.perKeyErrors, session.perKeyTotal);
-  const stamina = analyzeStamina(session.wpmWindows);
+  const flaws = analyzeFlaws(session.perKeyErrors, session.perKeyTotal, lang);
+  const stamina = analyzeStamina(session.wpmWindows, lang);
   const keyHeatmap = buildKeyHeatmap(session.perKeyErrors, session.perKeyTotal);
   const grade = calculateGrade(session.accuracy, flaws.length, stamina.verdict);
-  const mascotMessage = generateMascotMessage(flaws, stamina, grade, session.accuracy, session.wpm);
+  const mascotMessage = generateMascotMessage(flaws, stamina, grade, session.accuracy, session.wpm, lang);
 
   return {
     flaws,
@@ -326,7 +302,10 @@ export function generateSessionReport(
  * Generate a tutor report from aggregated lifetime stats.
  * Used on the Dashboard for an overall health check.
  */
-export function generateLifetimeReport(targetWpm: number = 40): TutorReport {
+export function generateLifetimeReport(
+  targetWpm: number = 40,
+  lang: SupportedLocale = 'en',
+): TutorReport {
   const stats = getLifetimeKeyStats();
   const sessions = getSessions();
 
@@ -362,8 +341,8 @@ export function generateLifetimeReport(targetWpm: number = 40): TutorReport {
       correctChars: 0,
     }));
 
-  const flaws = analyzeFlaws(stats.errors, stats.totals);
-  const stamina = analyzeStamina(averagedWindows);
+  const flaws = analyzeFlaws(stats.errors, stats.totals, lang);
+  const stamina = analyzeStamina(averagedWindows, lang);
   const keyHeatmap = buildKeyHeatmap(stats.errors, stats.totals);
 
   // Calculate average accuracy from recent sessions
@@ -372,7 +351,7 @@ export function generateLifetimeReport(targetWpm: number = 40): TutorReport {
     : 100;
 
   const grade = calculateGrade(avgAccuracy, flaws.length, stamina.verdict);
-  const mascotMessage = generateMascotMessage(flaws, stamina, grade, avgAccuracy, averageWpm);
+  const mascotMessage = generateMascotMessage(flaws, stamina, grade, avgAccuracy, averageWpm, lang);
 
   // If there's weak key data, also get the top weak keys and compute target WPM
   const weakKeys = getWeakKeys(5);

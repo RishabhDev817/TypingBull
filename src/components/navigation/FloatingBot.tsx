@@ -4,8 +4,13 @@ import { Sparkles, X } from 'lucide-react';
 import { Mascot } from '../Mascot';
 import { AITutorReport } from '../AITutorReport';
 import { soundEngine } from '../../utils/audio';
+import { useI18n } from '../../context/I18nContext';
+import { FLOATING_BOT_I18N } from '../../i18n/tutorTranslations';
 
 export const FloatingBot: React.FC = () => {
+  const { currentLang } = useI18n();
+  const botUi = FLOATING_BOT_I18N[currentLang] || FLOATING_BOT_I18N.en;
+
   const [isOpen, setIsOpen] = useState(false);
   const [showBubble, setShowBubble] = useState(false);
   const [hasDismissedBubble, setHasDismissedBubble] = useState(false);
@@ -65,10 +70,10 @@ export const FloatingBot: React.FC = () => {
 
               <div className="flex items-center gap-1.5 text-purple-600 dark:text-purple-300 text-[11px] font-black uppercase tracking-wider mb-1">
                 <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                <span>BullBot Tip</span>
+                <span>{botUi.tipTitle}</span>
               </div>
               <p className="text-[11px] text-slate-600 dark:text-slate-300 font-semibold leading-relaxed">
-                Want to check your weak keys and stamina? Tap me anytime! 🐂
+                {botUi.tipBody}
               </p>
 
               {/* Speech triangle pointing down to bot */}
@@ -115,7 +120,7 @@ export const FloatingBot: React.FC = () => {
               </span>
             </div>
             <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-300 leading-tight mt-0.5">
-              Tutor
+              {botUi.tutorLabel}
             </span>
           </div>
         </motion.button>

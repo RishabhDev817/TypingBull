@@ -9,7 +9,6 @@ import { isLessonUnlocked } from '../engine/sessionStore';
 import { Mascot } from '../components/Mascot';
 import { CoinCounter } from '../components/CoinCounter';
 import { soundEngine } from '../utils/audio';
-import { FloatingControls } from '../components/navigation/FloatingControls';
 import { AITutorReport } from '../components/AITutorReport';
 import {
   WelcomeBannerIllustration,
@@ -23,8 +22,13 @@ import {
 } from '../components/patterns/CardWatermarks';
 import { TypingFAQ } from '../components/TypingFAQ';
 import { SiteFooter } from '../components/navigation/SiteFooter';
+import { useI18n } from '../context/I18nContext';
+import { HomeSEOContent } from '../components/HomeSEOContent';
+import { usePageSEO } from '../hooks/usePageSEO';
 
 export const DashboardPage: React.FC = () => {
+  const { currentLang, t } = useI18n();
+  usePageSEO(currentLang);
   const navigate = useNavigate();
   const sessions = getSessions();
   const streak = getStreakData();
@@ -52,9 +56,14 @@ export const DashboardPage: React.FC = () => {
       animate="visible"
       className="max-w-6xl mx-auto px-3 sm:px-4 py-3 md:py-4 flex flex-col"
     >
-      {/* Mobile Top Controls Bar (< lg) */}
-      <div className="flex lg:hidden justify-end mb-2">
-        <FloatingControls className="flex flex-row items-center gap-2" showLabel={false} />
+      {/* Top Header Bar */}
+      <div className="flex items-center justify-between gap-3 mb-3 px-1">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            TypingBull Coach
+          </span>
+        </div>
       </div>
 
       {/* Glassmorphism wrapper for dashboard content */}
@@ -72,12 +81,12 @@ export const DashboardPage: React.FC = () => {
                 <Mascot mood={streak.currentStreak > 0 ? 'happy' : 'idle'} size="md" />
                 <div>
                   <h1 className="text-xl sm:text-2xl font-extrabold text-ink leading-tight">
-                    Hey there, typist! 👋
+                    {t('dash.hey')}
                   </h1>
                   <p className="text-body text-xs sm:text-sm mt-0.5 font-semibold">
                     {streak.currentStreak > 0
-                      ? `🔥 ${streak.currentStreak}-day streak! Keep it going!`
-                      : 'Ready to build those typing muscles? Let\'s go!'}
+                      ? t('dash.streakActive', { n: streak.currentStreak })
+                      : t('dash.streakZero')}
                   </p>
                   <div className="mt-2">
                     <CoinCounter />
@@ -103,9 +112,9 @@ export const DashboardPage: React.FC = () => {
                   style={{ background: 'var(--color-badge-bg-emerald)', border: '1px solid var(--color-badge-border-emerald)' }}
                 >📚</div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-xs font-extrabold text-ink leading-tight">Continue Learning</h3>
+                  <h3 className="text-xs font-extrabold text-ink leading-tight">{t('dash.continueLearning')}</h3>
                   <p className="text-[10.5px] text-body font-semibold leading-tight mt-0.5">
-                    {nextLesson ? `Station ${nextLesson.id}: ${nextLesson.title}` : 'All done! 🎉'}
+                    {nextLesson ? `${t('dash.station')} ${nextLesson.id}: ${nextLesson.title}` : t('dash.allDone')}
                   </p>
                 </div>
                 <ArrowRight className="w-3.5 h-3.5 text-primary shrink-0" />
@@ -126,8 +135,8 @@ export const DashboardPage: React.FC = () => {
                   style={{ background: 'var(--color-badge-bg-pink)', border: '1px solid var(--color-badge-border-pink)' }}
                 >🚀</div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-xs font-extrabold text-ink leading-tight">Play Game</h3>
-                  <p className="text-[10.5px] text-body font-semibold leading-tight mt-0.5">Stellar Dash runner</p>
+                  <h3 className="text-xs font-extrabold text-ink leading-tight">{t('dash.playGame')}</h3>
+                  <p className="text-[10.5px] text-body font-semibold leading-tight mt-0.5">{t('dash.stellarDash')}</p>
                 </div>
                 <ArrowRight className="w-3.5 h-3.5 text-highlight-pink shrink-0" />
                 {/* Watermark illustration */}
@@ -147,8 +156,8 @@ export const DashboardPage: React.FC = () => {
                   style={{ background: 'var(--color-badge-bg-orange)', border: '1px solid var(--color-badge-border-orange)' }}
                 >⌨️</div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-xs font-extrabold text-ink leading-tight">Quick Practice</h3>
-                  <p className="text-[10.5px] text-body font-semibold leading-tight mt-0.5">Free typing speed test</p>
+                  <h3 className="text-xs font-extrabold text-ink leading-tight">{t('dash.quickPractice')}</h3>
+                  <p className="text-[10.5px] text-body font-semibold leading-tight mt-0.5">{t('dash.freeTypingTest')}</p>
                 </div>
                 <ArrowRight className="w-3.5 h-3.5 text-orange shrink-0" />
                 {/* Watermark illustration */}
@@ -168,8 +177,8 @@ export const DashboardPage: React.FC = () => {
                   style={{ background: 'var(--color-badge-bg-purple)', border: '1px solid var(--color-badge-border-purple)' }}
                 >🤖</div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-xs font-extrabold text-ink leading-tight">AI Tutor</h3>
-                  <p className="text-[10.5px] text-body font-semibold leading-tight mt-0.5">Diagnose weak points</p>
+                  <h3 className="text-xs font-extrabold text-ink leading-tight">{t('dash.aiTutor')}</h3>
+                  <p className="text-[10.5px] text-body font-semibold leading-tight mt-0.5">{t('dash.diagnoseWeak')}</p>
                 </div>
                 <Brain className="w-3.5 h-3.5 text-violet shrink-0" />
               </motion.button>
@@ -182,7 +191,7 @@ export const DashboardPage: React.FC = () => {
                 <div className="flex-1 flex flex-col min-h-0">
                   <div className="flex items-center gap-2 mb-2 shrink-0">
                     <Trophy className="w-4 h-4 text-warning" />
-                    <h3 className="text-sm font-extrabold text-ink">Recent Sessions</h3>
+                    <h3 className="text-sm font-extrabold text-ink">{t('dash.recentSessions')}</h3>
                   </div>
 
                   {recentSessions.length > 0 ? (
@@ -210,7 +219,7 @@ export const DashboardPage: React.FC = () => {
                   ) : (
                     <div className="flex-1 flex items-center justify-center py-4">
                       <p className="text-xs text-body font-semibold">
-                        No sessions yet. Start a lesson to see your stats!
+                        {t('dash.noSessions')}
                       </p>
                     </div>
                   )}
@@ -228,19 +237,11 @@ export const DashboardPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Sidebar: Aligned Header Block (Sound -> Theme -> STAT OVERVIEW) + 4 Compact Stat Circles */}
+          {/* Right Sidebar: Clean Stat Overview Rail */}
           <motion.div variants={itemVariants} className="w-full lg:w-32 shrink-0 flex flex-col items-center pt-0 pb-1 self-stretch">
-            {/* Desktop Header Block: Sound + Theme docked at top-right → STAT OVERVIEW Label */}
-            <div className="hidden lg:flex flex-col items-center gap-2 mb-2">
-              <FloatingControls className="flex flex-row items-center gap-2.5" showLabel={false} />
-              <div className="text-center text-[11px] font-extrabold text-direct uppercase tracking-wider">
-                Stat Overview
-              </div>
-            </div>
-
-            {/* Mobile Fallback Label (< lg) */}
-            <div className="lg:hidden text-center text-[11px] font-extrabold text-direct uppercase tracking-wider mb-2">
-              Stat Overview
+            {/* Unified Stat Overview Header Label */}
+            <div className="text-center text-[11px] font-extrabold text-direct uppercase tracking-wider mb-2.5">
+              {t('dash.statOverview')}
             </div>
 
             <div className="flex flex-col items-center w-full gap-2 flex-1">
@@ -257,7 +258,7 @@ export const DashboardPage: React.FC = () => {
                   <StreakIllustration />
                 </div>
                 <span className="text-[8.5px] font-extrabold text-orange uppercase tracking-wider flex items-center gap-0.5 leading-none mb-0.5">
-                  <Flame className="w-2.5 h-2.5 text-orange" /> Streak
+                  <Flame className="w-2.5 h-2.5 text-orange" /> {t('dash.streak')}
                 </span>
                 <div className="flex items-baseline gap-0.5">
                   <span className="text-lg font-extrabold text-ink leading-none">{streak.currentStreak}</span>
@@ -278,7 +279,7 @@ export const DashboardPage: React.FC = () => {
                   <StarsIllustration />
                 </div>
                 <span className="text-[8.5px] font-extrabold text-warning-deep uppercase tracking-wider flex items-center gap-0.5 leading-none mb-0.5">
-                  <Star className="w-2.5 h-2.5 text-warning fill-warning" /> Stars
+                  <Star className="w-2.5 h-2.5 text-warning fill-warning" /> {t('dash.stars')}
                 </span>
                 <div className="flex items-baseline gap-0.5">
                   <span className="text-lg font-extrabold text-ink leading-none">{totalStars}</span>
@@ -299,7 +300,7 @@ export const DashboardPage: React.FC = () => {
                   <LessonsIllustration />
                 </div>
                 <span className="text-[8.5px] font-extrabold text-violet uppercase tracking-wider flex items-center gap-0.5 leading-none mb-0.5">
-                  <BookOpen className="w-2.5 h-2.5 text-violet" /> Lessons
+                  <BookOpen className="w-2.5 h-2.5 text-violet" /> {t('dash.lessons')}
                 </span>
                 <div className="flex items-baseline gap-0.5">
                   <span className="text-lg font-extrabold text-ink leading-none">{completedLessons}</span>
@@ -320,7 +321,7 @@ export const DashboardPage: React.FC = () => {
                   <SessionsIllustration />
                 </div>
                 <span className="text-[8.5px] font-extrabold text-sky-blue uppercase tracking-wider flex items-center gap-0.5 leading-none mb-0.5">
-                  <TrendingUp className="w-2.5 h-2.5 text-sky-blue" /> Sessions
+                  <TrendingUp className="w-2.5 h-2.5 text-sky-blue" /> {t('dash.sessions')}
                 </span>
                 <div className="flex items-baseline gap-0.5">
                   <span className="text-lg font-extrabold text-ink leading-none">{streak.totalSessions}</span>
@@ -331,6 +332,11 @@ export const DashboardPage: React.FC = () => {
           </motion.div>
         </div>
       </div>
+
+      {/* ─── High-Value SEO Content: Free Gamified Typing Tutor ─── */}
+      <motion.div variants={itemVariants} className="mt-8">
+        <HomeSEOContent />
+      </motion.div>
 
       {/* ─── SEO-Optimized FAQ Section ─── */}
       <motion.div variants={itemVariants} className="mt-8">
