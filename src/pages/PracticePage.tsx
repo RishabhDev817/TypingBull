@@ -6,7 +6,6 @@ import { calculateAllocatedTime, type PracticeLevel, type PracticePassage } from
 import { getLocalizedPracticeLevels } from '../data/practicePassagesI18n';
 import { soundEngine } from '../utils/audio';
 import { ConfettiFireworks } from '../components/game/ConfettiFireworks';
-import { FloatingControls } from '../components/navigation/FloatingControls';
 import { AITutorReport } from '../components/AITutorReport';
 import type { SessionResult, WpmWindow } from '../engine/typingEngine';
 import { saveSession } from '../engine/sessionStore';
@@ -347,21 +346,13 @@ export const PracticePage: React.FC = () => {
       {/* Confetti on Completion */}
       <ConfettiFireworks active={gameStatus === 'completed'} />
 
-      {/* ─── Top Navigation Header with Right-Aligned Controls ─── */}
+      {/* ─── Top Navigation Header ─── */}
       <div className="w-full flex items-center justify-between gap-4 mb-4 max-w-full">
         {/* Left: Practice Section Badge */}
         <div className="flex items-center gap-2">
           <span className="px-3.5 py-1.5 rounded-2xl bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
             {t('practice.title')}
           </span>
-        </div>
-
-        {/* Right-aligned Flex Container with Sufficient Padding-Right to prevent viewport clipping */}
-        <div className="flex flex-row items-center justify-end gap-3 pr-4 sm:pr-6 max-w-full">
-          <FloatingControls
-            className="flex flex-row items-center gap-3"
-            showLabel={false}
-          />
         </div>
       </div>
 

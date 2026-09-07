@@ -112,6 +112,7 @@ const rawUi = {
     'guide.keyboardTitle': '🎹 Interactive Keyboard Layout',
     'guide.touchAnchors': 'Touch Anchors',
     'guide.tactileAssist': 'Tactile Assist',
+    'guide.handsOverlay': 'Hands Overlay',
 
     // Keyboard Layouts
     'keyboard.layout': 'Keyboard Layout',
@@ -230,6 +231,7 @@ const rawUi = {
     'guide.keyboardTitle': '🎹 Distribución Interactiva del Teclado',
     'guide.touchAnchors': 'Anclajes Táctiles',
     'guide.tactileAssist': 'Asistencia Táctil',
+    'guide.handsOverlay': 'Superposición de Manos',
 
     'keyboard.layout': 'Distribución de Teclado',
     'keyboard.autoAdapted': 'Adaptado automáticamente para',
@@ -344,6 +346,7 @@ const rawUi = {
     'guide.keyboardTitle': '🎹 インタラクティブ・キーボード配列',
     'guide.touchAnchors': 'タッチアンカー',
     'guide.tactileAssist': '視覚・触覚アシスト',
+    'guide.handsOverlay': 'ハンドオーバーレイ',
 
     'keyboard.layout': 'キーボード配列',
     'keyboard.autoAdapted': '自動最適化:',
@@ -457,7 +460,8 @@ const rawUi = {
     'guide.eyes': 'Regard vers l’écran',
     'guide.keyboardTitle': '🎹 Disposition Interactive du Clavier',
     'guide.touchAnchors': 'Repères Tactiles',
-    'guide.tactileAssist': 'Assistance Visuelle',
+    'guide.tactileAssist': 'Assistance Tactile',
+    'guide.handsOverlay': 'Mains Virtuelles',
 
     'keyboard.layout': 'Disposition Clavier',
     'keyboard.autoAdapted': 'Adapté pour',
@@ -572,6 +576,7 @@ const rawUi = {
     'guide.keyboardTitle': '🎹 Interaktives Tastaturlayout',
     'guide.touchAnchors': 'Taktile Anker',
     'guide.tactileAssist': 'Visuelle Hilfen',
+    'guide.handsOverlay': 'Hand-Überlagerung',
 
     'keyboard.layout': 'Tastaturlayout',
     'keyboard.autoAdapted': 'Angepasst für',
@@ -686,6 +691,7 @@ const rawUi = {
     'guide.keyboardTitle': '🎹 Layout Interativo do Teclado',
     'guide.touchAnchors': 'Âncoras Táteis',
     'guide.tactileAssist': 'Assistência Tátil',
+    'guide.handsOverlay': 'Sobreposição de Mãos',
 
     'keyboard.layout': 'Layout de Teclado',
     'keyboard.autoAdapted': 'Adaptado para',
@@ -800,6 +806,7 @@ const rawUi = {
     'guide.keyboardTitle': '🎹 인터랙티브 키보드 배열',
     'guide.touchAnchors': '촉각 기준점',
     'guide.tactileAssist': '시각/촉각 보조',
+    'guide.handsOverlay': '손 오버레이',
 
     'keyboard.layout': '키보드 배열',
     'keyboard.autoAdapted': '자동 최적화:',
@@ -914,6 +921,7 @@ const rawUi = {
     'guide.keyboardTitle': '🎹 Layout Tastiera Interattivo',
     'guide.touchAnchors': 'Punti di Riferimento',
     'guide.tactileAssist': 'Supporto Tattile',
+    'guide.handsOverlay': 'Mani in Trasparenza',
 
     'keyboard.layout': 'Layout Tastiera',
     'keyboard.autoAdapted': 'Adattato per',
@@ -1028,6 +1036,7 @@ const rawUi = {
     'guide.keyboardTitle': '🎹 इंटरैक्टिव कीबोर्ड लेआउट',
     'guide.touchAnchors': 'स्पर्श बिंदु (Anchors)',
     'guide.tactileAssist': 'सहायक संकेत',
+    'guide.handsOverlay': 'हाथ ओवरले (Hands)',
 
     'keyboard.layout': 'कीबोर्ड लेआउट',
     'keyboard.autoAdapted': 'स्वतः अनुकूलित:',

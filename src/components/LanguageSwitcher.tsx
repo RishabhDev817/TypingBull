@@ -14,8 +14,8 @@ interface LanguageSwitcherProps {
   currentLang?: SupportedLocale;
   /** Optional custom CSS class for positioning */
   className?: string;
-  /** Variant: 'compact' (Option A: Flag + 2-letter code 🇺🇸 EN ⌄) or 'full' (Option B) */
-  variant?: 'compact' | 'full';
+  /** Variant: 'compact' (Flag + code), 'full' (Flag + full name), or 'transparent' (flattened for glass container) */
+  variant?: 'compact' | 'full' | 'transparent';
   /** Dropdown open direction */
   placement?: 'top' | 'bottom';
 }
@@ -95,24 +95,28 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   return (
     <div
       ref={dropdownRef}
-      className={`relative inline-block text-left select-none z-50 ${className}`}
+      className={`relative inline-block text-left select-none z-[100] ${className}`}
     >
-      {/* Option A (Compact Pill): Flag + 2-letter code (e.g., 🇺🇸 EN ⌄) */}
+      {/* Option A (Compact Pill) or Option C (Transparent in Glass Pill) */}
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-label="Select language"
-        className="h-10 px-3.5 rounded-full flex items-center gap-2
-                   bg-white/80 dark:bg-slate-900/80
-                   hover:bg-white dark:hover:bg-slate-800
-                   backdrop-blur-xl border border-slate-200/80 dark:border-white/20
-                   text-slate-800 dark:text-slate-100 text-xs font-bold
-                   shadow-[0_4px_16px_rgba(0,0,0,0.06)]
-                   hover:shadow-[0_6px_20px_rgba(59,130,246,0.15)]
-                   hover:scale-105 active:scale-95
-                   transition-all duration-200 outline-none cursor-pointer"
+        className={
+          variant === 'transparent'
+            ? 'h-8.5 px-2.5 rounded-full flex items-center gap-1.5 bg-transparent hover:bg-white/25 dark:hover:bg-white/10 active:scale-95 text-slate-800 dark:text-slate-100 text-xs font-bold transition-all outline-none cursor-pointer shrink-0'
+            : `h-10 px-3.5 rounded-full flex items-center gap-2
+               bg-white/80 dark:bg-slate-900/80
+               hover:bg-white dark:hover:bg-slate-800
+               backdrop-blur-xl border border-slate-200/80 dark:border-white/20
+               text-slate-800 dark:text-slate-100 text-xs font-bold
+               shadow-[0_4px_16px_rgba(0,0,0,0.06)]
+               hover:shadow-[0_6px_20px_rgba(59,130,246,0.15)]
+               hover:scale-105 active:scale-95
+               transition-all duration-200 outline-none cursor-pointer`
+        }
       >
         <span className="text-base leading-none" aria-hidden="true">
           {currentMeta.flag}

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import type { SupportedLocale } from '../i18n/ui';
+import { getLocalizedFaqData } from '../i18n/faqData';
 
 export interface LocalizedSEOMetadata {
   title: string;
@@ -197,6 +198,30 @@ export function usePageSEO(lang: SupportedLocale): void {
       }
       link.setAttribute('href', href);
     });
+
+    // 8. Dynamic Localized FAQ Schema (FAQPage JSON-LD)
+    const localizedFaqItems = getLocalizedFaqData(lang);
+    const faqSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: localizedFaqItems.map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.answer,
+        },
+      })),
+    };
+
+    let faqScript = document.getElementById('faq-schema-jsonld') as HTMLScriptElement | null;
+    if (!faqScript) {
+      faqScript = document.createElement('script');
+      faqScript.id = 'faq-schema-jsonld';
+      faqScript.type = 'application/ld+json';
+      document.head.appendChild(faqScript);
+    }
+    faqScript.textContent = JSON.stringify(faqSchema, null, 2);
   }, [lang]);
 }
 

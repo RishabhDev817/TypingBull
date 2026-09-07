@@ -22,6 +22,7 @@ import {
 } from '../components/patterns/CardWatermarks';
 import { TypingFAQ } from '../components/TypingFAQ';
 import { SiteFooter } from '../components/navigation/SiteFooter';
+import { FloatingControls } from '../components/navigation/FloatingControls';
 import { useI18n } from '../context/I18nContext';
 import { HomeSEOContent } from '../components/HomeSEOContent';
 import { usePageSEO } from '../hooks/usePageSEO';
@@ -54,24 +55,15 @@ export const DashboardPage: React.FC = () => {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="max-w-6xl mx-auto px-3 sm:px-4 py-3 md:py-4 flex flex-col"
+      className="w-full flex-1 flex flex-col px-4 sm:px-6 lg:px-8 py-4 sm:py-6"
     >
-      {/* Top Header Bar */}
-      <div className="flex items-center justify-between gap-3 mb-3 px-1">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            TypingBull Coach
-          </span>
-        </div>
-      </div>
 
       {/* Glassmorphism wrapper for dashboard content */}
-      <div className="glass-panel rounded-2xl md:rounded-3xl p-4 md:p-5">
+      <div className="glass-panel rounded-2xl md:rounded-3xl p-5 sm:p-6 lg:p-8 flex-1 flex flex-col min-h-[calc(100vh-8rem)] min-h-[calc(100dvh-8rem)]">
         {/* Dashboard Main 2-Column Layout */}
-        <div className="flex flex-col lg:flex-row gap-5 items-stretch">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-stretch flex-1">
           {/* Left Primary Content Area (Hero + Quick Actions + Analytics Row) */}
-          <div className="flex-1 min-w-0 w-full flex flex-col">
+          <div className="flex-1 min-w-0 w-full flex flex-col justify-between">
             {/* 1. Hero / Welcome Banner */}
             <motion.div
               variants={itemVariants}
@@ -185,9 +177,9 @@ export const DashboardPage: React.FC = () => {
             </motion.div>
 
             {/* 3. Bottom Analytics Row: Recent Sessions (Left) & Weak-Key Analysis (Right) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch flex-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-stretch flex-1 min-h-[240px]">
               {/* Recent Sessions Card */}
-              <motion.div variants={itemVariants} className="card-game card-halo-gold p-4 pb-4 flex flex-col justify-between h-full min-h-[210px]">
+              <motion.div variants={itemVariants} className="card-game card-halo-gold p-4 sm:p-5 flex flex-col justify-between h-full flex-1 min-h-[220px]">
                 <div className="flex-1 flex flex-col min-h-0">
                   <div className="flex items-center gap-2 mb-2 shrink-0">
                     <Trophy className="w-4 h-4 text-warning" />
@@ -195,7 +187,7 @@ export const DashboardPage: React.FC = () => {
                   </div>
 
                   {recentSessions.length > 0 ? (
-                    <div className="flex-1 overflow-y-auto space-y-1.5 pr-1 max-h-[175px]">
+                    <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scrollbar min-h-[140px]">
                       {recentSessions.map((session, i) => (
                         <div key={session.id || i} className="flex items-center justify-between py-1.5 border-b border-hairline/50 last:border-0">
                           <div className="flex items-center gap-2">
@@ -227,7 +219,7 @@ export const DashboardPage: React.FC = () => {
               </motion.div>
 
               {/* Weak Key Panel */}
-              <motion.div variants={itemVariants} className="h-full flex flex-col">
+              <motion.div variants={itemVariants} className="h-full flex-1 flex flex-col">
                 <WeakKeyPanel
                   onStartMission={(content, targetKeys) => {
                     navigate('/practice', { state: { missionContent: content, missionKeys: targetKeys } });
@@ -238,19 +230,24 @@ export const DashboardPage: React.FC = () => {
           </div>
 
           {/* Right Sidebar: Clean Stat Overview Rail */}
-          <motion.div variants={itemVariants} className="w-full lg:w-32 shrink-0 flex flex-col items-center pt-0 pb-1 self-stretch">
+          <motion.div variants={itemVariants} className="w-full lg:w-48 shrink-0 flex flex-col items-center pt-0 pb-1 self-stretch justify-between relative z-30">
+            {/* Glassmorphic Utility Pill in column header flow */}
+            <div className="mb-4 flex justify-center relative z-[100]">
+              <FloatingControls showLabel={false} showLanguageSwitcher={true} />
+            </div>
+
             {/* Unified Stat Overview Header Label */}
-            <div className="text-center text-[11px] font-extrabold text-direct uppercase tracking-wider mb-2.5">
+            <div className="text-center text-[13px] font-black text-direct uppercase tracking-widest mt-1 mb-3.5">
               {t('dash.statOverview')}
             </div>
 
-            <div className="flex flex-col items-center w-full gap-2 flex-1">
+            <div className="flex flex-col items-center justify-around w-full gap-2.5 flex-1 relative z-10">
               {/* 1. Streak Circle Card */}
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 style={{ borderRadius: '50%' }}
-                className="w-22 h-22 card-game card-halo-orange flex flex-col items-center justify-center p-1.5 text-center overflow-hidden shrink-0 shadow-md relative"
+                className="w-22 h-22 card-game card-halo-orange flex flex-col items-center justify-center p-1.5 text-center overflow-hidden shrink-0 shadow-md"
               >
                 <div className="w-6.5 h-6.5 rounded-full shrink-0 flex items-center justify-center overflow-hidden mb-0.5"
                   style={{ background: 'var(--color-badge-bg-orange)', border: '1px solid var(--color-badge-border-orange)' }}
@@ -271,7 +268,7 @@ export const DashboardPage: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 style={{ borderRadius: '50%' }}
-                className="w-22 h-22 card-game card-halo-gold flex flex-col items-center justify-center p-1.5 text-center overflow-hidden shrink-0 shadow-md relative"
+                className="w-22 h-22 card-game card-halo-gold flex flex-col items-center justify-center p-1.5 text-center overflow-hidden shrink-0 shadow-md"
               >
                 <div className="w-6.5 h-6.5 rounded-full shrink-0 flex items-center justify-center overflow-hidden mb-0.5"
                   style={{ background: 'var(--color-badge-bg-yellow)', border: '1px solid var(--color-badge-border-yellow)' }}
@@ -292,7 +289,7 @@ export const DashboardPage: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 style={{ borderRadius: '50%' }}
-                className="w-22 h-22 card-game card-halo-purple flex flex-col items-center justify-center p-1.5 text-center overflow-hidden shrink-0 shadow-md relative"
+                className="w-22 h-22 card-game card-halo-purple flex flex-col items-center justify-center p-1.5 text-center overflow-hidden shrink-0 shadow-md"
               >
                 <div className="w-6.5 h-6.5 rounded-full shrink-0 flex items-center justify-center overflow-hidden mb-0.5"
                   style={{ background: 'var(--color-badge-bg-purple)', border: '1px solid var(--color-badge-border-purple)' }}
@@ -313,7 +310,7 @@ export const DashboardPage: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 style={{ borderRadius: '50%' }}
-                className="w-22 h-22 card-game card-halo-blue flex flex-col items-center justify-center p-1.5 text-center overflow-hidden shrink-0 shadow-md relative"
+                className="w-22 h-22 card-game card-halo-blue flex flex-col items-center justify-center p-1.5 text-center overflow-hidden shrink-0 shadow-md"
               >
                 <div className="w-6.5 h-6.5 rounded-full shrink-0 flex items-center justify-center overflow-hidden mb-0.5"
                   style={{ background: 'var(--color-badge-bg-blue)', border: '1px solid var(--color-badge-border-blue)' }}
@@ -334,17 +331,17 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* ─── High-Value SEO Content: Free Gamified Typing Tutor ─── */}
-      <motion.div variants={itemVariants} className="mt-8">
+      <motion.div variants={itemVariants} className="mt-12 max-w-6xl mx-auto w-full">
         <HomeSEOContent />
       </motion.div>
 
       {/* ─── SEO-Optimized FAQ Section ─── */}
-      <motion.div variants={itemVariants} className="mt-8">
+      <motion.div variants={itemVariants} className="mt-10 max-w-6xl mx-auto w-full">
         <TypingFAQ />
       </motion.div>
 
       {/* ─── Site Footer with Legal & Company Links ─── */}
-      <motion.div variants={itemVariants} className="mt-12">
+      <motion.div variants={itemVariants} className="mt-14 max-w-6xl mx-auto w-full">
         <SiteFooter />
       </motion.div>
 

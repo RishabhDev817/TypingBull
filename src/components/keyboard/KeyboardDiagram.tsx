@@ -246,7 +246,10 @@ KEYBOARD_LAYOUT.forEach(k => {
 
 // ─── Key lookup by key character ─────────────────────────────────
 
+import { HandsOverlay } from './HandsOverlay';
+
 export function getFingerForKey(key: string): number {
+  if (key === ' ' || key.toLowerCase() === 'space') return 8;
   const found = KEYBOARD_LAYOUT.find(k => k.key === key.toLowerCase());
   return found ? found.finger : -1;
 }
@@ -272,6 +275,10 @@ interface KeyboardDiagramProps {
   showSymbols?: boolean;
   /** Show resting touch anchors on home row keys */
   showHandShadows?: boolean;
+  /** Show realistic semi-transparent hands overlay on home row keys */
+  showHandsOverlay?: boolean;
+  /** Hovered finger index from external parent (e.g., Finger Map) */
+  hoveredFingerIdx?: number | null;
   /** Force specific keyboard layout locale; defaults to active website language */
   layoutLocale?: SupportedLocale;
 }
@@ -286,6 +293,8 @@ export const KeyboardDiagram: React.FC<KeyboardDiagramProps> = ({
   showPatterns = true,
   showSymbols = false,
   showHandShadows = true,
+  showHandsOverlay = false,
+  hoveredFingerIdx = null,
   layoutLocale,
 }) => {
   const i18n = useI18n();
@@ -300,7 +309,22 @@ export const KeyboardDiagram: React.FC<KeyboardDiagramProps> = ({
 
   const svgWidth = 15 * KEY_UNIT;
   const numRows = compact ? 4 : 5;
-  const svgHeight = numRows * KEY_UNIT + 10;
+  const svgHeight = compact ? numRows * KEY_UNIT + 10 : (showHandsOverlay ? 305 : numRows * KEY_UNIT + 10);
+
+  const effectiveActiveFinger = activeKeyLower
+    ? activeKeyLower === ' '
+      ? 8
+      : getFingerForKey(activeKeyLower)
+    : null;
+
+  const effectiveHoveredFinger =
+    hoveredFingerIdx !== null && hoveredFingerIdx !== undefined
+      ? hoveredFingerIdx
+      : hoveredKey
+      ? hoveredKey === ' '
+        ? 8
+        : getFingerForKey(hoveredKey)
+      : null;
 
   const visibleKeys = compact
     ? KEYBOARD_LAYOUT.filter(k => k.y < 4)
@@ -723,6 +747,16 @@ export const KeyboardDiagram: React.FC<KeyboardDiagramProps> = ({
               );
             })}
           </g>
+        )}
+
+        {/* ─── Realistic Semi-Transparent Hands Overlay ─── */}
+        {!compact && (
+          <HandsOverlay
+            visible={showHandsOverlay}
+            hoveredFingerIdx={effectiveHoveredFinger}
+            activeFingerIdx={effectiveActiveFinger}
+            opacity={0.75}
+          />
         )}
       </svg>
     </div>

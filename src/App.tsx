@@ -16,7 +16,6 @@ import { TermsPage } from './pages/TermsPage';
 import { ContactPage } from './pages/ContactPage';
 import { ThemeProvider } from './context/ThemeContext';
 import { I18nProvider } from './context/I18nContext';
-import { FloatingControls } from './components/navigation/FloatingControls';
 import { FloatingBot } from './components/navigation/FloatingBot';
 import { LivingBackground } from './components/LivingBackground';
 
@@ -71,15 +70,6 @@ function MainLayout() {
     >
       {/* 3D Living Background Canvas (omitted on /learn to guarantee pure night theme) */}
       {!isLearn && <LivingBackground />}
-
-      {/* Persistent Top-Right Utility Cluster Across All Routes */}
-      <div className="fixed top-3 sm:top-4 right-3 sm:right-6 z-50 pointer-events-auto">
-        <FloatingControls
-          className="flex flex-row items-center gap-2 p-1.5 rounded-2xl bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-700/80 shadow-lg"
-          showLabel={false}
-          showLanguageSwitcher={true}
-        />
-      </div>
 
       {/* Desktop Sidebar with Slide Toggle */}
       <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} />

@@ -11,7 +11,7 @@ interface FloatingControlsProps {
 }
 
 export const FloatingControls: React.FC<FloatingControlsProps> = ({
-  className = 'flex items-center gap-2',
+  className = '',
   showLabel = false,
   showLanguageSwitcher = true,
 }) => {
@@ -31,23 +31,22 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
     else setMode('auto');
   };
 
-  const hasPosition = /\b(fixed|absolute|sticky|relative|static)\b/.test(className);
-  const basePosition = hasPosition ? '' : 'relative';
-
   return (
-    <div className={`${basePosition} z-50 flex items-center gap-2 ${className}`.trim()}>
+    <div
+      className={`relative z-[100] inline-flex items-center gap-1.5 p-1.5 rounded-full bg-white/40 dark:bg-slate-900/40 backdrop-blur-md border border-white/50 dark:border-white/10 shadow-sm ${className}`.trim()}
+    >
       {/* 1. Sound Toggle */}
       <button
         type="button"
         onClick={toggleMute}
-        className="h-10 w-10 rounded-full border border-slate-200/80 dark:border-white/20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl hover:scale-105 active:scale-95 transition-all shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_20px_rgba(59,130,246,0.15)] cursor-pointer flex items-center justify-center shrink-0"
-        title={muted ? "Unmute sounds" : "Mute sounds"}
-        aria-label={muted ? "Unmute sounds" : "Mute sounds"}
+        className="h-8.5 w-8.5 rounded-full bg-transparent hover:bg-white/25 dark:hover:bg-white/10 active:scale-95 transition-all cursor-pointer flex items-center justify-center shrink-0"
+        title={muted ? 'Unmute sounds' : 'Mute sounds'}
+        aria-label={muted ? 'Unmute sounds' : 'Mute sounds'}
       >
         {muted ? (
-          <VolumeX className="w-4.5 h-4.5 text-rose-400" />
+          <VolumeX className="w-4 h-4 text-rose-500" />
         ) : (
-          <Volume2 className="w-4.5 h-4.5 text-emerald-500 dark:text-emerald-400" />
+          <Volume2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
         )}
       </button>
 
@@ -55,19 +54,19 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
       <button
         type="button"
         onClick={cycleTheme}
-        className="h-10 w-10 rounded-full border border-slate-200/80 dark:border-white/20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl hover:scale-105 active:scale-95 transition-all shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_20px_rgba(59,130,246,0.15)] cursor-pointer flex items-center justify-center shrink-0"
+        className="h-8.5 w-8.5 rounded-full bg-transparent hover:bg-white/25 dark:hover:bg-white/10 active:scale-95 transition-all cursor-pointer flex items-center justify-center shrink-0"
         title={`Theme / Zen: ${mode.toUpperCase()} mode (Click to switch Day/Night/Auto)`}
         aria-label={`Toggle Theme Mode (Current: ${mode})`}
       >
-        {mode === 'day' && <Sun className="w-4.5 h-4.5 text-amber-400" />}
-        {mode === 'night' && <Moon className="w-4.5 h-4.5 text-indigo-300" />}
-        {mode === 'auto' && <Clock className="w-4.5 h-4.5 text-sky-400" />}
+        {mode === 'day' && <Sun className="w-4 h-4 text-amber-500" />}
+        {mode === 'night' && <Moon className="w-4 h-4 text-indigo-400" />}
+        {mode === 'auto' && <Clock className="w-4 h-4 text-sky-400" />}
       </button>
 
-      {/* 3. Language Selector ⌄ (Only on home dashboard) */}
-      {showLanguageSwitcher && <LanguageSwitcher variant="compact" />}
+      {/* 3. Language Selector ⌄ */}
+      {showLanguageSwitcher && <LanguageSwitcher variant="transparent" />}
 
-      {/* 4. Stat Overview Label (Bottom - when embedded in header block) */}
+      {/* 4. Stat Overview Label (optional) */}
       {showLabel && (
         <div className="text-center text-[11px] font-extrabold text-direct uppercase tracking-wider">
           Stat Overview

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Hand, Sparkles } from 'lucide-react';
+import { ArrowRight, Hand, Sparkles, Eye } from 'lucide-react';
 import { KeyboardDiagram, FINGER_COLORS, FINGER_SYMBOLS } from '../components/keyboard/KeyboardDiagram';
 import { FingerGuide } from '../components/keyboard/FingerGuide';
 import { Mascot } from '../components/Mascot';
@@ -73,6 +73,7 @@ export const GuidelinesPage: React.FC = () => {
   const [hoveredFingerIdx, setHoveredFingerIdx] = useState<number | null>(null);
   const [colorblindAssist, setColorblindAssist] = useState(true);
   const [showHands, setShowHands] = useState(true);
+  const [showHandsOverlay, setShowHandsOverlay] = useState(true);
 
   const tips = [
     { emoji: '🪑', title: t('guide.tip.posture.title'), text: t('guide.tip.posture.desc'), color: '#2196F3' },
@@ -121,6 +122,23 @@ export const GuidelinesPage: React.FC = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
+            {/* Realistic Hands Overlay Toggle */}
+            <button
+              onClick={() => {
+                soundEngine.playPop();
+                setShowHandsOverlay(prev => !prev);
+              }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer ${
+                showHandsOverlay
+                  ? 'bg-emerald-500/15 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-sm'
+                  : 'bg-canvas/80 border-hairline text-mute hover:text-ink'
+              }`}
+              title="Toggle realistic semi-transparent hands overlay on keyboard"
+            >
+              <Eye className="w-3.5 h-3.5" />
+              <span>{t('guide.handsOverlay')}: {showHandsOverlay ? 'ON' : 'OFF'}</span>
+            </button>
+
             {/* Home Row Touch Anchors Toggle */}
             <button
               onClick={() => {
@@ -162,6 +180,8 @@ export const GuidelinesPage: React.FC = () => {
           showPatterns={true}
           showSymbols={colorblindAssist}
           showHandShadows={showHands}
+          showHandsOverlay={showHandsOverlay}
+          hoveredFingerIdx={hoveredFingerIdx}
           onKeyHover={(_key, fingerIdx) => {
             setHoveredFingerIdx(fingerIdx !== undefined ? fingerIdx : null);
           }}

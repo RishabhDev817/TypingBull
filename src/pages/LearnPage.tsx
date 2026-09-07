@@ -8,7 +8,6 @@ import { TrainMap } from '../components/TrainMap';
 import { ChapterSelector } from '../components/ChapterSelector';
 import { Mascot } from '../components/Mascot';
 import { CoinCounter } from '../components/CoinCounter';
-import { FloatingControls } from '../components/navigation/FloatingControls';
 import { useI18n } from '../context/I18nContext';
 
 export const LearnPage: React.FC = () => {
@@ -113,11 +112,6 @@ export const LearnPage: React.FC = () => {
                 className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-green-400 to-emerald-500 shadow-sm"
               />
             </div>
-          </div>
-
-          {/* Dedicated Header Controls Container: Sound & Mode Toggle Buttons */}
-          <div className="flex flex-row items-center gap-3 shrink-0 pl-1 md:border-l md:border-white/20">
-            <FloatingControls className="flex flex-row items-center gap-3" showLabel={false} />
           </div>
         </div>
       </motion.div>
