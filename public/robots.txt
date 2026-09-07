@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Host
+Host: https://typingbull.com
+
+# Sitemaps
+Sitemap: https://typingbull.com/sitemap.xml

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- Homepage with Multilingual Alternate Annotations -->
+  <url>
+    <loc>https://typingbull.com/</loc>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://typingbull.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://typingbull.com/"/>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://typingbull.com/"/>
+    <xhtml:link rel="alternate" hreflang="en-GB" href="https://typingbull.com/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://typingbull.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://typingbull.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://typingbull.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://typingbull.com/fr/"/>
+    <xhtml:link rel="alternate" hreflang="fr-FR" href="https://typingbull.com/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://typingbull.com/de/"/>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://typingbull.com/de/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://typingbull.com/pt/"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://typingbull.com/pt/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://typingbull.com/it/"/>
+    <xhtml:link rel="alternate" hreflang="it-IT" href="https://typingbull.com/it/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://typingbull.com/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ja-JP" href="https://typingbull.com/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://typingbull.com/ko/"/>
+    <xhtml:link rel="alternate" hreflang="ko-KR" href="https://typingbull.com/ko/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://typingbull.com/hi/"/>
+    <xhtml:link rel="alternate" hreflang="hi-IN" href="https://typingbull.com/hi/"/>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Touch Typing Guidelines & Ergonomics -->
+  <url>
+    <loc>https://typingbull.com/guidelines</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Structured Lessons / Learn Curriculum -->
+  <url>
+    <loc>https://typingbull.com/learn</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Custom Practice Arena & Speed Drills -->
+  <url>
+    <loc>https://typingbull.com/practice</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Arcade Games Mode -->
+  <url>
+    <loc>https://typingbull.com/play</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- About TypingBull -->
+  <url>
+    <loc>https://typingbull.com/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Contact Us -->
+  <url>
+    <loc>https://typingbull.com/contact</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Privacy Policy -->
+  <url>
+    <loc>https://typingbull.com/privacy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Terms & Conditions -->
+  <url>
+    <loc>https://typingbull.com/terms</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Multilingual Root Pages -->
+  <url>
+    <loc>https://typingbull.com/es/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://typingbull.com/ja/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://typingbull.com/fr/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://typingbull.com/de/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://typingbull.com/pt/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://typingbull.com/it/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://typingbull.com/ko/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://typingbull.com/hi/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+</urlset>
