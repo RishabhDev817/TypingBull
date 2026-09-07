@@ -21,6 +21,15 @@ const currentLang = getLangFromUrl(Astro.url);
 <!doctype html>
 <html lang={currentLang} dir="ltr">
   <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PEB27YTSN1"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-PEB27YTSN1');
+    </script>
     <HeadSEO title={title} description={description} />
   </head>
   <body class="min-h-screen bg-slate-50 dark:bg-[#0b101b] text-slate-900 dark:text-slate-100 antialiased font-sans transition-colors duration-200">
