@@ -279,7 +279,7 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
                     <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                     <span>BullBot</span>
                     <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 px-1 py-0.2 rounded bg-purple-100/60 dark:bg-purple-950/40">
-                      Gemini 1.5 Flash
+                      Gemini Flash AI
                     </span>
                   </div>
                 )}

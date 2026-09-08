@@ -90,7 +90,9 @@ export async function handleGeminiChat(
   body: ChatRequestBody,
   apiKey?: string
 ): Promise<{ text: string }> {
-  const resolvedApiKey = apiKey || process.env.GEMINI_API_KEY;
+  const resolvedApiKey =
+    apiKey ||
+    (typeof process !== 'undefined' && process.env ? process.env.GEMINI_API_KEY : undefined);
 
   if (!resolvedApiKey) {
     throw new Error('MISSING_API_KEY');
@@ -113,7 +115,7 @@ export async function handleGeminiChat(
 
   const latestText = lastMessageItem.parts.map((p) => p.text).join('\n');
   const priorHistory = chatHistory.slice(0, -1).map((msg) => ({
-    role: msg.role === 'model' ? 'model' : 'user',
+    role: msg.role === 'model' ? ('model' as const) : ('user' as const),
     parts: msg.parts.map((p) => ({ text: p.text })),
   }));
 
@@ -123,14 +125,43 @@ export async function handleGeminiChat(
   while (startIndex < priorHistory.length && priorHistory[startIndex].role !== 'user') {
     startIndex++;
   }
-  const sanitizedHistory = priorHistory.slice(startIndex);
+  const filteredHistory = priorHistory.slice(startIndex);
 
-  // Supported model candidates (Google recommended gemini-3.6-flash, with resilient fallbacks)
+  // Strictly sanitize history so roles alternate: user -> model -> user -> model...
+  const sanitizedHistory: Array<{ role: 'user' | 'model'; parts: Array<{ text: string }> }> = [];
+  for (const item of filteredHistory) {
+    const text = item.parts.map((p) => p.text).join('\n').trim();
+    if (!text) continue;
+
+    if (sanitizedHistory.length === 0) {
+      if (item.role === 'user') {
+        sanitizedHistory.push({ role: 'user', parts: [{ text }] });
+      }
+    } else {
+      const prev = sanitizedHistory[sanitizedHistory.length - 1];
+      if (prev.role === item.role) {
+        prev.parts[0].text += `\n${text}`;
+      } else {
+        sanitizedHistory.push({ role: item.role, parts: [{ text }] });
+      }
+    }
+  }
+
+  // Since chat.sendMessage(latestText) appends a new user turn,
+  // history must end with a model turn (or be empty). If it ends with user, merge it.
+  let messageToSend = latestText;
+  if (sanitizedHistory.length > 0 && sanitizedHistory[sanitizedHistory.length - 1].role === 'user') {
+    const trailingUser = sanitizedHistory.pop()!;
+    messageToSend = `${trailingUser.parts[0].text}\n${messageToSend}`;
+  }
+
+  // Highly resilient candidate models hierarchy (modern, active flash models)
   const candidateModels = [
-    'gemini-3.6-flash',
     'gemini-flash-latest',
-    'gemini-2.5-flash',
-    'gemini-1.5-flash',
+    'gemini-3.5-flash',
+    'gemini-3.6-flash',
+    'gemini-3.7-flash',
+    'gemini-3.1-flash-lite',
   ];
 
   let lastError: unknown;
@@ -145,14 +176,15 @@ export async function handleGeminiChat(
         history: sanitizedHistory,
       });
 
-      const result = await chat.sendMessage(latestText);
+      const result = await chat.sendMessage(messageToSend);
       const response = await result.response;
       const replyText = response.text();
 
       return { text: replyText };
     } catch (err: unknown) {
       lastError = err;
-      console.warn(`[BullBot] Attempt with ${modelName} failed, trying next candidate...`);
+      const errMsg = err instanceof Error ? err.message : String(err);
+      console.warn(`[BullBot] Attempt with ${modelName} failed (${errMsg}), trying next candidate...`);
     }
   }
 
