@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, BookOpen, Gamepad2, Keyboard, Info } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Gamepad2, Keyboard, Info, Sparkles } from 'lucide-react';
 import { soundEngine } from '../../utils/audio';
 import { useI18n } from '../../context/I18nContext';
 
@@ -14,6 +14,7 @@ export const BottomNav: React.FC = () => {
     { to: '/learn', icon: BookOpen, label: t('nav.learn'), color: '#4CAF50' },
     { to: '/play', icon: Gamepad2, label: t('nav.play'), color: '#FF4081' },
     { to: '/practice', icon: Keyboard, label: t('nav.practice'), color: '#FF9800' },
+    { to: '/roadmap', icon: Sparkles, label: t('nav.roadmap'), color: '#06B6D4' },
   ];
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t-2 border-hairline"

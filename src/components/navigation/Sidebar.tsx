@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, BookOpen, Gamepad2, Keyboard, Info, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Gamepad2, Keyboard, Info, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { Mascot } from '../Mascot';
 import { soundEngine } from '../../utils/audio';
 import { useI18n } from '../../context/I18nContext';
@@ -22,6 +22,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, 
     { to: '/learn', icon: BookOpen, label: t('nav.learn'), color: '#4CAF50' },
     { to: '/play', icon: Gamepad2, label: t('nav.play'), color: '#FF4081' },
     { to: '/practice', icon: Keyboard, label: t('nav.practice'), color: '#FF9800' },
+    { to: '/roadmap', icon: Sparkles, label: t('nav.roadmap'), color: '#06B6D4', badge: 'SOON' },
   ];
 
   const toggleSidebar = () => {
@@ -71,7 +72,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, 
 
       {/* Nav links */}
       <nav className="flex-1 px-3 py-4 space-y-2 overflow-y-auto">
-        {navItems.map(({ to, icon: Icon, label, color }) => (
+        {navItems.map(({ to, icon: Icon, label, color, badge }) => (
           <NavLink
             key={to}
             to={to}
@@ -97,10 +98,21 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, 
                 whileTap={{ scale: 0.93, rotate: -1 }}
               >
                 <Icon
-                  className="w-5 h-5 transition-colors duration-200"
+                  className="w-5 h-5 transition-colors duration-200 shrink-0"
                   style={{ color: isActive ? 'white' : 'var(--color-mute)' }}
                 />
-                <span className={isActive ? 'text-white' : 'text-body font-bold'}>{label}</span>
+                <span className={`truncate ${isActive ? 'text-white' : 'text-body font-bold'}`}>{label}</span>
+                {badge && (
+                  <span
+                    className={`ml-auto px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-md border ${
+                      isActive
+                        ? 'bg-white/25 text-white border-white/40'
+                        : 'bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border-cyan-500/30'
+                    }`}
+                  >
+                    {badge}
+                  </span>
+                )}
               </motion.div>
             )}
           </NavLink>

@@ -14,6 +14,7 @@ import { AboutPage } from './pages/AboutPage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { TermsPage } from './pages/TermsPage';
 import { ContactPage } from './pages/ContactPage';
+import { RoadmapPage } from './pages/RoadmapPage';
 import { ThemeProvider } from './context/ThemeContext';
 import { I18nProvider } from './context/I18nContext';
 import { FloatingBot } from './components/navigation/FloatingBot';
@@ -40,6 +41,8 @@ function AnimatedRoutes() {
         <Route path="/terms-and-conditions" element={<TermsPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/contact-us" element={<ContactPage />} />
+        <Route path="/roadmap" element={<RoadmapPage />} />
+        <Route path="/coming-soon" element={<RoadmapPage />} />
       </Routes>
     </AnimatePresence>
   );

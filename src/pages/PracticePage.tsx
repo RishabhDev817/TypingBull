@@ -10,6 +10,8 @@ import { AITutorReport } from '../components/AITutorReport';
 import type { SessionResult, WpmWindow } from '../engine/typingEngine';
 import { saveSession } from '../engine/sessionStore';
 import { useI18n } from '../context/I18nContext';
+import { ProductRoadmap } from '../components/ProductRoadmap';
+import { SiteFooter } from '../components/navigation/SiteFooter';
 
 type PracticeStatus = 'idle' | 'typing' | 'completed' | 'failed';
 
@@ -737,6 +739,16 @@ export const PracticePage: React.FC = () => {
             </span>
           </div>
         </div>
+      </div>
+
+      {/* ─── Coming Soon / Product Roadmap Section (Down in Practice Section) ─── */}
+      <div id="roadmap" className="mt-14 max-w-6xl mx-auto w-full">
+        <ProductRoadmap />
+      </div>
+
+      {/* ─── Site Footer ─── */}
+      <div className="mt-14 max-w-6xl mx-auto w-full">
+        <SiteFooter />
       </div>
 
       {/* AI Tutor Report Modal */}
