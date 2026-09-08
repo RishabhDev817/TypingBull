@@ -51,12 +51,12 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Also update html lang attribute
       document.documentElement.lang = newLang;
 
-      // Sync localized route if running in multi-route / Astro environment
+      // Smoothly update browser URL without destructive full page reload
       const currentPath = window.location.pathname;
       const targetPath = getLocalizedPathname(currentPath, newLang);
-      if (currentPath !== targetPath && !window.location.port) {
-        // In full static routing, navigate
-        window.location.href = targetPath;
+      if (currentPath !== targetPath) {
+        const fullNewPath = `${targetPath}${window.location.search}${window.location.hash}`;
+        window.history.replaceState(null, '', fullNewPath);
       }
     }
   };
@@ -65,6 +65,22 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (typeof document !== 'undefined') {
       document.documentElement.lang = currentLang;
     }
+  }, [currentLang]);
+
+  // Sync state when user navigates using browser back / forward buttons
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handlePopState = () => {
+      const urlLang = getLangFromUrl(window.location.pathname);
+      if (urlLang && urlLang !== currentLang) {
+        setCurrentLang(urlLang);
+        document.documentElement.lang = urlLang;
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, [currentLang]);
 
   return (

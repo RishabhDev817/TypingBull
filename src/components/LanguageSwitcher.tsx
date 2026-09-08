@@ -5,7 +5,6 @@ import {
   type SupportedLocale,
   DEFAULT_LOCALE,
 } from '../i18n/ui';
-import { getLocalizedPathname } from '../i18n/utils';
 import { useI18n } from '../context/I18nContext';
 import { Globe, Check, ChevronDown } from 'lucide-react';
 
@@ -69,22 +68,6 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
 
     if (i18n?.setLanguage) {
       i18n.setLanguage(targetLocale);
-    }
-
-    if (typeof window !== 'undefined') {
-      const currentPath = window.location.pathname;
-      const currentSearch = window.location.search;
-      const currentHash = window.location.hash;
-
-      // Check if we are running in an Astro multi-page route environment (/es, /ja, etc.)
-      const isSubpathLocale = LOCALES.some(
-        (l) => l !== DEFAULT_LOCALE && currentPath.startsWith(`/${l}`)
-      );
-
-      if (isSubpathLocale) {
-        const newPath = getLocalizedPathname(currentPath, targetLocale);
-        window.location.href = `${newPath}${currentSearch}${currentHash}`;
-      }
     }
 
     setIsOpen(false);

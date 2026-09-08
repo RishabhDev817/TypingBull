@@ -19,13 +19,16 @@ import { ThemeProvider } from './context/ThemeContext';
 import { I18nProvider } from './context/I18nContext';
 import { FloatingBot } from './components/navigation/FloatingBot';
 import { LivingBackground } from './components/LivingBackground';
+import { stripLocaleFromPathname } from './i18n/utils';
 
 function AnimatedRoutes() {
   const location = useLocation();
+  const normalizedPathname = stripLocaleFromPathname(location.pathname);
+  const normalizedLocation = { ...location, pathname: normalizedPathname };
 
   return (
     <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
+      <Routes location={normalizedLocation} key={normalizedPathname}>
         <Route path="/" element={<DashboardPage />} />
         <Route path="/guidelines" element={<GuidelinesPage />} />
         <Route path="/guide" element={<GuidelinesPage />} />
@@ -43,6 +46,7 @@ function AnimatedRoutes() {
         <Route path="/contact-us" element={<ContactPage />} />
         <Route path="/roadmap" element={<RoadmapPage />} />
         <Route path="/coming-soon" element={<RoadmapPage />} />
+        <Route path="*" element={<DashboardPage />} />
       </Routes>
     </AnimatePresence>
   );
@@ -51,7 +55,8 @@ function AnimatedRoutes() {
 function MainLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const location = useLocation();
-  const isLearn = location.pathname.startsWith('/learn');
+  const normalizedPathname = stripLocaleFromPathname(location.pathname);
+  const isLearn = normalizedPathname.startsWith('/learn');
 
   // Toggle body class for route-specific background styling
   useEffect(() => {
