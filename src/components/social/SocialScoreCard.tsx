@@ -319,17 +319,24 @@ export const SocialScoreCard = forwardRef<HTMLDivElement, SocialScoreCardProps>(
           }}
         >
           {/* WPM Title & Glow Display */}
-          <div className="relative inline-block" style={{ whiteSpace: 'nowrap' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              justifyContent: 'center',
+              whiteSpace: 'nowrap',
+              lineHeight: 1,
+            }}
+          >
             <span
               style={{
-                fontSize: '78px',
-                lineHeight: '80px',
+                fontSize: '84px',
+                lineHeight: 1,
                 fontWeight: 900,
                 letterSpacing: '-0.04em',
-                background: 'linear-gradient(180deg, #FFFFFF 20%, #E2E8F0 60%, #94A3B8 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                filter: 'drop-shadow(0 0 25px rgba(255, 255, 255, 0.25))',
+                color: '#FFFFFF',
+                textShadow:
+                  '0 0 35px rgba(255, 255, 255, 0.35), 0 0 60px rgba(56, 189, 248, 0.25), 0 4px 12px rgba(0, 0, 0, 0.5)',
                 fontVariantNumeric: 'tabular-nums',
                 display: 'inline-block',
                 whiteSpace: 'nowrap',
@@ -339,15 +346,14 @@ export const SocialScoreCard = forwardRef<HTMLDivElement, SocialScoreCardProps>(
             </span>
             <span
               style={{
-                fontSize: '22px',
-                lineHeight: '24px',
+                fontSize: '24px',
+                lineHeight: 1,
                 fontWeight: 900,
                 letterSpacing: '0.04em',
                 color: '#38BDF8',
-                marginLeft: '8px',
+                marginLeft: '10px',
                 textTransform: 'uppercase',
-                verticalAlign: 'super',
-                textShadow: '0 0 16px rgba(56, 189, 248, 0.5)',
+                textShadow: '0 0 20px rgba(56, 189, 248, 0.6)',
                 whiteSpace: 'nowrap',
                 display: 'inline-block',
               }}
