@@ -174,8 +174,9 @@ export const SocialScoreCard = forwardRef<HTMLDivElement, SocialScoreCardProps>(
         className={`relative overflow-hidden select-none text-white font-sans ${className}`}
         style={{
           width: '460px',
+          minWidth: '460px',
           height: '460px',
-          maxWidth: '100%',
+          minHeight: '460px',
           aspectRatio: '1 / 1',
           background: 'linear-gradient(145deg, #0B0F19 0%, #0F172A 50%, #090D16 100%)',
           borderRadius: '32px',
@@ -228,38 +229,67 @@ export const SocialScoreCard = forwardRef<HTMLDivElement, SocialScoreCardProps>(
         />
 
         {/* ─── Top Row: Brand & Mode ─── */}
-        <div className="relative z-10 flex items-center justify-between w-full">
+        <div
+          className="relative z-10"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            width: '100%',
+            whiteSpace: 'nowrap',
+          }}
+        >
           {/* Official Brand Logo + Title */}
-          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              flexShrink: 0,
+              whiteSpace: 'nowrap',
+            }}
+          >
             <div
-              className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl p-0.5 flex items-center justify-center shrink-0 shadow-lg"
+              className="w-11 h-11 rounded-2xl p-0.5 flex items-center justify-center shrink-0 shadow-lg"
               style={{
                 background: 'linear-gradient(135deg, #7C3AED 0%, #4F46E5 50%, #2563EB 100%)',
                 boxShadow: '0 4px 16px rgba(124, 58, 237, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3)',
+                flexShrink: 0,
               }}
             >
               <OfficialTypingBullLogo size={36} />
             </div>
-            <div className="flex items-center">
-              <span className="font-black text-xl sm:text-2xl tracking-tight text-white">
-                Typing<span className="text-purple-400">Bull</span>
+            <div style={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+              <span
+                style={{
+                  fontWeight: 900,
+                  fontSize: '24px',
+                  letterSpacing: '-0.02em',
+                  color: '#FFFFFF',
+                  whiteSpace: 'nowrap',
+                  lineHeight: '28px',
+                }}
+              >
+                Typing<span style={{ color: '#C084FC' }}>Bull</span>
               </span>
             </div>
           </div>
 
-          {/* Performance Tier Pill */}
+          {/* Performance Tier Pill (Single-line constraint) */}
           <div
             style={{
               background: tier.badgeBg,
               border: `1px solid ${tier.badgeBorder}`,
               borderRadius: '9999px',
-              padding: '5px 12px',
-              display: 'flex',
+              padding: '6px 14px',
+              display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
             }}
           >
-            <TierIcon size={13} color={tier.badgeText} strokeWidth={2.6} />
+            <TierIcon size={14} color={tier.badgeText} strokeWidth={2.6} style={{ flexShrink: 0 }} />
             <span
               style={{
                 color: tier.badgeText,
@@ -267,6 +297,9 @@ export const SocialScoreCard = forwardRef<HTMLDivElement, SocialScoreCardProps>(
                 fontWeight: 900,
                 letterSpacing: '0.06em',
                 textTransform: 'uppercase',
+                whiteSpace: 'nowrap',
+                display: 'inline-block',
+                lineHeight: '14px',
               }}
             >
               {effectiveRank}
@@ -275,13 +308,22 @@ export const SocialScoreCard = forwardRef<HTMLDivElement, SocialScoreCardProps>(
         </div>
 
         {/* ─── Center: Huge Glowing WPM & Core Metrics ─── */}
-        <div className="relative z-10 text-center my-auto py-2">
+        <div
+          className="relative z-10 text-center my-auto py-2"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+          }}
+        >
           {/* WPM Title & Glow Display */}
-          <div className="relative inline-block">
+          <div className="relative inline-block" style={{ whiteSpace: 'nowrap' }}>
             <span
               style={{
                 fontSize: '78px',
-                lineHeight: 1,
+                lineHeight: '80px',
                 fontWeight: 900,
                 letterSpacing: '-0.04em',
                 background: 'linear-gradient(180deg, #FFFFFF 20%, #E2E8F0 60%, #94A3B8 100%)',
@@ -290,6 +332,7 @@ export const SocialScoreCard = forwardRef<HTMLDivElement, SocialScoreCardProps>(
                 filter: 'drop-shadow(0 0 25px rgba(255, 255, 255, 0.25))',
                 fontVariantNumeric: 'tabular-nums',
                 display: 'inline-block',
+                whiteSpace: 'nowrap',
               }}
             >
               {Math.round(wpm)}
@@ -297,6 +340,7 @@ export const SocialScoreCard = forwardRef<HTMLDivElement, SocialScoreCardProps>(
             <span
               style={{
                 fontSize: '22px',
+                lineHeight: '24px',
                 fontWeight: 900,
                 letterSpacing: '0.04em',
                 color: '#38BDF8',
@@ -304,6 +348,8 @@ export const SocialScoreCard = forwardRef<HTMLDivElement, SocialScoreCardProps>(
                 textTransform: 'uppercase',
                 verticalAlign: 'super',
                 textShadow: '0 0 16px rgba(56, 189, 248, 0.5)',
+                whiteSpace: 'nowrap',
+                display: 'inline-block',
               }}
             >
               WPM
@@ -313,18 +359,30 @@ export const SocialScoreCard = forwardRef<HTMLDivElement, SocialScoreCardProps>(
           <div
             style={{
               fontSize: '11px',
+              lineHeight: '14px',
               fontWeight: 800,
               letterSpacing: '0.15em',
               color: '#64748B',
               textTransform: 'uppercase',
               marginTop: '4px',
+              whiteSpace: 'nowrap',
             }}
           >
             WORDS PER MINUTE
           </div>
 
-          {/* Secondary Badges (Accuracy, Streak/Rating) */}
-          <div className="flex items-center justify-center gap-3 mt-4">
+          {/* Secondary Badges (Accuracy, Streak/Rating) - Fixed min-width and rigid flex gap */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '12px',
+              marginTop: '16px',
+              width: '100%',
+              whiteSpace: 'nowrap',
+            }}
+          >
             {/* Accuracy Pill */}
             <div
               style={{
@@ -332,23 +390,50 @@ export const SocialScoreCard = forwardRef<HTMLDivElement, SocialScoreCardProps>(
                 backdropFilter: 'blur(8px)',
                 border: '1px solid rgba(255, 255, 255, 0.12)',
                 borderRadius: '16px',
-                padding: '8px 16px',
+                padding: '10px 18px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
+                gap: '10px',
+                minWidth: '155px',
+                boxSizing: 'border-box',
+                flexShrink: 0,
+                whiteSpace: 'nowrap',
               }}
             >
-              <Target size={16} color="#10B981" strokeWidth={2.4} />
-              <div className="text-left">
-                <span className="block text-[9px] font-extrabold uppercase text-slate-400 tracking-wider">
+              <Target size={18} color="#10B981" strokeWidth={2.4} style={{ flexShrink: 0 }} />
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '3px',
+                  textAlign: 'left',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                }}
+              >
+                <span
+                  style={{
+                    display: 'block',
+                    fontSize: '9px',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    color: '#94A3B8',
+                    letterSpacing: '0.08em',
+                    lineHeight: '12px',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
                   Accuracy
                 </span>
                 <span
                   style={{
-                    fontSize: '15px',
+                    display: 'block',
+                    fontSize: '16px',
                     fontWeight: 900,
                     color: '#10B981',
                     letterSpacing: '-0.02em',
+                    lineHeight: '18px',
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   {typeof accuracy === 'number' ? accuracy.toFixed(accuracy % 1 === 0 ? 0 : 1) : accuracy}%
@@ -356,30 +441,57 @@ export const SocialScoreCard = forwardRef<HTMLDivElement, SocialScoreCardProps>(
               </div>
             </div>
 
-            {/* Streak or Speed Tier */}
+            {/* Streak or Speed Rating Pill */}
             <div
               style={{
                 background: 'rgba(255, 255, 255, 0.05)',
                 backdropFilter: 'blur(8px)',
                 border: '1px solid rgba(255, 255, 255, 0.12)',
                 borderRadius: '16px',
-                padding: '8px 16px',
+                padding: '10px 18px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
+                gap: '10px',
+                minWidth: '155px',
+                boxSizing: 'border-box',
+                flexShrink: 0,
+                whiteSpace: 'nowrap',
               }}
             >
-              <Zap size={16} color="#F59E0B" strokeWidth={2.4} />
-              <div className="text-left">
-                <span className="block text-[9px] font-extrabold uppercase text-slate-400 tracking-wider">
+              <Zap size={18} color="#F59E0B" strokeWidth={2.4} style={{ flexShrink: 0 }} />
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '3px',
+                  textAlign: 'left',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                }}
+              >
+                <span
+                  style={{
+                    display: 'block',
+                    fontSize: '9px',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    color: '#94A3B8',
+                    letterSpacing: '0.08em',
+                    lineHeight: '12px',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
                   {streak ? 'Streak' : 'Speed Rating'}
                 </span>
                 <span
                   style={{
-                    fontSize: '15px',
+                    display: 'block',
+                    fontSize: '16px',
                     fontWeight: 900,
                     color: '#FBBF24',
                     letterSpacing: '-0.02em',
+                    lineHeight: '18px',
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   {streak ? `${streak} keys` : `${Math.round(wpm * 5)} CPM`}
@@ -389,7 +501,16 @@ export const SocialScoreCard = forwardRef<HTMLDivElement, SocialScoreCardProps>(
           </div>
 
           {/* Wordle-Style Visual Block Bar */}
-          <div className="flex items-center justify-center gap-1.5 mt-5">
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              marginTop: '18px',
+              whiteSpace: 'nowrap',
+            }}
+          >
             {Array.from({ length: totalBlocks }).map((_, i) => {
               const isFilled = i < filledBlocks;
               return (
@@ -402,6 +523,7 @@ export const SocialScoreCard = forwardRef<HTMLDivElement, SocialScoreCardProps>(
                     backgroundColor: isFilled ? '#10B981' : 'rgba(255, 255, 255, 0.1)',
                     boxShadow: isFilled ? '0 0 10px rgba(16, 185, 129, 0.5)' : 'none',
                     border: isFilled ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(255, 255, 255, 0.05)',
+                    flexShrink: 0,
                   }}
                 />
               );
@@ -417,10 +539,13 @@ export const SocialScoreCard = forwardRef<HTMLDivElement, SocialScoreCardProps>(
             backdropFilter: 'blur(12px)',
             border: '1px solid rgba(255, 255, 255, 0.09)',
             borderRadius: '18px',
-            padding: '10px 16px',
+            padding: '12px 18px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            whiteSpace: 'nowrap',
+            boxSizing: 'border-box',
+            width: '100%',
           }}
         >
           <span
@@ -429,19 +554,24 @@ export const SocialScoreCard = forwardRef<HTMLDivElement, SocialScoreCardProps>(
               fontWeight: 700,
               color: '#CBD5E1',
               letterSpacing: '-0.01em',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+              lineHeight: '16px',
             }}
           >
             Can you beat my score?
           </span>
           <div
             style={{
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
               background: 'rgba(16, 185, 129, 0.12)',
               border: '1px solid rgba(16, 185, 129, 0.3)',
               borderRadius: '9999px',
-              padding: '4px 10px',
+              padding: '4px 12px',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
             }}
           >
             <span
@@ -450,6 +580,8 @@ export const SocialScoreCard = forwardRef<HTMLDivElement, SocialScoreCardProps>(
                 fontWeight: 900,
                 color: '#34D399',
                 letterSpacing: '0.02em',
+                whiteSpace: 'nowrap',
+                lineHeight: '14px',
               }}
             >
               typingbull.com

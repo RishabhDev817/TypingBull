@@ -80,15 +80,47 @@ export const ShareScoreModal: FC<ShareScoreModalProps> = ({
   const wordleText = generateWordleScoreText(shareData);
 
   /**
+   * Waits for all custom web fonts to be fully loaded and rendered
+   * before triggering canvas snapshot, preventing miscalculated text dimensions.
+   */
+  const waitForDocumentFonts = async () => {
+    if (typeof document !== 'undefined' && 'fonts' in document) {
+      try {
+        await document.fonts.ready;
+      } catch (err) {
+        console.warn('document.fonts.ready warning:', err);
+      }
+    }
+    // Brief layout settle delay
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  };
+
+  /**
    * Generates a high-quality PNG blob from the card DOM element.
    */
   const generatePngBlob = async (): Promise<Blob | null> => {
-    if (!cardRef.current) return null;
+    const el = cardRef.current;
+    if (!el) return null;
+
     try {
-      const blob = await toBlob(cardRef.current, {
-        pixelRatio: 2.5,
+      // 4. Await Font Loading
+      await waitForDocumentFonts();
+
+      // 5. Optimize the Canvas Configuration
+      // Lock exact capture dimensions to the element's actual scroll dimensions
+      const captureWidth = el.scrollWidth || 460;
+      const captureHeight = el.scrollHeight || 460;
+      const pixelRatio = 3; // High-resolution 3x export scale
+
+      const blob = await toBlob(el, {
+        width: captureWidth,
+        height: captureHeight,
+        canvasWidth: captureWidth * pixelRatio,
+        canvasHeight: captureHeight * pixelRatio,
+        pixelRatio,
         cacheBust: true,
-        backgroundColor: '#090D16',
+        includeQueryParams: true,
+        backgroundColor: '#0B0F19', // Hardcoded exact dark background
       });
       return blob;
     } catch (err) {
