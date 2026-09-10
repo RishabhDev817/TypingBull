@@ -15,10 +15,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
   X, RotateCcw, TrendingUp, AlertTriangle,
-  CheckCircle2, Sparkles, Brain, Zap, BarChart3,
+  CheckCircle2, Sparkles, Brain, Zap, BarChart3, Share2,
 } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { AITutorChat } from './AITutorChat';
+import { ShareScoreModal } from './social/ShareScoreModal';
 import { soundEngine } from '../utils/audio';
 import type { SessionResult } from '../engine/typingEngine';
 import { useI18n } from '../context/I18nContext';
@@ -158,6 +159,7 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
   const [report, setReport] = useState<TutorReport | null>(null);
   const [typewriterText, setTypewriterText] = useState('');
   const [activeTab, setActiveTab] = useState<'analytics' | 'chat'>('analytics');
+  const [shareModalOpen, setShareModalOpen] = useState(false);
 
   const gradeConfig = {
     'excellent': { label: ui.grades.excellent, emoji: '✨', color: '#22C55E', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.4)' },
@@ -480,6 +482,7 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
   // ─── Main Render ───────────────────────────────────────────
 
   return (
+    <>
     <AnimatePresence>
       {isOpen && (
         <motion.div
@@ -730,7 +733,19 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
               )}
 
               {/* ─── Bottom close action ───────────────────── */}
-              <div className="flex justify-center pt-3">
+              <div className="flex flex-wrap justify-center items-center gap-3 pt-3">
+                <motion.button
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
+                  onClick={() => {
+                    soundEngine.playPop();
+                    setShareModalOpen(true);
+                  }}
+                  className="px-7 py-3 rounded-2xl text-sm font-black text-white cursor-pointer bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 shadow-lg shadow-emerald-500/25 transition-all flex items-center gap-2"
+                >
+                  <Share2 className="w-4 h-4" />
+                  <span>Share Score 🚀</span>
+                </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.96 }}
@@ -770,6 +785,16 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
     </motion.div>
       )}
     </AnimatePresence>
+
+    {/* Viral Share Score Modal */}
+    <ShareScoreModal
+      isOpen={shareModalOpen}
+      onClose={() => setShareModalOpen(false)}
+      wpm={sessionResult?.wpm ?? report?.averageWpm ?? 60}
+      accuracy={sessionResult?.accuracy ?? 98}
+      modeName={sessionResult ? 'Typing Diagnostic' : 'Typing Career'}
+    />
+    </>
   );
 };
 

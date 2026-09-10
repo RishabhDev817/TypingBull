@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, ArrowRight, RotateCcw, Star, CheckCircle2,
-  BookOpen, Sparkles, Trophy, Lightbulb, Compass, Zap, Brain
+  BookOpen, Sparkles, Trophy, Lightbulb, Compass, Zap, Brain, Share2
 } from 'lucide-react';
 import { getLessonById, LESSONS } from '../data/lessonData';
 import { getChapterByLessonId } from '../data/curriculum';
@@ -14,6 +14,7 @@ import { soundEngine } from '../utils/audio';
 import { Mascot } from '../components/Mascot';
 import type { MascotMood } from '../components/Mascot';
 import { AITutorReport } from '../components/AITutorReport';
+import { ShareScoreModal } from '../components/social/ShareScoreModal';
 import type { SessionResult } from '../engine/typingEngine';
 import { useI18n } from '../context/I18nContext';
 import { getLocalizedLesson, getLocalizedChapter } from '../data/curriculumI18n';
@@ -39,6 +40,7 @@ export const LessonView: React.FC = () => {
   const [activeKey, setActiveKey] = useState('');
   const [consecutiveErrors, setConsecutiveErrors] = useState(0);
   const [tutorOpen, setTutorOpen] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
   const [lastSessionResult, setLastSessionResult] = useState<SessionResult | null>(null);
 
   const content = lesson?.content || '';
@@ -517,6 +519,22 @@ export const LessonView: React.FC = () => {
                 ))}
               </div>
 
+              {/* Share Score Button */}
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => { soundEngine.playPop(); setShareModalOpen(true); }}
+                className="w-full mb-2.5 py-2.5 rounded-2xl text-xs font-black text-emerald-200 flex items-center justify-center gap-2 cursor-pointer transition-all"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.2))',
+                  border: '1.5px solid rgba(16, 185, 129, 0.4)',
+                  boxShadow: '0 4px 15px rgba(16, 185, 129, 0.15)',
+                }}
+              >
+                <Share2 className="w-3.5 h-3.5 text-emerald-400" />
+                🚀 Share Your Score
+              </motion.button>
+
               {/* AI Tutor Report Button */}
               <motion.button
                 whileHover={{ scale: 1.03 }}
@@ -582,6 +600,16 @@ export const LessonView: React.FC = () => {
         onClose={() => setTutorOpen(false)}
         targetWpm={lesson.wpmGoal || chapter?.wpmGoal || 30}
         showReplayButtons={true}
+      />
+
+      {/* Viral Share Score Modal */}
+      <ShareScoreModal
+        isOpen={shareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+        wpm={engine.metrics.wpm}
+        accuracy={engine.metrics.accuracy}
+        streak={engine.maxStreak}
+        modeName={lesson.title || `Lesson ${lesson.id}`}
       />
     </div>
   );

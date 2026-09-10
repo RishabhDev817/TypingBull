@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RotateCcw, ArrowRight, AlertTriangle, BookOpen, Clock, Brain } from 'lucide-react';
+import { RotateCcw, ArrowRight, AlertTriangle, BookOpen, Clock, Brain, Share2 } from 'lucide-react';
 import { Mascot } from '../components/Mascot';
 import { calculateAllocatedTime, type PracticeLevel, type PracticePassage } from '../data/practiceLevels';
 import { getLocalizedPracticeLevels } from '../data/practicePassagesI18n';
 import { soundEngine } from '../utils/audio';
 import { ConfettiFireworks } from '../components/game/ConfettiFireworks';
 import { AITutorReport } from '../components/AITutorReport';
+import { ShareScoreModal } from '../components/social/ShareScoreModal';
 import type { SessionResult, WpmWindow } from '../engine/typingEngine';
 import { saveSession } from '../engine/sessionStore';
 import { useI18n } from '../context/I18nContext';
@@ -47,6 +48,7 @@ export const PracticePage: React.FC = () => {
   const [totalKeystrokes, setTotalKeystrokes] = useState<number>(0);
   const [showFailPenalty, setShowFailPenalty] = useState<boolean>(false);
   const [tutorOpen, setTutorOpen] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
   const [practiceSessionResult, setPracticeSessionResult] = useState<SessionResult | null>(null);
 
   const hiddenInputRef = useRef<HTMLInputElement>(null);
@@ -563,7 +565,14 @@ export const PracticePage: React.FC = () => {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-3 mt-4">
+                <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
+                  <button
+                    onClick={() => { soundEngine.playPop(); setShareModalOpen(true); }}
+                    className="px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-black text-sm shadow-xl flex items-center gap-1.5 cursor-pointer hover:scale-105 transition-all"
+                  >
+                    <Share2 className="w-4 h-4" />
+                    <span>Share Score 🚀</span>
+                  </button>
                   <button
                     onClick={() => { soundEngine.playPop(); setTutorOpen(true); }}
                     className="px-5 py-3 rounded-2xl bg-purple-500/20 hover:bg-purple-500/30 text-purple-200 font-black text-sm border border-purple-500/30 flex items-center gap-1.5 cursor-pointer transition-all"
@@ -574,7 +583,7 @@ export const PracticePage: React.FC = () => {
                   {currentLevelNum < practiceLevels.length && (
                     <button
                       onClick={() => handleSelectLevel(currentLevelNum + 1)}
-                      className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-sm shadow-xl flex items-center gap-2 cursor-pointer hover:scale-105 transition-all"
+                      className="px-6 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-black text-sm border border-white/20 shadow-xl flex items-center gap-2 cursor-pointer hover:scale-105 transition-all"
                     >
                       <span>{t('lesson.nextLesson')} ({currentLevelNum + 1})</span>
                       <ArrowRight className="w-4 h-4" />
@@ -758,6 +767,15 @@ export const PracticePage: React.FC = () => {
         onClose={() => setTutorOpen(false)}
         targetWpm={currentLevel.targetWPM}
         showReplayButtons={true}
+      />
+
+      {/* Viral Share Score Modal */}
+      <ShareScoreModal
+        isOpen={shareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+        wpm={currentWpm}
+        accuracy={accuracy}
+        modeName={`Level ${currentLevelNum}: ${currentPassage.title}`}
       />
     </div>
   );
