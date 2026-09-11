@@ -55,6 +55,29 @@ export async function POST(req: Request) {
 
     console.log('[Serverless Feedback Received]:', JSON.stringify(feedbackEntry));
 
+    // Dispatch via Resend API
+    const resendApiKey = process.env.RESEND_API_KEY;
+    if (resendApiKey) {
+      try {
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${resendApiKey}`,
+          },
+          body: JSON.stringify({
+            from: 'TypingBull Feedback <onboarding@resend.dev>',
+            to: ['rishabhrajmahato@gmail.com'],
+            subject: `[TypingBull Feedback] ${feedbackEntry.feedbackType.toUpperCase()}: ${feedbackEntry.priority}`,
+            text: `Feedback: ${feedbackEntry.message}\nUser: ${feedbackEntry.email || 'Anonymous'}\nRating: ${feedbackEntry.rating ?? 'None'}\nContext: ${JSON.stringify(feedbackEntry.metadata, null, 2)}`,
+            reply_to: feedbackEntry.email || undefined,
+          }),
+        });
+      } catch (e) {
+        console.warn('[Resend API Error]:', e);
+      }
+    }
+
     return new Response(
       JSON.stringify({ success: true, id: feedbackEntry.id, message: 'Feedback submitted successfully.' }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
