@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, BookOpen, Gamepad2, Keyboard, Info, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Gamepad2, Keyboard, Info, ChevronLeft, ChevronRight, Sparkles, MessageSquareHeart } from 'lucide-react';
 import { Mascot } from '../Mascot';
 import { soundEngine } from '../../utils/audio';
 import { useI18n } from '../../context/I18nContext';
+import { useFeedback } from '../../context/FeedbackContext';
 import { stripLocaleFromPathname } from '../../i18n/utils';
 
 interface SidebarProps {
@@ -14,6 +15,7 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, onToggle }) => {
   const { t } = useI18n();
+  const { openFeedback } = useFeedback();
   const location = useLocation();
   const normalizedCurrentPath = stripLocaleFromPathname(location.pathname);
   const [internalCollapsed, setInternalCollapsed] = useState(false);
@@ -120,6 +122,31 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, 
             </NavLink>
           );
         })}
+
+        {/* Feedback & Review (directly below Coming Soon) */}
+        <button
+          type="button"
+          onClick={() => {
+            soundEngine.playPop();
+            openFeedback('feature_request', 'sidebar');
+          }}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all text-body hover:text-ink hover:bg-white/60 dark:hover:bg-slate-800/60 cursor-pointer text-left group"
+          title={t('nav.feedback') || 'Feedback & Review'}
+        >
+          <motion.div
+            className="flex items-center gap-3 w-full"
+            whileHover={{ x: 6, scale: 1.02 }}
+            whileTap={{ scale: 0.93, rotate: -1 }}
+          >
+            <MessageSquareHeart
+              className="w-5 h-5 transition-colors duration-200 shrink-0 group-hover:text-purple-500"
+              style={{ color: 'var(--color-mute)' }}
+            />
+            <span className="truncate text-body font-bold group-hover:text-ink">
+              {t('nav.feedback') || 'Feedback & Review'}
+            </span>
+          </motion.div>
+        </button>
       </nav>
     </aside>
   );

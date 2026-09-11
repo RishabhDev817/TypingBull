@@ -17,6 +17,7 @@ import { ContactPage } from './pages/ContactPage';
 import { RoadmapPage } from './pages/RoadmapPage';
 import { ThemeProvider } from './context/ThemeContext';
 import { I18nProvider } from './context/I18nContext';
+import { FeedbackProvider } from './context/FeedbackContext';
 import { FloatingBot } from './components/navigation/FloatingBot';
 import { LivingBackground } from './components/LivingBackground';
 import { stripLocaleFromPathname } from './i18n/utils';
@@ -117,9 +118,11 @@ function App() {
   return (
     <ThemeProvider>
       <I18nProvider>
-        <BrowserRouter>
-          <MainLayout />
-        </BrowserRouter>
+        <FeedbackProvider>
+          <BrowserRouter>
+            <MainLayout />
+          </BrowserRouter>
+        </FeedbackProvider>
       </I18nProvider>
     </ThemeProvider>
   );
