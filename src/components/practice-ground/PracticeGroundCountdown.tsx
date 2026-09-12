@@ -15,9 +15,11 @@ export const PracticeGroundCountdown: React.FC<Props> = ({
 }) => {
   const [displayNumber, setDisplayNumber] = useState<number | string>(3);
   const [lastSoundNumber, setLastSoundNumber] = useState<number | string | null>(null);
+  const completedRef = React.useRef(false);
 
   useEffect(() => {
     let animFrame: number;
+    completedRef.current = false;
 
     const tick = () => {
       const now = Date.now();
@@ -29,8 +31,11 @@ export const PracticeGroundCountdown: React.FC<Props> = ({
           soundEngine.playLevelUnlock();
           setLastSoundNumber('GO!');
         }
-        if (diffMs <= -700 && onCountdownComplete) {
-          onCountdownComplete();
+        if (diffMs <= -400 && !completedRef.current) {
+          completedRef.current = true;
+          if (onCountdownComplete) {
+            onCountdownComplete();
+          }
         }
       } else {
         const secondsRemaining = Math.ceil(diffMs / 1000);

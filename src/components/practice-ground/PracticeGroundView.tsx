@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePracticeGroundSocket } from '../../hooks/usePracticeGroundSocket';
 import { PracticeGroundConnectionBanner } from './PracticeGroundConnectionBanner';
@@ -22,6 +22,7 @@ export const PracticeGroundView: React.FC<Props> = ({
   const {
     status,
     phase,
+    setPhase,
     room,
     myPlayerId,
     playerName,
@@ -81,6 +82,41 @@ export const PracticeGroundView: React.FC<Props> = ({
   const handleLocalFinish = () => {
     setMyProgress((prev) => ({ ...prev, finished: true }));
   };
+
+  const activeRoom = useMemo(() => {
+    return (
+      room || {
+        id: 'RACE',
+        hostId: myPlayerId,
+        status: (phase === 'COUNTDOWN' ? 'COUNTDOWN' : 'RACING') as 'COUNTDOWN' | 'RACING',
+        players: {
+          [myPlayerId]: {
+            id: myPlayerId,
+            sessionToken: '',
+            name: playerName || 'You',
+            avatarEmoji: playerEmoji || '🐂',
+            isHost: true,
+            status: 'RACING' as const,
+            ready: true,
+            progress: 0,
+            correctChars: 0,
+            incorrectChars: 0,
+            totalChars: 0,
+            wpm: 0,
+            accuracy: 100,
+          },
+        },
+        settings: {
+          maxPlayers: 2,
+          durationSeconds: 60,
+          language: 'english',
+        },
+        text: raceText || 'The speedway is ready for racing champions.',
+        textTitle: raceTextTitle || 'Speed Speedway',
+        createdAt: 0,
+      }
+    );
+  }, [room, myPlayerId, phase, playerName, playerEmoji, raceText, raceTextTitle]);
 
   return (
     <div className="w-full min-h-[calc(100vh-5rem)] flex flex-col justify-center relative py-6">
@@ -218,26 +254,18 @@ export const PracticeGroundView: React.FC<Props> = ({
           </motion.div>
         )}
 
-        {/* PHASE 4: SYNCHRONIZED COUNTDOWN OVERLAY */}
-        {phase === 'COUNTDOWN' && countdownStartAt && (
-          <PracticeGroundCountdown
-            startAt={countdownStartAt}
-            textTitle={raceTextTitle}
-          />
-        )}
-
-        {/* PHASE 5: LIVE RACING */}
-        {phase === 'RACING' && room && (
+        {/* PHASE 4 & 5: LIVE RACING WITH COUNTDOWN OVERLAY */}
+        {(phase === 'COUNTDOWN' || phase === 'RACING') && (
           <motion.div
             key="pg-racing"
             initial={{ opacity: 0, scale: 0.99 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
-            className="w-full max-w-5xl mx-auto px-3 sm:px-6 flex flex-col gap-5 select-none"
+            className="w-full max-w-5xl mx-auto px-3 sm:px-6 flex flex-col gap-5 select-none relative"
           >
             {/* Real-time Multi-runner Track */}
             <PracticeGroundRaceTrack
-              players={Object.values(room.players)}
+              players={Object.values(activeRoom.players)}
               myPlayerId={myPlayerId}
               opponentsProgress={opponentsProgress}
               myProgress={myProgress}
@@ -245,14 +273,25 @@ export const PracticeGroundView: React.FC<Props> = ({
 
             {/* Zero-latency Interactive Typing Arena */}
             <PracticeGroundTypingArea
-              targetText={raceText}
-              textTitle={raceTextTitle}
-              raceStartAt={room.raceStartAt ?? countdownStartAt ?? 0}
-              durationSeconds={room.settings.durationSeconds}
+              targetText={raceText || activeRoom.text}
+              textTitle={raceTextTitle || activeRoom.textTitle}
+              raceStartAt={activeRoom.raceStartAt ?? countdownStartAt ?? 0}
+              durationSeconds={activeRoom.settings.durationSeconds}
               isFinished={myProgress.finished}
               onProgressUpdate={handleProgressUpdate}
               onLocalFinish={handleLocalFinish}
             />
+
+            {/* Synchronized Countdown Overlay */}
+            {phase === 'COUNTDOWN' && countdownStartAt && (
+              <PracticeGroundCountdown
+                startAt={countdownStartAt}
+                textTitle={raceTextTitle || activeRoom.textTitle}
+                onCountdownComplete={() => {
+                  setPhase('RACING');
+                }}
+              />
+            )}
           </motion.div>
         )}
 
@@ -268,6 +307,10 @@ export const PracticeGroundView: React.FC<Props> = ({
             <PracticeGroundResults
               rankings={raceRankings}
               myPlayerId={myPlayerId}
+              myProgress={myProgress}
+              playerName={playerName}
+              playerEmoji={playerEmoji}
+              durationSeconds={room?.settings?.durationSeconds ?? 60}
               onPlayAgain={() => {
                 setMyProgress({ progress: 0, wpm: 0, accuracy: 100, finished: false });
                 requestRematch();

@@ -10,6 +10,14 @@ import { getHighScore, setHighScore } from '../../engine/sessionStore';
 interface Props {
   rankings: RaceRankingItem[];
   myPlayerId: string;
+  myProgress?: {
+    wpm: number;
+    accuracy: number;
+    finished: boolean;
+  };
+  playerName?: string;
+  playerEmoji?: string;
+  durationSeconds?: number;
   onPlayAgain: () => void;
   onReturnToMenu: () => void;
 }
@@ -17,11 +25,39 @@ interface Props {
 export const PracticeGroundResults: React.FC<Props> = ({
   rankings,
   myPlayerId,
+  myProgress,
+  playerName,
+  playerEmoji,
+  durationSeconds = 60,
   onPlayAgain,
   onReturnToMenu,
 }) => {
-  const myResult = rankings.find((r) => r.playerId === myPlayerId);
-  const isWinner = myResult?.rank === 1;
+  const rawRankings = Array.isArray(rankings) ? rankings : [];
+
+  let myResult = rawRankings.find((r) => r.playerId === myPlayerId);
+
+  // If not found in rankings (e.g. race timeout, disconnect, or delay), synthesize a resilient result
+  if (!myResult) {
+    myResult = {
+      playerId: myPlayerId || 'player-me',
+      name: playerName || 'You',
+      avatarEmoji: playerEmoji || '🐂',
+      rank: rawRankings.length > 0 ? rawRankings.length + 1 : 1,
+      wpm: myProgress?.wpm ?? 0,
+      accuracy: myProgress?.accuracy ?? 100,
+      finished: myProgress?.finished ?? true,
+      durationSeconds,
+    };
+  }
+
+  // Ensure effectiveRankings contains at least myResult so leaderboard is never blank
+  const effectiveRankings = rawRankings.some((r) => r.playerId === myResult.playerId)
+    ? [...rawRankings]
+    : [...rawRankings, myResult];
+
+  effectiveRankings.sort((a, b) => a.rank - b.rank);
+
+  const isWinner = myResult.rank === 1;
 
   const [isNewPersonalBest] = useState<boolean>(() => {
     if (myResult && myResult.wpm > 0) {
@@ -102,8 +138,8 @@ export const PracticeGroundResults: React.FC<Props> = ({
           Final Rankings
         </span>
 
-        {rankings.map((item) => {
-          const isMe = item.playerId === myPlayerId;
+        {effectiveRankings.map((item) => {
+          const isMe = item.playerId === myResult.playerId || item.playerId === myPlayerId;
           const medal =
             item.rank === 1
               ? '🥇'

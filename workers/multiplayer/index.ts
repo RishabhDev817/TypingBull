@@ -22,6 +22,8 @@ export class MultiplayerArena extends DurableObject {
   public connectionManager: ConnectionManager;
   public cleanupManager: CleanupManager;
   private raceTimers: Map<string, ReturnType<typeof setTimeout>> = new Map();
+  private matchmakingTimers: Map<string, ReturnType<typeof setTimeout>> = new Map();
+  private botSimTimers: Map<string, ReturnType<typeof setInterval>> = new Map();
 
   constructor(ctx: DurableObjectState, env: any) {
     super(ctx, env);
@@ -127,6 +129,12 @@ export class MultiplayerArena extends DurableObject {
   private handleDisconnect(socket: UniversalWebSocket): void {
     const conn = this.connectionManager.getConnection(socket);
     if (!conn) return;
+
+    const mmTimer = this.matchmakingTimers.get(conn.playerId);
+    if (mmTimer) {
+      clearTimeout(mmTimer);
+      this.matchmakingTimers.delete(conn.playerId);
+    }
 
     this.matchmakingManager.removePlayer(conn.playerId);
 
@@ -343,26 +351,40 @@ export class MultiplayerArena extends DurableObject {
         if (matchResult.status === 'MATCHED' && matchResult.roomCode) {
           const room = this.roomManager.getRoom(matchResult.roomCode);
           if (room) {
-            conn.currentRoomCode = room.id;
-            this.connectionManager.sendToSocket(socket, {
-              type: 'MATCH_FOUND',
-              payload: { roomCode: room.id },
-            });
-            this.connectionManager.broadcastToRoom(room, {
-              type: 'ROOM_UPDATED',
-              payload: { room },
-            });
+            this.startQuickMatchRace(room);
           }
         } else {
           this.connectionManager.sendToSocket(socket, {
             type: 'MATCH_SEARCHING',
             payload: { message: 'Searching for an opponent...' },
           });
+
+          // Set 3.5s auto-challenger bot timer so the racer is never left stranded
+          const existingMmTimer = this.matchmakingTimers.get(conn.playerId);
+          if (existingMmTimer) clearTimeout(existingMmTimer);
+
+          const mmTimer = setTimeout(() => {
+            this.matchmakingTimers.delete(conn.playerId);
+            const botMatch = this.matchmakingManager.matchQueuedPlayerWithBot(conn.playerId);
+            if (botMatch) {
+              const room = this.roomManager.getRoom(botMatch.roomCode);
+              if (room) {
+                this.startQuickMatchRace(room);
+              }
+            }
+          }, 3500);
+
+          this.matchmakingTimers.set(conn.playerId, mmTimer);
         }
         break;
       }
 
       case 'CANCEL_MATCH': {
+        const mmTimer = this.matchmakingTimers.get(conn.playerId);
+        if (mmTimer) {
+          clearTimeout(mmTimer);
+          this.matchmakingTimers.delete(conn.playerId);
+        }
         this.matchmakingManager.removePlayer(conn.playerId);
         break;
       }
@@ -492,6 +514,7 @@ export class MultiplayerArena extends DurableObject {
         }
 
         if (progressResult.allFinished) {
+          this.stopBotSimulation(room.id);
           const timer = this.raceTimers.get(room.id);
           if (timer) {
             clearTimeout(timer);
@@ -513,6 +536,7 @@ export class MultiplayerArena extends DurableObject {
         const room = this.roomManager.getRoom(conn.currentRoomCode);
         if (!room || room.status !== 'FINISHED') return;
 
+        this.stopBotSimulation(room.id);
         const resetRoom = this.roomManager.resetRoomForRematch(conn.currentRoomCode);
         if (resetRoom) {
           this.connectionManager.broadcastToRoom(resetRoom, {
@@ -522,6 +546,170 @@ export class MultiplayerArena extends DurableObject {
         }
         break;
       }
+    }
+  }
+
+  private startQuickMatchRace(room: Room): void {
+    // Ensure all players have currentRoomCode and ready status
+    for (const p of Object.values(room.players)) {
+      this.connectionManager.setRoomForPlayer(p.id, room.id);
+      p.ready = true;
+      p.status = 'READY';
+      // Clear any pending matchmaking timers
+      const mmTimer = this.matchmakingTimers.get(p.id);
+      if (mmTimer) {
+        clearTimeout(mmTimer);
+        this.matchmakingTimers.delete(p.id);
+      }
+    }
+
+    // Broadcast MATCH_FOUND and ROOM_UPDATED to all players in the room
+    this.connectionManager.broadcastToRoom(room, {
+      type: 'MATCH_FOUND',
+      payload: { roomCode: room.id, room },
+    });
+    this.connectionManager.broadcastToRoom(room, {
+      type: 'ROOM_UPDATED',
+      payload: { room },
+    });
+
+    // Auto-schedule countdown after 1200ms
+    setTimeout(() => {
+      if (room.status !== 'LOBBY') return;
+      const countdownData = RaceManager.scheduleCountdown(room);
+
+      this.connectionManager.broadcastToRoom(room, {
+        type: 'RACE_COUNTDOWN',
+        payload: countdownData,
+      });
+
+      const delayMs = Math.max(0, countdownData.startAt - Date.now());
+      setTimeout(() => {
+        if (room.status === 'COUNTDOWN') {
+          RaceManager.startRace(room);
+          this.connectionManager.broadcastToRoom(room, {
+            type: 'RACE_STARTED',
+            payload: {
+              startAt: countdownData.startAt,
+              durationSeconds: room.settings.durationSeconds,
+            },
+          });
+
+          // Start bot simulation if bot exists
+          this.startBotSimulation(room);
+
+          const durationMs = room.settings.durationSeconds * 1000;
+          const existingTimer = this.raceTimers.get(room.id);
+          if (existingTimer) clearTimeout(existingTimer);
+
+          const timer = setTimeout(() => {
+            if (room.status === 'RACING') {
+              this.stopBotSimulation(room.id);
+              const rankings = RaceManager.finalizeRace(room);
+              this.connectionManager.broadcastToRoom(room, {
+                type: 'RACE_FINISHED',
+                payload: { rankings, reason: 'timeout' },
+              });
+            }
+            this.raceTimers.delete(room.id);
+          }, durationMs);
+
+          this.raceTimers.set(room.id, timer);
+        }
+      }, delayMs);
+    }, 1200);
+  }
+
+  private startBotSimulation(room: Room): void {
+    const bots = Object.values(room.players).filter((p) => p.isBot);
+    if (bots.length === 0) return;
+
+    const botTimer = setInterval(() => {
+      if (room.status !== 'RACING') {
+        this.stopBotSimulation(room.id);
+        return;
+      }
+
+      const raceStartAt = room.raceStartAt || Date.now();
+      const textLen = room.text.length;
+
+      // Check if human racers have finished; if so, accelerate bot to conclude swiftly
+      const humans = Object.values(room.players).filter((p) => !p.isBot && p.status !== 'DISCONNECTED');
+      const allHumansFinished = humans.length > 0 && humans.every((h) => h.status === 'FINISHED');
+
+      for (const bot of bots) {
+        if (bot.status === 'FINISHED') continue;
+
+        const targetWpm = bot.targetWpm || 70;
+        const charsStep = allHumansFinished
+          ? Math.max(15, Math.ceil((textLen - bot.correctChars) / 3))
+          : Math.max(2, Math.round(((targetWpm * 5) / 120) * (0.85 + Math.random() * 0.3)));
+
+        bot.correctChars = Math.min(textLen, bot.correctChars + charsStep);
+        bot.totalChars = bot.correctChars;
+        bot.progress = Math.min(100, Math.round((bot.correctChars / textLen) * 100));
+
+        const elapsedMinutes = Math.max(0.01, (Date.now() - raceStartAt) / 60000);
+        bot.wpm = Math.round((bot.correctChars / 5) / elapsedMinutes);
+
+        this.connectionManager.broadcastToRoom(room, {
+          type: 'PLAYER_PROGRESS',
+          payload: {
+            playerId: bot.id,
+            progress: bot.progress,
+            correctChars: bot.correctChars,
+            wpm: bot.wpm,
+            accuracy: bot.accuracy,
+          },
+        });
+
+        if (bot.correctChars >= textLen) {
+          bot.status = 'FINISHED';
+          bot.finishedAt = Date.now();
+          const finishedCount = Object.values(room.players).filter((p) => p.status === 'FINISHED').length;
+          bot.rank = finishedCount;
+
+          const durationSeconds = Math.max(1, (bot.finishedAt - raceStartAt) / 1000);
+
+          this.connectionManager.broadcastToRoom(room, {
+            type: 'PLAYER_FINISHED',
+            payload: {
+              playerId: bot.id,
+              name: bot.name,
+              rank: bot.rank,
+              wpm: bot.wpm,
+              accuracy: bot.accuracy,
+              timeTakenSeconds: Math.round(durationSeconds * 10) / 10,
+            },
+          });
+
+          // Check if all connected players have finished
+          const connectedPlayers = Object.values(room.players).filter((p) => p.status !== 'DISCONNECTED');
+          if (connectedPlayers.every((p) => p.status === 'FINISHED')) {
+            this.stopBotSimulation(room.id);
+            const raceTimer = this.raceTimers.get(room.id);
+            if (raceTimer) {
+              clearTimeout(raceTimer);
+              this.raceTimers.delete(room.id);
+            }
+            const rankings = RaceManager.finalizeRace(room);
+            this.connectionManager.broadcastToRoom(room, {
+              type: 'RACE_FINISHED',
+              payload: { rankings, reason: 'completed' },
+            });
+          }
+        }
+      }
+    }, 500);
+
+    this.botSimTimers.set(room.id, botTimer);
+  }
+
+  private stopBotSimulation(roomId: string): void {
+    const timer = this.botSimTimers.get(roomId);
+    if (timer) {
+      clearInterval(timer);
+      this.botSimTimers.delete(roomId);
     }
   }
 }

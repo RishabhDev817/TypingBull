@@ -1,6 +1,6 @@
 import type { SupportedLocale } from './ui';
 
-export type FAQCategoryKey = 'All' | 'Games' | 'AI Tutor' | 'Curriculum' | 'General Typing';
+export type FAQCategoryKey = 'All' | 'Multiplayer' | 'Games' | 'AI Tutor' | 'Curriculum' | 'General Typing';
 
 export interface LocalizedFAQItem {
   id: string;
@@ -20,6 +20,7 @@ export interface FAQLocalUi {
 export const FAQ_CATEGORY_LABELS: Record<SupportedLocale, Record<FAQCategoryKey, string>> = {
   en: {
     All: 'All',
+    Multiplayer: 'Multiplayer Races',
     Games: 'Games',
     'AI Tutor': 'AI Tutor',
     Curriculum: 'Curriculum',
@@ -27,6 +28,7 @@ export const FAQ_CATEGORY_LABELS: Record<SupportedLocale, Record<FAQCategoryKey,
   },
   es: {
     All: 'Todos',
+    Multiplayer: 'Carreras Multijugador',
     Games: 'Juegos',
     'AI Tutor': 'Tutor IA',
     Curriculum: 'Currículo',
@@ -34,6 +36,7 @@ export const FAQ_CATEGORY_LABELS: Record<SupportedLocale, Record<FAQCategoryKey,
   },
   fr: {
     All: 'Tous',
+    Multiplayer: 'Courses Multijoueur',
     Games: 'Jeux',
     'AI Tutor': 'Tuteur IA',
     Curriculum: 'Programme',
@@ -41,6 +44,7 @@ export const FAQ_CATEGORY_LABELS: Record<SupportedLocale, Record<FAQCategoryKey,
   },
   de: {
     All: 'Alle',
+    Multiplayer: 'Mehrspieler-Rennen',
     Games: 'Spiele',
     'AI Tutor': 'KI-Tutor',
     Curriculum: 'Lehrplan',
@@ -48,6 +52,7 @@ export const FAQ_CATEGORY_LABELS: Record<SupportedLocale, Record<FAQCategoryKey,
   },
   pt: {
     All: 'Todos',
+    Multiplayer: 'Corridas Multijogador',
     Games: 'Jogos',
     'AI Tutor': 'Tutor IA',
     Curriculum: 'Currículo',
@@ -55,6 +60,7 @@ export const FAQ_CATEGORY_LABELS: Record<SupportedLocale, Record<FAQCategoryKey,
   },
   it: {
     All: 'Tutti',
+    Multiplayer: 'Gare Multigiocatore',
     Games: 'Giochi',
     'AI Tutor': 'Tutor IA',
     Curriculum: 'Percorso',
@@ -62,6 +68,7 @@ export const FAQ_CATEGORY_LABELS: Record<SupportedLocale, Record<FAQCategoryKey,
   },
   ja: {
     All: 'すべて',
+    Multiplayer: 'マルチプレイヤーレース',
     Games: 'ゲーム',
     'AI Tutor': 'AIチューター',
     Curriculum: 'カリキュラム',
@@ -69,6 +76,7 @@ export const FAQ_CATEGORY_LABELS: Record<SupportedLocale, Record<FAQCategoryKey,
   },
   ko: {
     All: '전체',
+    Multiplayer: '멀티플레이어 레이스',
     Games: '게임',
     'AI Tutor': 'AI 튜터',
     Curriculum: '커리큘럼',
@@ -76,6 +84,7 @@ export const FAQ_CATEGORY_LABELS: Record<SupportedLocale, Record<FAQCategoryKey,
   },
   hi: {
     All: 'सभी',
+    Multiplayer: 'मल्टीप्लेयर रेस',
     Games: 'गेम्स',
     'AI Tutor': 'AI ट्यूटर',
     Curriculum: 'पाठ्यक्रम',
@@ -256,6 +265,34 @@ export const FAQ_DATA_BY_LANG: Record<SupportedLocale, LocalizedFAQItem[]> = {
       answer:
         'Yes. All curriculum levels, arcade game modes, custom practice arenas, and AI performance reports are completely free to access.',
     },
+    {
+      id: 'faq-16',
+      category: 'Multiplayer',
+      question: 'How does real-time multiplayer racing work in Practice Ground?',
+      answer:
+        'Practice Ground lets you compete in head-to-head typing races on a visual live speedway. All racers receive the exact same passage and start simultaneously following a synchronized 3-2-1 countdown. As you type, real-time progress bars show your speed and lane position relative to rivals, ending with an instant podium and stats report.',
+    },
+    {
+      id: 'faq-17',
+      category: 'Multiplayer',
+      question: 'What is Quick Match and how do challenger bots work?',
+      answer:
+        'Quick Match instantly pairs you with online typists. If no human opponent is queuing within a few seconds, an arena challenger bot (such as CyberBull, SpeedyFalcon, or NeonCheetah) automatically joins the race with natural human-like typing cadence and variable WPM, ensuring you never wait around in empty lobbies.',
+    },
+    {
+      id: 'faq-18',
+      category: 'Multiplayer',
+      question: 'Can I create private rooms to race against friends or classmates?',
+      answer:
+        'Yes! You can create custom private rooms with a unique 5-letter room code. Room hosts can customize max player capacity and race duration, invite friends via direct link or code, ready up together in the pre-race lobby, and launch custom multiplayer tournaments.',
+    },
+    {
+      id: 'faq-19',
+      category: 'Multiplayer',
+      question: 'How does TypingBull prevent cheating and ensure fair race rankings?',
+      answer:
+        'Our dedicated multiplayer server validates keystrokes, character timestamps, and completion rates authoritatively. Anti-paste protection prevents copy-paste exploits, and speeds are calculated using canonical Net WPM formulas, ensuring completely fair leaderboards and certified personal bests.',
+    },
   ],
 
   es: [
@@ -363,6 +400,34 @@ export const FAQ_DATA_BY_LANG: Record<SupportedLocale, LocalizedFAQItem[]> = {
       question: '¿TypingBull es gratis?',
       answer:
         'Sí. Todos los niveles curriculares, modos de juego arcade, arenas de práctica personalizadas e informes de IA son 100% gratuitos.',
+    },
+    {
+      id: 'faq-16',
+      category: 'Multiplayer',
+      question: '¿Cómo funcionan las carreras multijugador en tiempo real en Practice Ground?',
+      answer:
+        'Practice Ground te permite competir en carreras de mecanografía en vivo en una pista de velocidad interactiva. Todos los corredores reciben el mismo texto y arrancan simultáneamente tras una cuenta regresiva 3-2-1. Las barras de progreso muestran tu posición y PPM en tiempo real frente a tus rivales hasta el podio final.',
+    },
+    {
+      id: 'faq-17',
+      category: 'Multiplayer',
+      question: '¿Qué es Partida Rápida y cómo funcionan los bots retadores?',
+      answer:
+        'Partida Rápida (Quick Match) te empareja al instante con mecanógrafos en línea. Si no hay rivales humanos en cola tras unos segundos, un bot retador de la arena (como CyberBull o SpeedyFalcon) se une automáticamente con cadencia de escritura realista para que nunca te quedes esperando.',
+    },
+    {
+      id: 'faq-18',
+      category: 'Multiplayer',
+      question: '¿Puedo crear salas privadas para competir con amigos o compañeros de clase?',
+      answer:
+        '¡Sí! Puedes crear salas privadas personalizadas con un código de 5 letras. El anfitrión puede configurar el límite de jugadores y la duración, compartir el enlace con amigos, prepararse en la sala de espera y disputar torneos privados.',
+    },
+    {
+      id: 'faq-19',
+      category: 'Multiplayer',
+      question: '¿Cómo evita TypingBull las trampas en las carreras multijugador?',
+      answer:
+        'Nuestro servidor multijugador valida cada pulsación, marcas de tiempo y ritmo de escritura de forma autoritativa. El sistema bloquea acciones de copiar y pegar y calcula la velocidad neta real en PPM para garantizar clasificaciones 100% justas y limpias.',
     },
   ],
 
@@ -472,6 +537,34 @@ export const FAQ_DATA_BY_LANG: Record<SupportedLocale, LocalizedFAQItem[]> = {
       answer:
         "Oui. Tous les cours du cursus, les jeux d'arcade, l'arène de pratique et les rapports d'analyse IA sont 100% gratuits.",
     },
+    {
+      id: 'faq-16',
+      category: 'Multiplayer',
+      question: 'Comment fonctionnent les courses multijoueur en direct sur Practice Ground ?',
+      answer:
+        "Practice Ground vous permet de participer à des duels de frappe en temps réel sur un circuit visuel interactif. Tous les pilotes reçoivent le même extrait et partent ensemble après un compte à rebours 3-2-1. Votre progression et vos MPM sont affichés en direct face à vos adversaires jusqu'au podium final.",
+    },
+    {
+      id: 'faq-17',
+      category: 'Multiplayer',
+      question: "Qu'est-ce que la Partie Rapide et comment fonctionnent les bots arène ?",
+      answer:
+        "La Partie Rapide vous connecte instantanément à des adversaires en ligne. Si aucun joueur n'est disponible après quelques secondes, un bot challenger (comme CyberBull ou SpeedyFalcon) rejoint automatiquement la course avec une cadence de frappe humaine réaliste pour éviter toute attente.",
+    },
+    {
+      id: 'faq-18',
+      category: 'Multiplayer',
+      question: 'Puis-je créer des salons privés pour défier mes amis ou mes camarades ?',
+      answer:
+        "Oui ! Vous pouvez créer des salons privés avec un code à 5 lettres. L'hôte peut configurer le nombre de participants et la durée, inviter des amis via un lien direct, se préparer dans le salon d'attente et lancer des tournois personnalisés.",
+    },
+    {
+      id: 'faq-19',
+      category: 'Multiplayer',
+      question: "Comment TypingBull garantit-il l'équité et empêche-t-il la triche en course ?",
+      answer:
+        "Notre serveur multijoueur dédié certifie chaque frappe et horodatage de manière autoritaire. La protection anti-collage empêche la triche et les calculs de MPM nets garantissent des classements rigoureusement fiables et authentiques.",
+    },
   ],
 
   de: [
@@ -579,6 +672,34 @@ export const FAQ_DATA_BY_LANG: Record<SupportedLocale, LocalizedFAQItem[]> = {
       question: 'Ist TypingBull kostenlos nutzbar?',
       answer:
         'Ja. Sämtliche Lehrplanstufen, Spiele, Übungs-Arenen und KI-Analysen stehen dauerhaft kostenlos zur Verfügung.',
+    },
+    {
+      id: 'faq-16',
+      category: 'Multiplayer',
+      question: 'Wie funktionieren die Echtzeit-Mehrspieler-Rennen im Practice Ground?',
+      answer:
+        'Im Practice Ground treten Sie in Live-Tippwettrennen auf einer dynamischen Rennstrecke gegeneinander an. Alle Teilnehmer tippen denselben Text und starten zeitgleich nach einem 3-2-1-Countdown. Fortschrittsbalken und WPM-Werte zeigen Ihre Position live bis zum Siegerpodest.',
+    },
+    {
+      id: 'faq-17',
+      category: 'Multiplayer',
+      question: 'Was ist das Schnelle Spiel und wie funktionieren die Arena-Bots?',
+      answer:
+        'Das Schnelle Spiel verbindet Sie sofort mit Online-Tippern. Sollte nach wenigen Sekunden kein menschlicher Gegner in der Warteschlange sein, tritt automatisch ein Arena-Challenger-Bot (z. B. CyberBull oder SpeedyFalcon) mit natürlicher Tippkadenz bei, sodass Sie nie warten müssen.',
+    },
+    {
+      id: 'faq-18',
+      category: 'Multiplayer',
+      question: 'Kann ich private Räume erstellen, um gegen Freunde oder Mitschüler anzutreten?',
+      answer:
+        'Ja! Erstellen Sie individuelle Privaträume mit einem 5-stelligen Raumcode. Der Host kann Teilnehmerlimits und Rundenzeiten anpassen, Freunde per Link einladen und private Tippturniere starten.',
+    },
+    {
+      id: 'faq-19',
+      category: 'Multiplayer',
+      question: 'Wie verhindert TypingBull Betrug und manipuliertes Tippen?',
+      answer:
+        'Unser dedizierter Mehrspieler-Server validiert alle Tastenanschläge und Zeitstempel serverseitig. Einfügeschutz verhindert Copy-Paste-Tricks und die Netto-WPM-Berechnung sichert faire und verlässliche Ranglisten.',
     },
   ],
 
@@ -688,6 +809,34 @@ export const FAQ_DATA_BY_LANG: Record<SupportedLocale, LocalizedFAQItem[]> = {
       answer:
         'Sim. Todas as fases do currículo, jogos, arenas de treino e diagnósticos com IA são totalmente gratuitos.',
     },
+    {
+      id: 'faq-16',
+      category: 'Multiplayer',
+      question: 'Como funcionam as corridas multijogador em tempo real no Practice Ground?',
+      answer:
+        'As corridas multijogador colocam você contra outros digitadores em uma pista dinâmica ao vivo. Todos os participantes digitam o mesmo trecho simultaneamente após uma contagem 3-2-1. Barras de progresso e velocímetro WPM em tempo real mostram sua posição até o pódio.',
+    },
+    {
+      id: 'faq-17',
+      category: 'Multiplayer',
+      question: 'O que é a Partida Rápida e como funcionam os bots desafiantes?',
+      answer:
+        'A Partida Rápida conecta você imediatamente com corredores online. Se não houver concorrentes humanos na fila em poucos segundos, um bot desafiante da arena (como CyberBull ou SpeedyFalcon) entra na corrida com ritmo humano natural para que você nunca fique esperando.',
+    },
+    {
+      id: 'faq-18',
+      category: 'Multiplayer',
+      question: 'Posso criar salas privadas para correr contra amigos ou colegas de turma?',
+      answer:
+        'Sim! Crie salas privadas personalizadas com um código de sala de 5 dígitos. O anfitrião pode configurar o limite de jogadores, tempo de partida, convidar amigos com link direto e organizar torneios de digitação.',
+    },
+    {
+      id: 'faq-19',
+      category: 'Multiplayer',
+      question: 'Como o TypingBull garante corridas justas e sem trapaças?',
+      answer:
+        'Nosso servidor multijogador dedicado valida todas as teclas digitadas e carimbos de data/hora no lado do servidor. O bloqueio contra colagem impede cópias e a métrica de WPM líquido garante pontuações justas e confiáveis nas tabelas de classificação.',
+    },
   ],
 
   it: [
@@ -795,6 +944,34 @@ export const FAQ_DATA_BY_LANG: Record<SupportedLocale, LocalizedFAQItem[]> = {
       question: 'TypingBull è gratuito?',
       answer:
         'Sì. Tutti i livelli didattici, i giochi, le arene di allenamento e i report IA sono completamente gratuiti.',
+    },
+    {
+      id: 'faq-16',
+      category: 'Multiplayer',
+      question: 'Come funzionano le gare multigiocatore in tempo reale nel Practice Ground?',
+      answer:
+        'Le gare multigiocatore ti mettono alla prova contro altri dattilografi su una pista dinamica in tempo reale. Tutti i piloti digitano lo stesso brano contemporaneamente dopo un conto alla rovescia 3-2-1. Barre di avanzamento e tachimetro WPM live mostrano la tua posizione fino al podio.',
+    },
+    {
+      id: 'faq-17',
+      category: 'Multiplayer',
+      question: 'Cosa è la Partita Rapida e come funzionano i bot sfidanti?',
+      answer:
+        'La Partita Rapida ti collega all’istante con altri dattilografi online. Se nessun concorrente umano è in coda entro pochi secondi, un bot sfidante dell’arena (come CyberBull o SpeedyFalcon) scende in pista con ritmo naturale per non farti mai aspettare.',
+    },
+    {
+      id: 'faq-18',
+      category: 'Multiplayer',
+      question: 'Posso creare stanze private per sfidare amici o compagni di classe?',
+      answer:
+        'Sì! Crea stanze private personalizzate con un codice a 5 caratteri. Il creatore della stanza può impostare il numero massimo di giocatori, durata della sessione, condividere il link d’invito e organizzare gare personalizzate.',
+    },
+    {
+      id: 'faq-19',
+      category: 'Multiplayer',
+      question: 'In che modo TypingBull garantisce competizioni leali e senza trucchi?',
+      answer:
+        'Il nostro server multigiocatore dedicato convalida ogni pressione dei tasti e timestamp lato server. La protezione anti-incolla impedisce scorciatoie di copia-incolla e il calcolo delle WPM nette garantisce classifiche pulite e sicure.',
     },
   ],
 
@@ -904,6 +1081,34 @@ export const FAQ_DATA_BY_LANG: Record<SupportedLocale, LocalizedFAQItem[]> = {
       answer:
         'はい。すべての学習コース、アーケードゲームモード、カスタム練習アリーナ、AI診断レポートは完全無料でご利用いただけます。',
     },
+    {
+      id: 'faq-16',
+      category: 'Multiplayer',
+      question: 'Practice Groundのリアルタイムマルチプレイヤーレースはどのように動作しますか？',
+      answer:
+        'マルチプレイヤーレースでは、リアルタイムのレーストラック上で世界中のタイピストと対戦できます。3-2-1のカウントダウン後、全員が同じ課題文を一斉に入力開始します。進行バーやライブWPMメーターで相手との差がリアルタイムに表示され、白熱したゴール争いが楽しめます。',
+    },
+    {
+      id: 'faq-17',
+      category: 'Multiplayer',
+      question: 'クイックマッチとアリーナボットはどのような仕組みですか？',
+      answer:
+        'クイックマッチをクリックすると、即座にオンライン対戦キューに参加します。待機列に人間プレイヤーがいない場合でも、数秒以内に人間らしい自然な入力リズムを持つアリーナボット（CyberBullやSpeedyFalconなど）が参戦するため、待ち時間なしでいつでもレースが始められます。',
+    },
+    {
+      id: 'faq-18',
+      category: 'Multiplayer',
+      question: '友達やクラスメイトと競うためのプライベートルームを作成できますか？',
+      answer:
+        'はい！5桁の専用ルームコードを使ってカスタムプライベートルームを作成できます。ホストは最大参加人数や制限時間を設定し、招待リンクを共有してクラスや友達同士でタイピング大会を開催できます。',
+    },
+    {
+      id: 'faq-19',
+      category: 'Multiplayer',
+      question: 'TypingBullは不正行為の防止や公正な順位判定をどのように行っていますか？',
+      answer:
+        '専用のマルチプレイヤーサーバーが各キーストロークとタイムスタンプをサーバー側で厳密に検証します。貼り付け（ペースト）防止保護により不正なコピー入力を遮断し、純WPM計算によって公平で改ざんのないリーダーボードを実現しています。',
+    },
   ],
 
   ko: [
@@ -1012,6 +1217,34 @@ export const FAQ_DATA_BY_LANG: Record<SupportedLocale, LocalizedFAQItem[]> = {
       answer:
         '네. 모든 학습 커리큘럼, 아케이드 게임 모드, 커스텀 연습실, AI 분석 리포트까지 100% 완전 무료입니다.',
     },
+    {
+      id: 'faq-16',
+      category: 'Multiplayer',
+      question: 'Practice Ground의 실시간 멀티플레이어 타자 레이스는 어떻게 진행되나요?',
+      answer:
+        '멀티플레이어 레이스는 역동적인 스피드웨이 트랙에서 실시간으로 다른 타자들과 대결하는 모드입니다. 3-2-1 카운트다운 후 모든 참가자가 동일한 텍스트를 동시에 타이핑하기 시작하며, 실시간 진행 바와 WPM 속도계를 통해 결승선까지의 순위를 즉시 확인할 수 있습니다.',
+    },
+    {
+      id: 'faq-17',
+      category: 'Multiplayer',
+      question: '빠른 매칭(Quick Match)과 아레나 봇은 어떻게 작동하나요?',
+      answer:
+        '빠른 매칭을 선택하면 즉시 온라인 대기열에 진입합니다. 몇 초 내에 사람 참가자가 매칭되지 않으면 인간적인 타이핑 리듬을 가진 아레나 챌린저 봇(CyberBull, SpeedyFalcon 등)이 자동 출전하여 대기 시간 없이 즉시 레이스를 즐길 수 있습니다.',
+    },
+    {
+      id: 'faq-18',
+      category: 'Multiplayer',
+      question: '친구들이나 학급 동료들과 대결할 비공개 방을 만들 수 있나요?',
+      answer:
+        '네! 5자리 룸 코드를 발급받아 비공개 맞춤형 룸을 만들 수 있습니다. 방장은 참가 인원 수와 경기 제한 시간을 설정할 수 있으며, 초대 링크를 전송하여 친구나 학급 단위의 타자 토너먼트를 주최할 수 있습니다.',
+    },
+    {
+      id: 'faq-19',
+      category: 'Multiplayer',
+      question: '부정 행위 방지와 공정한 순위 판정은 어떻게 이루어지나요?',
+      answer:
+        '전용 멀티플레이어 서버가 모든 키 입력 스트로크와 타임스탬프를 서버 측에서 직접 검증합니다. 텍스트 붙여넣기(Ctrl+V) 차단 시스템과 순 WPM 계산 방식을 통해 매크로 및 치팅 없는 공정하고 신뢰할 수 있는 리더보드를 보장합니다.',
+    },
   ],
 
   hi: [
@@ -1119,6 +1352,34 @@ export const FAQ_DATA_BY_LANG: Record<SupportedLocale, LocalizedFAQItem[]> = {
       question: 'क्या TypingBull का उपयोग पूरी तरह से मुफ़्त है?',
       answer:
         'हाँ। सभी पाठ्यक्रम स्तर, आर्केड गेम मोड, अभ्यास अखाड़ा और AI प्रदर्शन रिपोर्ट 100% पूरी तरह से मुफ़्त हैं।',
+    },
+    {
+      id: 'faq-16',
+      category: 'Multiplayer',
+      question: 'Practice Ground में रीयल-टाइम मल्टीप्लेयर टाइपिंग रेस कैसे काम करती है?',
+      answer:
+        'मल्टीप्लेयर रेस आपको लाइव स्पीडवे ट्रैक पर अन्य टाइपिस्टों के खिलाफ मुकाबला करने का मौका देती है। 3-2-1 काउंटडाउन के बाद सभी प्रतिभागी एक साथ समान पैराग्राफ टाइप करना शुरू करते हैं। रीयल-टाइम प्रोग्रेस बार और WPM स्पीडोमीटर पोडियम तक आपकी लाइव स्थिति दिखाते हैं।',
+    },
+    {
+      id: 'faq-17',
+      category: 'Multiplayer',
+      question: 'त्वरित मैच (Quick Match) क्या है और चैलेंजर बॉट कैसे काम करते हैं?',
+      answer:
+        'त्वरित मैच आपको तुरंत ऑनलाइन खिलाड़ियों से जोड़ता है। यदि कुछ सेकंड के भीतर कोई अन्य खिलाड़ी कतार में नहीं होता है, तो स्वाभाविक मानव टाइपिंग गति वाले एरीना चैलेंजर बॉट (जैसे CyberBull या SpeedyFalcon) तुरंत शामिल हो जाते हैं ताकि आपको कभी इंतजार न करना पड़े।',
+    },
+    {
+      id: 'faq-18',
+      category: 'Multiplayer',
+      question: 'क्या मैं दोस्तों या सहपाठियों के साथ खेलने के लिए प्राइवेट रूम बना सकता हूँ?',
+      answer:
+        'हाँ! 5-अंकों के रूम कोड के साथ कस्टम प्राइवेट रूम बनाएं। रूम होस्ट अधिकतम खिलाड़ियों की संख्या और समय सीमा निर्धारित कर सकता है, डायरेक्ट इनवाइट लिंक साझा कर सकता है और दोस्तों के बीच निजी टाइपिंग टूर्नामेंट आयोजित कर सकता है।',
+    },
+    {
+      id: 'faq-19',
+      category: 'Multiplayer',
+      question: 'TypingBull चीटिंग को कैसे रोकता है और निष्पक्ष रैंकिंग कैसे सुनिश्चित करता है?',
+      answer:
+        'हमारा समर्पित मल्टीप्लेयर सर्वर सभी कीस्ट्रोक्स और टाइमस्टैम्प को सर्वर साइड पर सत्यापित करता है। पेस्ट-प्रोटेक्शन कॉपी-पेस्ट ट्रिक्स को रोकता है और नेट डब्ल्यूपीएम गणना लीडरबोर्ड पर निष्पक्ष और सटीक परिणाम सुनिश्चित करती है।',
     },
   ],
 };

@@ -15,6 +15,7 @@ export const PlayPage: React.FC = () => {
   const modeParam = searchParams.get('mode') || '';
   const isPracticeGroundRoute =
     location.pathname.includes('/practice-ground') ||
+    location.pathname.includes('/multiplayer') ||
     modeParam === 'practice-ground' ||
     Boolean(roomParam);
 

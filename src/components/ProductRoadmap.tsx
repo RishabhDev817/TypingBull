@@ -11,7 +11,7 @@ export interface RoadmapCardData {
   titleKey: string;
   descKey: string;
   tagKey: string;
-  status: 'inDev' | 'comingSoon';
+  status: 'inDev' | 'comingSoon' | 'live';
   glowColor: 'cyan' | 'purple' | 'amber' | 'emerald';
 }
 
@@ -33,8 +33,8 @@ const ROADMAP_ITEMS: RoadmapCardData[] = [
     titleKey: 'roadmap.card2.title',
     descKey: 'roadmap.card2.desc',
     tagKey: 'roadmap.card2.tag',
-    status: 'comingSoon',
-    glowColor: 'purple',
+    status: 'live',
+    glowColor: 'emerald',
   },
   {
     id: 'global-leaderboards',
@@ -142,21 +142,31 @@ export const ProductRoadmap: React.FC<ProductRoadmapProps> = ({ className = '' }
                     </span>
                   </div>
 
-                  {/* Status Pill Badge (Soft Purple or Neon Cyan accent) */}
+                  {/* Status Pill Badge */}
                   <span
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold tracking-wide uppercase shadow-2xs border ${
-                      isInDev
+                      item.status === 'live'
+                        ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/40 badge-live-pulse'
+                        : isInDev
                         ? 'bg-cyan-500/15 dark:bg-cyan-400/15 text-cyan-700 dark:text-cyan-300 border-cyan-500/30'
                         : 'bg-purple-500/15 dark:bg-purple-400/15 text-purple-700 dark:text-purple-300 border-purple-500/30'
                     }`}
                   >
                     <span
                       className={`w-1.5 h-1.5 rounded-full ${
-                        isInDev ? 'bg-cyan-500 dark:bg-cyan-400 animate-pulse' : 'bg-purple-500 dark:bg-purple-400'
+                        item.status === 'live'
+                          ? 'bg-emerald-500 shadow-sm'
+                          : isInDev
+                          ? 'bg-cyan-500 dark:bg-cyan-400 animate-pulse'
+                          : 'bg-purple-500 dark:bg-purple-400'
                       }`}
                     />
                     <span>
-                      {isInDev ? t('roadmap.status.inDev') : t('roadmap.status.comingSoon')}
+                      {item.status === 'live'
+                        ? 'NOW LIVE'
+                        : isInDev
+                        ? t('roadmap.status.inDev')
+                        : t('roadmap.status.comingSoon')}
                     </span>
                   </span>
                 </div>

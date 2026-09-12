@@ -27,106 +27,151 @@
     <xhtml:link rel="alternate" hreflang="ko-KR" href="https://typingbull.com/ko/"/>
     <xhtml:link rel="alternate" hreflang="hi" href="https://typingbull.com/hi/"/>
     <xhtml:link rel="alternate" hreflang="hi-IN" href="https://typingbull.com/hi/"/>
+    <lastmod>2026-09-12</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
-  <!-- Touch Typing Guidelines & Ergonomics -->
+  <!-- Practice Ground / Real-Time Multiplayer Speedway Races -->
   <url>
-    <loc>https://typingbull.com/guidelines</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <loc>https://typingbull.com/practice-ground</loc>
+    <lastmod>2026-09-12</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
   </url>
-
-  <!-- Structured Lessons / Learn Curriculum -->
   <url>
-    <loc>https://typingbull.com/learn</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <loc>https://typingbull.com/multiplayer</loc>
+    <lastmod>2026-09-12</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
   </url>
-
-  <!-- Custom Practice Arena & Speed Drills -->
   <url>
-    <loc>https://typingbull.com/practice</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <loc>https://typingbull.com/play/practice-ground</loc>
+    <lastmod>2026-09-12</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.90</priority>
   </url>
 
   <!-- Arcade Games Mode -->
   <url>
     <loc>https://typingbull.com/play</loc>
+    <lastmod>2026-09-12</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.90</priority>
+  </url>
+
+  <!-- Structured Lessons / Learn Curriculum -->
+  <url>
+    <loc>https://typingbull.com/learn</loc>
+    <lastmod>2026-09-12</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.90</priority>
+  </url>
+
+  <!-- Custom Practice Arena & Speed Drills -->
+  <url>
+    <loc>https://typingbull.com/practice</loc>
+    <lastmod>2026-09-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+  </url>
+
+  <!-- Touch Typing Guidelines & Ergonomics -->
+  <url>
+    <loc>https://typingbull.com/guidelines</loc>
+    <lastmod>2026-09-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Product Roadmap & Feature Announcements -->
+  <url>
+    <loc>https://typingbull.com/roadmap</loc>
+    <lastmod>2026-09-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
   </url>
 
   <!-- About TypingBull -->
   <url>
     <loc>https://typingbull.com/about</loc>
+    <lastmod>2026-09-12</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.70</priority>
   </url>
 
   <!-- Contact Us -->
   <url>
     <loc>https://typingbull.com/contact</loc>
+    <lastmod>2026-09-12</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.60</priority>
   </url>
 
   <!-- Privacy Policy -->
   <url>
     <loc>https://typingbull.com/privacy</loc>
+    <lastmod>2026-09-12</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.50</priority>
   </url>
 
   <!-- Terms & Conditions -->
   <url>
     <loc>https://typingbull.com/terms</loc>
+    <lastmod>2026-09-12</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.50</priority>
   </url>
 
   <!-- Multilingual Root Pages -->
   <url>
     <loc>https://typingbull.com/es/</loc>
+    <lastmod>2026-09-12</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.80</priority>
   </url>
   <url>
     <loc>https://typingbull.com/ja/</loc>
+    <lastmod>2026-09-12</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.80</priority>
   </url>
   <url>
     <loc>https://typingbull.com/fr/</loc>
+    <lastmod>2026-09-12</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.80</priority>
   </url>
   <url>
     <loc>https://typingbull.com/de/</loc>
+    <lastmod>2026-09-12</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.80</priority>
   </url>
   <url>
     <loc>https://typingbull.com/pt/</loc>
+    <lastmod>2026-09-12</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.80</priority>
   </url>
   <url>
     <loc>https://typingbull.com/it/</loc>
+    <lastmod>2026-09-12</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.80</priority>
   </url>
   <url>
     <loc>https://typingbull.com/ko/</loc>
+    <lastmod>2026-09-12</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.80</priority>
   </url>
   <url>
     <loc>https://typingbull.com/hi/</loc>
+    <lastmod>2026-09-12</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.80</priority>
   </url>
 
 </urlset>

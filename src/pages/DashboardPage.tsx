@@ -116,26 +116,47 @@ export const DashboardPage: React.FC = () => {
                 </div>
               </motion.button>
 
-              {/* Play Game Card */}
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.96 }}
-                onClick={() => { soundEngine.playPop(); navigate('/play'); }}
-                className="card-game card-halo-pink relative flex items-center gap-2.5 px-3 py-2.5 text-left cursor-pointer h-full"
-              >
-                <div className="w-8.5 h-8.5 rounded-xl flex items-center justify-center text-base shrink-0"
-                  style={{ background: 'var(--color-badge-bg-pink)', border: '1px solid var(--color-badge-border-pink)' }}
-                >🚀</div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-xs font-extrabold text-ink leading-tight">{t('dash.playGame')}</h3>
-                  <p className="text-[10.5px] text-body font-semibold leading-tight mt-0.5">{t('dash.stellarDash')}</p>
+              {/* Play Multiplayer Card with Floating Cloud Notification */}
+              <div className="relative h-full flex flex-col">
+                {/* Floating "Cloud" Notification (Speech Bubble Callout) */}
+                <div
+                  className="absolute -top-10 sm:-top-11 left-1/2 -translate-x-1/2 z-30 pointer-events-none select-none flex flex-col items-center whitespace-nowrap"
+                  aria-hidden="true"
+                >
+                  <div className="animate-cloud-float flex flex-col items-center">
+                    <div className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 text-white text-[11px] sm:text-xs font-black tracking-wide shadow-xl shadow-rose-500/30 flex items-center gap-1.5 border border-white/40 backdrop-blur-md">
+                      <span>New! Come and play multiplayer! 🎮</span>
+                    </div>
+                    {/* Speech bubble pointer arrow */}
+                    <div className="w-0 h-0 border-x-[5px] border-x-transparent border-t-[6px] border-t-rose-500 -mt-[0.5px] drop-shadow-sm" />
+                  </div>
                 </div>
-                <ArrowRight className="w-3.5 h-3.5 text-highlight-pink shrink-0" />
-                {/* Watermark illustration */}
-                <div className="absolute -bottom-2 -right-2 w-12 h-12 opacity-[0.08] pointer-events-none">
-                  <PlayGameIllustration />
-                </div>
-              </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.96 }}
+                  onClick={() => { soundEngine.playPop(); navigate('/play'); }}
+                  className="card-game card-halo-pink relative flex items-center gap-2.5 px-3 py-2.5 text-left cursor-pointer h-full w-full"
+                >
+                  <div className="w-8.5 h-8.5 rounded-xl flex items-center justify-center text-base shrink-0"
+                    style={{ background: 'var(--color-badge-bg-pink)', border: '1px solid var(--color-badge-border-pink)' }}
+                  >🏎️</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <h3 className="text-xs font-extrabold text-ink leading-tight">{t('dash.playGame')}</h3>
+                      <span className="px-1.5 py-0.5 text-[8.5px] font-black uppercase tracking-wider rounded-full bg-emerald-500 text-slate-950 dark:text-slate-950 leading-none">
+                        LIVE
+                      </span>
+                    </div>
+                    <p className="text-[10.5px] text-body font-semibold leading-tight mt-0.5">Multiplayer Speedway</p>
+                  </div>
+                  <ArrowRight className="w-3.5 h-3.5 text-highlight-pink shrink-0" />
+                  {/* Watermark illustration */}
+                  <div className="absolute -bottom-2 -right-2 w-12 h-12 opacity-[0.08] pointer-events-none">
+                    <PlayGameIllustration />
+                  </div>
+                </motion.button>
+              </div>
 
               {/* Quick Practice Card */}
               <motion.button

@@ -37,6 +37,8 @@ function AnimatedRoutes() {
         <Route path="/learn/:lessonId" element={<LessonView />} />
         <Route path="/play" element={<PlayPage />} />
         <Route path="/play/practice-ground" element={<PlayPage />} />
+        <Route path="/practice-ground" element={<PlayPage />} />
+        <Route path="/multiplayer" element={<PlayPage />} />
         <Route path="/practice" element={<PracticePage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/about-us" element={<AboutPage />} />

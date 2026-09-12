@@ -34,6 +34,8 @@ export interface Player {
   rank?: number;          // 1, 2, 3...
   finishedAt?: number;    // Timestamp when completed
   disconnectedAt?: number;
+  isBot?: boolean;
+  targetWpm?: number;
 }
 
 export interface RoomSettings {
@@ -102,7 +104,7 @@ export type ServerMessage =
   | { type: 'ROOM_JOINED'; payload: { room: Room; myPlayerId: string } }
   | { type: 'ROOM_UPDATED'; payload: { room: Room } }
   | { type: 'MATCH_SEARCHING'; payload: { message: string } }
-  | { type: 'MATCH_FOUND'; payload: { roomCode: string } }
+  | { type: 'MATCH_FOUND'; payload: { roomCode: string; room?: Room } }
   | { type: 'RACE_COUNTDOWN'; payload: { startAt: number; text: string; textTitle: string } }
   | { type: 'RACE_STARTED'; payload: { startAt: number; durationSeconds: number } }
   | {

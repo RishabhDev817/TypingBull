@@ -13,102 +13,102 @@ export interface LocalizedSEOMetadata {
 
 export const SEO_DATA_BY_LANG: Record<SupportedLocale, LocalizedSEOMetadata> = {
   en: {
-    title: 'TypingBull — Free Gamified Typing Tutor | Online Typing Test WPM & AI Coach',
+    title: 'TypingBull — Free Gamified Typing Tutor | Online Typing Test WPM & Real-Time Multiplayer Races',
     description:
-      'TypingBull is the ultimate free gamified typing tutor. Learn touch typing online with arcade games, AI typing coach analytics, typing practice for kids, fast keyboard speed drills, and coding typing tests.',
+      'TypingBull is the ultimate free gamified typing tutor and real-time multiplayer typing speedway. Learn touch typing online with arcade games, live multiplayer races, AI typing coach analytics, and fast keyboard speed drills.',
     keywords:
-      'Free Gamified Typing Tutor, online typing test wpm, learn touch typing online, ai typing coach, typing practice for kids, fast keyboard speed drills, coding typing test',
-    ogTitle: 'TypingBull — Free Gamified Typing Tutor | Online Typing Test WPM',
+      'Free Gamified Typing Tutor, online typing test wpm, learn touch typing online, multiplayer typing race, real-time typing competition, practice ground typing speedway, ai typing coach, typing practice for kids, fast keyboard speed drills, coding typing test',
+    ogTitle: 'TypingBull — Free Gamified Typing Tutor & Multiplayer Typing Races',
     ogDescription:
-      'Master touch typing online with our free gamified typing tutor. Play arcade typing games, get real-time AI typing coach analytics, and drill fast keyboard speed.',
+      'Master touch typing online with our free gamified typing tutor. Compete in real-time multiplayer typing races, play arcade games, and boost keyboard speed with AI analytics.',
     locale: 'en_US',
   },
   es: {
-    title: 'TypingBull — Tutor de Mecanografía Gamificado Gratis | Test WPM Online',
+    title: 'TypingBull — Tutor de Mecanografía Gamificado Gratis | Carreras Multijugador y Test WPM Online',
     description:
-      'Aprende con TypingBull, el tutor de mecanografía gamificado gratis líder. Prueba de mecanografía online, aprender mecanografía gratis, test de velocidad de mecanografía wpm y práctica de teclado.',
+      'Aprende con TypingBull, el tutor de mecanografía gamificado gratis líder. Carreras de mecanografía multijugador en tiempo real, prueba de mecanografía online, aprender mecanografía gratis y test de velocidad WPM.',
     keywords:
-      'Tutor de Mecanografía Gamificado Gratis, prueba de mecanografía online, aprender mecanografía gratis, test de velocidad de mecanografía wpm, práctica de teclado',
-    ogTitle: 'TypingBull — Tutor de Mecanografía Gamificado Gratis',
+      'Tutor de Mecanografía Gamificado Gratis, carreras de mecanografía multijugador, prueba de mecanografía online, aprender mecanografía gratis, test de velocidad de mecanografía wpm, práctica de teclado',
+    ogTitle: 'TypingBull — Tutor de Mecanografía Gamificado Gratis y Carreras Multijugador',
     ogDescription:
-      'Mejora tu velocidad con nuestro tutor de mecanografía gamificado gratis. Prueba de mecanografía online y práctica de teclado con juegos arcade.',
+      'Mejora tu velocidad con nuestro tutor de mecanografía gamificado gratis. Compite en carreras multijugador en tiempo real, haz tests de velocidad WPM y juega al arcade.',
     locale: 'es_ES',
   },
   fr: {
-    title: 'TypingBull — Tuteur de Dactylographie Ludique Gratuit | Test de Vitesse',
+    title: 'TypingBull — Tuteur de Dactylographie Ludique Gratuit | Courses Multijoueur et Test de Vitesse',
     description:
-      'Découvrez TypingBull, votre tuteur de dactylographie ludique gratuit. Test de dactylographie en ligne, apprendre la dactylo azerty, test de vitesse de frappe et jeux de frappe au clavier.',
+      'Découvrez TypingBull, votre tuteur de dactylographie ludique gratuit. Courses de dactylo multijoueur en temps réel, test de dactylographie en ligne, apprendre la dactylo azerty et jeux de frappe au clavier.',
     keywords:
-      'Tuteur de Dactylographie Ludique Gratuit, test de dactylographie en ligne, apprendre la dactylo azerty, test de vitesse de frappe, jeux de frappe au clavier',
-    ogTitle: 'TypingBull — Tuteur de Dactylographie Ludique Gratuit',
+      'Tuteur de Dactylographie Ludique Gratuit, course de frappe multijoueur, test de dactylographie en ligne, apprendre la dactylo azerty, test de vitesse de frappe, jeux de frappe au clavier',
+    ogTitle: 'TypingBull — Tuteur de Dactylographie Ludique et Courses Multijoueur',
     ogDescription:
-      'Apprenez la dactylo azerty avec notre tuteur de dactylographie ludique gratuit. Test de vitesse de frappe et jeux au clavier captivants.',
+      'Apprenez la dactylo azerty avec notre tuteur de dactylographie ludique gratuit. Défiez vos amis dans des courses de frappe multijoueur en direct et boostez votre vitesse.',
     locale: 'fr_FR',
   },
   de: {
-    title: 'TypingBull — Kostenloser Gamifizierter Schreibtrainer | Tipptest Online',
+    title: 'TypingBull — Kostenloser Gamifizierter Schreibtrainer | Mehrspieler-Tipprennen & Tipptest Online',
     description:
-      'Lerne das Zehnfingersystem mit TypingBull, dem kostenlosen gamifizierten Schreibtrainer. Tipptest online kostenlos, Zehnfingersystem lernen, Schreibtrainer QWERTZ und Tastatur tippen üben.',
+      'Lerne das Zehnfingersystem mit TypingBull, dem kostenlosen gamifizierten Schreibtrainer. Trete in Echtzeit-Mehrspieler-Tipprennen an, mache den Tipptest online kostenlos und übe Tastatur tippen mit Arcade-Games.',
     keywords:
-      'Kostenloser Gamifizierter Schreibtrainer, tipptest online kostenlos, zehnfingersystem lernen, schreibtrainer qwertz, tastatur tippen üben',
-    ogTitle: 'TypingBull — Kostenloser Gamifizierter Schreibtrainer',
+      'Kostenloser Gamifizierter Schreibtrainer, mehrspieler tipprennen, tipptest online kostenlos, zehnfingersystem lernen, schreibtrainer qwertz, tastatur tippen üben',
+    ogTitle: 'TypingBull — Kostenloser Gamifizierter Schreibtrainer & Mehrspieler-Rennen',
     ogDescription:
-      'Zehnfingersystem lernen mit dem kostenlosen gamifizierten Schreibtrainer. Mache den Tipptest online kostenlos und übe Tastatur tippen mit Arcade-Games.',
+      'Zehnfingersystem lernen mit dem kostenlosen Schreibtrainer. Tritt in Echtzeit-Mehrspieler-Tipprennen an, teste deine WPM und übe Tastatur tippen.',
     locale: 'de_DE',
   },
   pt: {
-    title: 'TypingBull — Tutor de Digitação Gamificado Grátis | Teste WPM Online',
+    title: 'TypingBull — Tutor de Digitação Gamificado Grátis | Corridas Multijogador e Teste WPM',
     description:
-      'Domine o teclado com o TypingBull, seu tutor de digitação gamificado grátis. Teste de digitação grátis, praticar digitação online, aula de digitação para iniciantes e acelerar velocidade de digitação.',
+      'Domine o teclado com o TypingBull, seu tutor de digitação gamificado grátis. Corridas de digitação multijogador em tempo real no Practice Ground, teste de digitação grátis e treino de velocidade.',
     keywords:
-      'Tutor de Digitação Gamificado Grátis, teste de digitação grátis, praticar digitação online, aula de digitação para iniciantes, acelerar velocidade de digitação',
-    ogTitle: 'TypingBull — Tutor de Digitação Gamificado Grátis',
+      'Tutor de Digitação Gamificado Grátis, corrida de digitação multijogador, teste de digitação grátis, praticar digitação online, aula de digitação para iniciantes, acelerar velocidade de digitação',
+    ogTitle: 'TypingBull — Tutor de Digitação Gamificado Grátis e Corridas Multijogador',
     ogDescription:
-      'Pratique digitação online com jogos arcade divertidos. Tutor de digitação gamificado grátis para acelerar velocidade de digitação.',
+      'Pratique digitação online com corridas multijogador em tempo real e jogos arcade divertidos. Acelere sua velocidade de digitação e compita com amigos.',
     locale: 'pt_BR',
   },
   it: {
-    title: 'TypingBull — Tutor di Dattilografia Gamificato Gratuito | Allenamento Tastiera',
+    title: 'TypingBull — Tutor di Dattilografia Gamificato Gratuito | Gare Multigiocatore e Test Tastiera',
     description:
-      'Impara a digitare veloce con TypingBull, il tutor di dattilografia gamificato gratuito. Test di dattilografia online, corso di dattilografia gratis, imparare a digitare veloce e allenamento tastiera.',
+      'Impara a digitare veloce con TypingBull, il tutor di dattilografia gamificato gratuito. Gare di dattilografia multigiocatore in tempo reale nel Practice Ground, test online e allenamento tastiera con IA.',
     keywords:
-      'Tutor di Dattilografia Gamificato Gratuito, test di dattilografia online, corso di dattilografia gratis, imparare a digitare veloce, allenamento tastiera',
-    ogTitle: 'TypingBull — Tutor di Dattilografia Gamificato Gratuito',
+      'Tutor di Dattilografia Gamificato Gratuito, gare di dattilografia multigiocatore, test di dattilografia online, corso di dattilografia gratis, imparare a digitare veloce, allenamento tastiera',
+    ogTitle: 'TypingBull — Tutor di Dattilografia Gamificato e Gare Multigiocatore',
     ogDescription:
-      'Corso di dattilografia gratis e test online con giochi arcade. Impara a digitare veloce con il tutor di dattilografia gamificato gratuito.',
+      'Corso di dattilografia gratis e gare multigiocatore in tempo reale. Sfida altri dattilografi, misura le tue WPM e impara a digitare veloce.',
     locale: 'it_IT',
   },
   ja: {
-    title: 'TypingBull — 無料のゲーム化されたタイピングチューター | タイピング練習 無料',
+    title: 'TypingBull — 無料のゲーム化されたタイピングチューター | リアルタイム対戦レース＆タイピング練習',
     description:
-      'TypingBullは無料のゲーム化されたタイピングチューターです。タイピング練習 無料、タイピングスピードテスト、ブラインドタッチ 練習、ローマ字 タイピング ゲームで楽しく上達。',
+      'TypingBullは無料のゲーム化されたタイピングチューターです。Practice Groundのリアルタイムマルチプレイヤー対戦レース、タイピング練習 無料、タイピングスピードテスト、ブラインドタッチ練習で楽しく上達。',
     keywords:
-      '無料のゲーム化されたタイピングチューター, タイピング練習 無料, タイピングスピードテスト, ブラインドタッチ 練習, ローマ字 タイピング ゲーム',
-    ogTitle: 'TypingBull — 無料のゲーム化されたタイピングチューター',
+      '無料のゲーム化されたタイピングチューター, タイピング 対戦 レース, タイピング練習 無料, タイピングスピードテスト, ブラインドタッチ 練習, ローマ字 タイピング ゲーム',
+    ogTitle: 'TypingBull — 無料タイピングチューター＆リアルタイムマルチ対戦',
     ogDescription:
-      '無料のゲーム化されたタイピングチューターでブラインドタッチ練習！タイピングスピードテストやローマ字タイピングゲームを体験。',
+      '無料のゲーム化されたタイピングチューターで白熱のマルチプレイヤーレースに挑戦！タイピングスピードテストやAIコーチでブラインドタッチ上達。',
     locale: 'ja_JP',
   },
   ko: {
-    title: 'TypingBull — 무료 게임형 타자 연습 튜터 | 온라인 한글 타자 테스트',
+    title: 'TypingBull — 무료 게임형 타자 연습 튜터 | 실시간 멀티플레이어 타자 레이스 & WPM 검정',
     description:
-      'TypingBull은 최고의 무료 게임형 타자 연습 튜터입니다. 무료 타자 연습, 온라인 한글 타자 테스트, 타자 속도 검정 wpm, 타자 연습 게임으로 타자 속도를 극대화하세요.',
+      'TypingBull은 최고의 무료 게임형 타자 연습 튜터입니다. Practice Ground 실시간 멀티플레이어 타자 레이스, 무료 타자 연습, 온라인 한글 타자 테스트, 타자 속도 검정 wpm으로 속도를 극대화하세요.',
     keywords:
-      '무료 게임형 타자 연습 튜터, 무료 타자 연습, 온라인 한글 타자 테스트, 타자 속도 검정 wpm, 타자 연습 게임',
-    ogTitle: 'TypingBull — 무료 게임형 타자 연습 튜터',
+      '무료 게임형 타자 연습 튜터, 멀티플레이어 타자 레이스, 실시간 타자 대결, 무료 타자 연습, 온라인 한글 타자 테스트, 타자 속도 검정 wpm',
+    ogTitle: 'TypingBull — 무료 게임형 타자 연습 튜터 & 멀티플레이어 타자 레이스',
     ogDescription:
-      '무료 게임형 타자 연습 튜터로 타자 속도 검정 wpm을 테스트하고 재미있는 게임과 함께 타자 실력을 키워보세요.',
+      '무료 게임형 타자 연습 튜터로 실시간 멀티플레이어 타자 레이스에 도전하고 WPM 속도 검정과 AI 코칭을 경험해보세요.',
     locale: 'ko_KR',
   },
   hi: {
-    title: 'TypingBull — मुफ्त गेमिफाइड टाइपिंग ट्यूटर | ऑनलाइन टाइपिंग टेस्ट WPM',
+    title: 'TypingBull — मुफ्त गेमिफाइड टाइपिंग ट्यूटर | रीयल-टाइम मल्टीप्लेयर टाइपिंग रेस & WPM टेस्ट',
     description:
-      'TypingBull सर्वश्रेष्ठ मुफ्त गेमिफाइड टाइपिंग ट्यूटर है। ऑनलाइन टाइपिंग टेस्ट, टाइपिंग स्पीड टेस्ट हिंदी, कीबोर्ड टाइपिंग प्रैक्टिस और फ्री टच टाइपिंग का आनंद लें।',
+      'TypingBull सर्वश्रेष्ठ मुफ्त गेमिफाइड टाइपिंग ट्यूटर है। Practice Ground रीयल-टाइम मल्टीप्लेयर टाइपिंग रेस, ऑनलाइन टाइपिंग टेस्ट, टाइपिंग स्पीड टेस्ट हिंदी और AI ट्यूटर का आनंद लें।',
     keywords:
-      'मुफ्त गेमिफाइड टाइपिंग ट्यूटर, ऑनलाइन टाइपिंग टेस्ट, टाइपिंग स्पीड टेस्ट हिंदी, कीबोर्ड टाइपिंग प्रैक्टिस, फ्री टच टाइपिंग',
-    ogTitle: 'TypingBull — मुफ्त गेमिफाइड टाइपिंग ट्यूटर',
+      'मुफ्त गेमिफाइड टाइपिंग ट्यूटर, मल्टीप्लेयर टाइपिंग रेस, ऑनलाइन टाइपिंग टेस्ट, टाइपिंग स्पीड टेस्ट हिंदी, कीबोर्ड टाइपिंग प्रैक्टिस, फ्री टच टाइपिंग',
+    ogTitle: 'TypingBull — मुफ्त गेमिफाइड टाइपिंग ट्यूटर & मल्टीप्लेयर रेस',
     ogDescription:
-      'मुफ्त गेमिफाइड टाइपिंग ट्यूटर के साथ ऑनलाइन टाइपिंग टेस्ट और टाइपिंग स्पीड टेस्ट हिंदी का अभ्यास करें और तेजी से टाइप करना सीखें।',
+      'मुफ्त गेमिफाइड टाइपिंग ट्यूटर के साथ रीयल-टाइम मल्टीप्लेयर टाइपिंग रेस में मुकाबला करें और ऑनलाइन टाइपिंग टेस्ट में अपनी गति बढ़ाएं।',
     locale: 'hi_IN',
   },
 };

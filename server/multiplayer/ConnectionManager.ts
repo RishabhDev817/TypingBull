@@ -64,6 +64,26 @@ export class ConnectionManager {
   }
 
   /**
+   * Retrieves connection metadata by player ID.
+   */
+  getConnectionByPlayerId(playerId: string): ClientConnection | undefined {
+    for (const conn of this.connections.values()) {
+      if (conn.playerId === playerId) return conn;
+    }
+    return undefined;
+  }
+
+  /**
+   * Sets currentRoomCode for a connection by player ID.
+   */
+  setRoomForPlayer(playerId: string, roomCode?: string): void {
+    const conn = this.getConnectionByPlayerId(playerId);
+    if (conn) {
+      conn.currentRoomCode = roomCode;
+    }
+  }
+
+  /**
    * Restores a connection across a disconnect if valid session token is provided.
    */
   restoreSession(

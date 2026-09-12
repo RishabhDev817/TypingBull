@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, HelpCircle, Search, Sparkles, Gamepad2, Brain, BookOpen, Keyboard } from 'lucide-react';
+import { ChevronDown, HelpCircle, Search, Sparkles, Gamepad2, Brain, BookOpen, Keyboard, Users } from 'lucide-react';
 import { soundEngine } from '../utils/audio';
 import { useI18n } from '../context/I18nContext';
 import {
@@ -18,6 +18,7 @@ export const FAQ_DATA: FAQItem[] = FAQ_DATA_BY_LANG.en;
 
 const CATEGORIES: { key: FAQCategoryKey; icon: React.FC<{ className?: string }> }[] = [
   { key: 'All', icon: Sparkles },
+  { key: 'Multiplayer', icon: Users },
   { key: 'Games', icon: Gamepad2 },
   { key: 'AI Tutor', icon: Brain },
   { key: 'Curriculum', icon: BookOpen },
@@ -25,6 +26,11 @@ const CATEGORIES: { key: FAQCategoryKey; icon: React.FC<{ className?: string }> 
 ];
 
 const CATEGORY_COLORS: Record<Exclude<FAQCategoryKey, 'All'>, { bg: string; text: string; border: string }> = {
+  Multiplayer: {
+    bg: 'bg-amber-500/10 dark:bg-amber-400/10',
+    text: 'text-amber-600 dark:text-amber-400',
+    border: 'border-amber-500/25 dark:border-amber-400/25',
+  },
   Games: {
     bg: 'bg-pink-500/10 dark:bg-pink-400/10',
     text: 'text-pink-600 dark:text-pink-400',

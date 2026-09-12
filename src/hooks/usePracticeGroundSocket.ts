@@ -221,6 +221,9 @@ export function usePracticeGroundSocket(initialRoomCode?: string) {
       }
 
       case 'MATCH_FOUND': {
+        if (msg.payload.room) {
+          setRoom(msg.payload.room);
+        }
         setErrorMessage(null);
         break;
       }

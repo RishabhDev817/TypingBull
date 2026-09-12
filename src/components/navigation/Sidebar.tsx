@@ -25,9 +25,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, 
     { to: '/', icon: LayoutDashboard, label: t('nav.home'), color: '#2196F3' },
     { to: '/guidelines', icon: Info, label: t('nav.guidelines'), color: '#9C27B0' },
     { to: '/learn', icon: BookOpen, label: t('nav.learn'), color: '#4CAF50' },
-    { to: '/play', icon: Gamepad2, label: t('nav.play'), color: '#FF4081' },
+    { to: '/play', icon: Gamepad2, label: t('nav.play'), color: '#FF4081', badge: 'LIVE', isLive: true },
     { to: '/practice', icon: Keyboard, label: t('nav.practice'), color: '#FF9800' },
-    { to: '/roadmap', icon: Sparkles, label: t('nav.roadmap'), color: '#06B6D4', badge: 'SOON' },
+    { to: '/roadmap', icon: Sparkles, label: t('nav.roadmap'), color: '#06B6D4' },
   ];
 
   const toggleSidebar = () => {
@@ -77,7 +77,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, 
 
       {/* Nav links with independent internal scrolling */}
       <nav className="flex-1 min-h-0 px-3 py-4 space-y-2 overflow-y-auto overflow-x-hidden">
-        {navItems.map(({ to, icon: Icon, label, color, badge }) => {
+        {navItems.map(({ to, icon: Icon, label, color, badge, isLive }) => {
           const isItemActive = to === '/' ? normalizedCurrentPath === '/' : normalizedCurrentPath.startsWith(to);
 
           return (
@@ -109,8 +109,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, 
                 <span className={`truncate ${isItemActive ? 'text-white' : 'text-body font-bold'}`}>{label}</span>
                 {badge && (
                   <span
-                    className={`ml-auto px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-md border ${
-                      isItemActive
+                    className={`ml-auto shrink-0 w-10 max-w-[42px] px-1 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-full text-center flex items-center justify-center border shadow-xs transition-all ${
+                      badge === 'LIVE' || isLive
+                        ? isItemActive
+                          ? 'bg-white text-emerald-600 border-white/90 shadow-sm font-black'
+                          : 'bg-emerald-500 dark:bg-emerald-400 text-slate-950 dark:text-slate-950 font-black border-white/80 dark:border-slate-800 badge-live-pulse'
+                        : isItemActive
                         ? 'bg-white/25 text-white border-white/40'
                         : 'bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border-cyan-500/30'
                     }`}
