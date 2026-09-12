@@ -95,7 +95,19 @@ export function usePracticeGroundSocket(initialRoomCode?: string) {
     const envUrl = import.meta.env.VITE_MULTIPLAYER_WS_URL;
     if (envUrl) return envUrl;
 
-    // Use current host WebSocket path
+    const hostname = window.location.hostname;
+    const isLocal =
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname.startsWith('192.168.') ||
+      hostname.startsWith('10.');
+
+    if (!isLocal) {
+      // Production Cloudflare Worker WebSocket server with Durable Objects
+      return 'wss://typingbull-multiplayer.rishabhrajmahato.workers.dev/practice-ground-ws';
+    }
+
+    // Local dev server WebSocket path
     const isHttps = window.location.protocol === 'https:';
     const protocol = isHttps ? 'wss://' : 'ws://';
     return `${protocol}${window.location.host}/practice-ground-ws`;

@@ -9,6 +9,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
+    "deploy:worker": "cd workers/multiplayer && wrangler deploy",
     "deploy": "npm run build && wrangler pages deploy dist --project-name=typingbull"
   },
   "dependencies": {

@@ -8,7 +8,7 @@ import { RoomManager } from './RoomManager.ts';
 import { MatchmakingManager } from './MatchmakingManager.ts';
 
 export class CleanupManager {
-  private cleanupInterval: NodeJS.Timeout | null = null;
+  private cleanupInterval: ReturnType<typeof setInterval> | null = null;
   private roomManager: RoomManager;
   private matchmakingManager: MatchmakingManager;
 

@@ -3,12 +3,16 @@
  * Handles session tokens, disconnect grace periods, and host transfers.
  */
 
-import { WebSocket } from 'ws';
+export interface UniversalWebSocket {
+  send(data: string): void;
+  readyState: number;
+}
+
 import { type Player, type Room, MULTIPLAYER_CONSTANTS } from './types.ts';
 import { RoomManager } from './RoomManager.ts';
 
 export interface ClientConnection {
-  socket: WebSocket;
+  socket: UniversalWebSocket;
   sessionToken: string;
   playerId: string;
   currentRoomCode?: string;
@@ -16,9 +20,9 @@ export interface ClientConnection {
 }
 
 export class ConnectionManager {
-  private connections: Map<WebSocket, ClientConnection> = new Map();
+  private connections: Map<UniversalWebSocket, ClientConnection> = new Map();
   private tokenToConnection: Map<string, ClientConnection> = new Map();
-  private pendingDisconnects: Map<string, NodeJS.Timeout> = new Map();
+  private pendingDisconnects: Map<string, ReturnType<typeof setTimeout>> = new Map();
 
   private roomManager: RoomManager;
 
@@ -36,7 +40,7 @@ export class ConnectionManager {
   /**
    * Registers a newly opened WebSocket connection.
    */
-  registerConnection(socket: WebSocket): ClientConnection {
+  registerConnection(socket: UniversalWebSocket): ClientConnection {
     const sessionToken = this.generateSessionToken();
     const playerId = `ply_${Math.random().toString(36).slice(2, 9)}`;
 
@@ -55,7 +59,7 @@ export class ConnectionManager {
   /**
    * Retrieves connection metadata for a socket.
    */
-  getConnection(socket: WebSocket): ClientConnection | undefined {
+  getConnection(socket: UniversalWebSocket): ClientConnection | undefined {
     return this.connections.get(socket);
   }
 
@@ -63,7 +67,7 @@ export class ConnectionManager {
    * Restores a connection across a disconnect if valid session token is provided.
    */
   restoreSession(
-    socket: WebSocket,
+    socket: UniversalWebSocket,
     sessionToken: string
   ): { restored: boolean; clientConn?: ClientConnection; room?: Room; player?: Player } {
     const existing = this.tokenToConnection.get(sessionToken);
@@ -103,7 +107,7 @@ export class ConnectionManager {
    * Handles socket disconnect with a grace period.
    */
   handleDisconnect(
-    socket: WebSocket,
+    socket: UniversalWebSocket,
     onGraceExpired: (roomCode: string, playerId: string) => void
   ): {
     room?: Room;
@@ -176,7 +180,7 @@ export class ConnectionManager {
   /**
    * Broadcasts a JSON message to all connected players in a room.
    */
-  broadcastToRoom(room: Room, message: unknown, excludeSocket?: WebSocket): void {
+  broadcastToRoom(room: Room, message: unknown, excludeSocket?: UniversalWebSocket): void {
     const payloadStr = JSON.stringify(message);
     for (const player of Object.values(room.players)) {
       if (player.status === 'DISCONNECTED') continue;
@@ -184,7 +188,7 @@ export class ConnectionManager {
         (c) => c.playerId === player.id
       );
 
-      if (conn && conn.socket !== excludeSocket && conn.socket.readyState === WebSocket.OPEN) {
+      if (conn && conn.socket !== excludeSocket && conn.socket.readyState === 1) {
         conn.socket.send(payloadStr);
       }
     }
@@ -193,8 +197,8 @@ export class ConnectionManager {
   /**
    * Broadcasts a JSON message to a single connection.
    */
-  sendToSocket(socket: WebSocket, message: unknown): void {
-    if (socket.readyState === WebSocket.OPEN) {
+  sendToSocket(socket: UniversalWebSocket, message: unknown): void {
+    if (socket.readyState === 1) {
       socket.send(JSON.stringify(message));
     }
   }
