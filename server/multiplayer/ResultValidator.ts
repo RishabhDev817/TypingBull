@@ -76,9 +76,9 @@ export class ResultValidator {
     // 4. Progress percentage (0 - 100)
     const calculatedProgress = Math.min(100, Math.round((boundedCorrect / textLength) * 100));
 
-    // 5. Anti-cheat check: Impossible typing speeds (> MAX_WPM_LIMIT e.g. 260 WPM)
-    // Allow small burst grace period in first 3 seconds (e.g. typing 1 word fast)
-    if (elapsedMs > 3000 && calculatedWpm > MULTIPLAYER_CONSTANTS.MAX_WPM_LIMIT) {
+    // 5. Anti-cheat check: Impossible typing speeds (> MAX_WPM_LIMIT e.g. 320 WPM)
+    // Allow small burst grace period in first 3.5 seconds (e.g. typing 1 short word fast)
+    if (elapsedMs > 3500 && calculatedWpm > MULTIPLAYER_CONSTANTS.MAX_WPM_LIMIT) {
       return {
         isValid: false,
         validatedWpm: MULTIPLAYER_CONSTANTS.MAX_WPM_LIMIT,
@@ -89,8 +89,14 @@ export class ResultValidator {
       };
     }
 
-    // 6. Completion validation: client can only complete if all correct chars match text length
-    const isActuallyCompleted = clientCompleted && boundedCorrect >= textLength;
+    // 6. Completion validation: client completes when full passage has been typed
+    // Allows completion with typos (real-world typing accuracy < 100%)
+    const hasTypedFullPassage =
+      totalChars >= textLength ||
+      (boundedCorrect + boundedIncorrect) >= textLength ||
+      boundedCorrect >= textLength;
+
+    const isActuallyCompleted = Boolean(clientCompleted && hasTypedFullPassage);
 
     return {
       isValid: true,

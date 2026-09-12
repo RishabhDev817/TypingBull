@@ -162,6 +162,7 @@ export class RoomManager {
     room.status = 'LOBBY';
     room.text = newPassage.text;
     room.textTitle = newPassage.title;
+    room.settings.durationSeconds = Math.max(MULTIPLAYER_CONSTANTS.DEFAULT_RACE_DURATION_SECONDS, room.settings.durationSeconds || 150);
     delete room.countdownStartAt;
     delete room.raceStartAt;
     delete room.raceEndAt;

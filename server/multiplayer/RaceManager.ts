@@ -121,13 +121,20 @@ export class RaceManager {
       };
     }
 
-    // Check if all connected racers have finished
-    const connectedPlayers = Object.values(room.players).filter(
-      (p) => p.status !== 'DISCONNECTED'
-    );
+    // Check if all participating racers in room have finished
+    // Crucial: Racers in active reconnect grace period are still typing/returning
+    const now = Date.now();
+    const activeRacers = Object.values(room.players).filter((p) => {
+      if (p.status !== 'DISCONNECTED') return true;
+      if (p.disconnectedAt && (now - p.disconnectedAt) < MULTIPLAYER_CONSTANTS.DISCONNECT_GRACE_PERIOD_MS) {
+        return true;
+      }
+      return false;
+    });
+
     const allFinished =
-      connectedPlayers.length > 0 &&
-      connectedPlayers.every((p) => p.status === 'FINISHED');
+      activeRacers.length > 0 &&
+      activeRacers.every((p) => p.status === 'FINISHED');
 
     if (allFinished) {
       room.status = 'FINISHED';
@@ -177,7 +184,7 @@ export class RaceManager {
         wpm: p.wpm,
         accuracy: p.accuracy,
         finished: p.status === 'FINISHED',
-        durationSeconds: Math.round(duration * 10) / 10,
+        durationSeconds: Math.max(1, Math.round(duration * 10) / 10),
       };
     });
 

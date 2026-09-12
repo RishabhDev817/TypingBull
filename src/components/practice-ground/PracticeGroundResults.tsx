@@ -29,14 +29,14 @@ export const PracticeGroundResults: React.FC<Props> = ({
   myProgress,
   playerName,
   playerEmoji,
-  durationSeconds = 60,
+  durationSeconds = 150,
   onPlayAgain,
   onReturnToMenu,
 }) => {
   const { t } = useI18n();
-  const rawRankings = Array.isArray(rankings) ? rankings : [];
+  const rawRankings = (Array.isArray(rankings) ? rankings : []).filter(Boolean);
 
-  let myResult = rawRankings.find((r) => r.playerId === myPlayerId);
+  let myResult = rawRankings.find((r) => r && r.playerId === myPlayerId);
 
   // If not found in rankings (e.g. race timeout, disconnect, or delay), synthesize a resilient result
   if (!myResult) {
@@ -48,18 +48,18 @@ export const PracticeGroundResults: React.FC<Props> = ({
       wpm: myProgress?.wpm ?? 0,
       accuracy: myProgress?.accuracy ?? 100,
       finished: myProgress?.finished ?? true,
-      durationSeconds,
+      durationSeconds: Math.max(1, durationSeconds),
     };
   }
 
   // Ensure effectiveRankings contains at least myResult so leaderboard is never blank
-  const effectiveRankings = rawRankings.some((r) => r.playerId === myResult.playerId)
+  const effectiveRankings = rawRankings.some((r) => r && r.playerId === myResult.playerId)
     ? [...rawRankings]
     : [...rawRankings, myResult];
 
-  effectiveRankings.sort((a, b) => a.rank - b.rank);
+  effectiveRankings.sort((a, b) => (a?.rank || 99) - (b?.rank || 99));
 
-  const isWinner = myResult.rank === 1;
+  const isWinner = (myResult?.rank ?? 1) === 1;
 
   const [isNewPersonalBest] = useState<boolean>(() => {
     if (myResult && myResult.wpm > 0) {
@@ -71,6 +71,16 @@ export const PracticeGroundResults: React.FC<Props> = ({
     }
     return false;
   });
+
+  const formatNewRecord = (wpm: number) => {
+    const str = t('multiplayer.newRecord') || 'New Record: {wpm} WPM';
+    return String(str).replace('{wpm}', String(wpm));
+  };
+
+  const formatDuration = (seconds?: number) => {
+    const str = t('multiplayer.durationSec') || '{s}s duration';
+    return String(str).replace('{s}', String(seconds ?? durationSeconds));
+  };
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-4 md:py-8 flex flex-col items-center select-none">
@@ -95,7 +105,7 @@ export const PracticeGroundResults: React.FC<Props> = ({
         {isNewPersonalBest && (
           <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-black shadow-md">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>{t('multiplayer.newRecord').replace('{wpm}', String(myResult?.wpm || 0))}</span>
+            <span>{formatNewRecord(myResult?.wpm || 0)}</span>
           </div>
         )}
       </div>
@@ -180,7 +190,7 @@ export const PracticeGroundResults: React.FC<Props> = ({
                     )}
                   </div>
                   <span className="text-[10px] font-bold text-slate-400">
-                    {item.finished ? t('multiplayer.durationSec').replace('{s}', String(item.durationSeconds)) : t('multiplayer.didNotFinish')}
+                    {item.finished ? formatDuration(item.durationSeconds) : t('multiplayer.didNotFinish')}
                   </span>
                 </div>
               </div>

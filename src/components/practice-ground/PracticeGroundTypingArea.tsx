@@ -39,19 +39,28 @@ export const PracticeGroundTypingArea: React.FC<Props> = ({
   const hiddenInputRef = useRef<HTMLInputElement>(null);
   const textContainerRef = useRef<HTMLDivElement>(null);
   const activeCharRef = useRef<HTMLSpanElement>(null);
+  const safeTargetText = targetText || 'The speedway is ready for racing champions.';
 
   // Time ticker
   useEffect(() => {
     if (isFinished) return;
 
+    // Guard against 0 or uninitialized raceStartAt to prevent instant 0s timeout
+    const validStartAt = raceStartAt && raceStartAt > 0 ? raceStartAt : Date.now();
+
     const timer = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - raceStartAt) / 1000);
+      const now = Date.now();
+      const elapsed = Math.max(0, Math.floor((now - validStartAt) / 1000));
       const remaining = Math.max(0, durationSeconds - elapsed);
       setTimeRemaining(remaining);
+
+      if (remaining <= 0 && !isFinished) {
+        onLocalFinish();
+      }
     }, 500);
 
     return () => clearInterval(timer);
-  }, [raceStartAt, durationSeconds, isFinished]);
+  }, [raceStartAt, durationSeconds, isFinished, onLocalFinish]);
 
   // Keep hidden input focused continuously
   useEffect(() => {
@@ -110,7 +119,8 @@ export const PracticeGroundTypingArea: React.FC<Props> = ({
     const accuracy =
       value.length === 0 ? 100 : Math.max(0, Math.round((correctCount / value.length) * 100));
 
-    const elapsedSeconds = Math.max(0.5, (Date.now() - raceStartAt) / 1000);
+    const effectiveStartAt = raceStartAt && raceStartAt > 0 ? raceStartAt : Date.now();
+    const elapsedSeconds = Math.max(0.5, (Date.now() - effectiveStartAt) / 1000);
     const wordsTyped = correctCount / 5;
     const wpm = Math.max(0, Math.round((wordsTyped / elapsedSeconds) * 60));
 
@@ -137,7 +147,8 @@ export const PracticeGroundTypingArea: React.FC<Props> = ({
       ? 100
       : Math.max(0, Math.round(((userInput.length - mistakesCount) / userInput.length) * 100));
 
-  const elapsedSeconds = Math.max(0.5, (Date.now() - raceStartAt) / 1000);
+  const effectiveStartAt = raceStartAt && raceStartAt > 0 ? raceStartAt : Date.now();
+  const elapsedSeconds = Math.max(0.5, (Date.now() - effectiveStartAt) / 1000);
   const correctKeystrokes = Math.max(0, userInput.length - mistakesCount);
   const currentWpm = Math.max(
     0,
@@ -210,7 +221,7 @@ export const PracticeGroundTypingArea: React.FC<Props> = ({
         ref={textContainerRef}
         className="flex-1 overflow-y-auto max-h-[340px] pr-2 font-mono text-base sm:text-lg md:text-xl leading-relaxed md:leading-loose tracking-wide select-none whitespace-pre-wrap"
       >
-        {targetText.split('').map((char, index) => {
+        {safeTargetText.split('').map((char, index) => {
           const isTyped = index < userInput.length;
           const isCurrent = index === userInput.length;
           const isCorrect = isTyped && userInput[index] === char;
@@ -249,12 +260,12 @@ export const PracticeGroundTypingArea: React.FC<Props> = ({
       {isFinished ? (
         <div className="pt-3 mt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs font-black text-emerald-600 dark:text-emerald-400">
           <span>{t('multiplayer.completedWaiting')}</span>
-          <span>{userInput.length}/{targetText.length} {t('multiplayer.charsLabel')}</span>
+          <span>{userInput.length}/{safeTargetText.length} {t('multiplayer.charsLabel')}</span>
         </div>
       ) : (
         <div className="pt-3 mt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs font-bold text-slate-400">
           <span>{t('multiplayer.typingTip')}</span>
-          <span>{userInput.length}/{targetText.length} {t('multiplayer.charsLabel')}</span>
+          <span>{userInput.length}/{safeTargetText.length} {t('multiplayer.charsLabel')}</span>
         </div>
       )}
     </div>

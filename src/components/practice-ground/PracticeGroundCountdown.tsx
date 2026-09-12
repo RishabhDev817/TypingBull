@@ -16,12 +16,15 @@ export const PracticeGroundCountdown: React.FC<Props> = ({
 }) => {
   const { t } = useI18n();
   const [displayNumber, setDisplayNumber] = useState<number | string>(3);
-  const [lastSoundNumber, setLastSoundNumber] = useState<number | string | null>(null);
   const completedRef = React.useRef(false);
+  const onCompleteRef = React.useRef(onCountdownComplete);
+  onCompleteRef.current = onCountdownComplete;
+  const lastSoundRef = React.useRef<number | string | null>(null);
 
   useEffect(() => {
     let animFrame: number;
     completedRef.current = false;
+    lastSoundRef.current = null;
 
     const tick = () => {
       const now = Date.now();
@@ -29,23 +32,23 @@ export const PracticeGroundCountdown: React.FC<Props> = ({
 
       if (diffMs <= 0) {
         setDisplayNumber('GO!');
-        if (lastSoundNumber !== 'GO!') {
+        if (lastSoundRef.current !== 'GO!') {
           soundEngine.playLevelUnlock();
-          setLastSoundNumber('GO!');
+          lastSoundRef.current = 'GO!';
         }
         if (diffMs <= -400 && !completedRef.current) {
           completedRef.current = true;
-          if (onCountdownComplete) {
-            onCountdownComplete();
+          if (onCompleteRef.current) {
+            onCompleteRef.current();
           }
         }
       } else {
         const secondsRemaining = Math.ceil(diffMs / 1000);
         setDisplayNumber(secondsRemaining);
 
-        if (secondsRemaining !== lastSoundNumber && secondsRemaining <= 3) {
+        if (secondsRemaining !== lastSoundRef.current && secondsRemaining <= 3) {
           soundEngine.playClick();
-          setLastSoundNumber(secondsRemaining);
+          lastSoundRef.current = secondsRemaining;
         }
       }
 
@@ -54,7 +57,7 @@ export const PracticeGroundCountdown: React.FC<Props> = ({
 
     animFrame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(animFrame);
-  }, [startAt, lastSoundNumber, onCountdownComplete]);
+  }, [startAt]);
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex flex-col items-center justify-center p-6 select-none">

@@ -684,9 +684,16 @@ export class MultiplayerArena extends DurableObject {
             },
           });
 
-          // Check if all connected players have finished
-          const connectedPlayers = Object.values(room.players).filter((p) => p.status !== 'DISCONNECTED');
-          if (connectedPlayers.every((p) => p.status === 'FINISHED')) {
+          // Check if all participating players have finished (including reconnecting grace racers)
+          const now = Date.now();
+          const activePlayers = Object.values(room.players).filter((p) => {
+            if (p.status !== 'DISCONNECTED') return true;
+            if (p.disconnectedAt && (now - p.disconnectedAt) < MULTIPLAYER_CONSTANTS.DISCONNECT_GRACE_PERIOD_MS) {
+              return true;
+            }
+            return false;
+          });
+          if (activePlayers.length > 0 && activePlayers.every((p) => p.status === 'FINISHED')) {
             this.stopBotSimulation(room.id);
             const raceTimer = this.raceTimers.get(room.id);
             if (raceTimer) {

@@ -38,7 +38,7 @@ export const PracticeGroundRaceTrack: React.FC<Props> = ({
       </div>
 
       <div className="flex flex-col gap-2.5">
-        {players.map((player) => {
+        {(players || []).filter(Boolean).map((player) => {
           const isMe = player.id === myPlayerId;
           const opp = opponentsProgress[player.id];
 
@@ -49,19 +49,19 @@ export const PracticeGroundRaceTrack: React.FC<Props> = ({
 
           return (
             <div
-              key={player.id}
+              key={player.id || Math.random().toString()}
               className={`p-2.5 rounded-2xl border transition-all ${
                 isMe
                   ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-400 dark:border-emerald-600 shadow-sm'
-                  : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-200 dark:border-slate-755'
+                  : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/80'
               }`}
             >
               {/* Header Info: Avatar, Name, Stats */}
               <div className="flex items-center justify-between text-xs mb-1.5 px-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg">{player.avatarEmoji}</span>
+                  <span className="text-lg">{player.avatarEmoji || '🐂'}</span>
                   <span className="font-black text-slate-800 dark:text-slate-100 truncate max-w-[120px] sm:max-w-[200px]">
-                    {player.name}
+                    {player.name || 'Racer'}
                   </span>
                   {isMe && (
                     <span className="px-1.5 py-0.2 rounded-md bg-emerald-500 text-white text-[9px] font-black uppercase">

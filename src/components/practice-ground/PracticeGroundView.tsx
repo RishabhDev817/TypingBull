@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePracticeGroundSocket } from '../../hooks/usePracticeGroundSocket';
 import { PracticeGroundConnectionBanner } from './PracticeGroundConnectionBanner';
@@ -8,8 +8,10 @@ import { PracticeGroundCountdown } from './PracticeGroundCountdown';
 import { PracticeGroundRaceTrack } from './PracticeGroundRaceTrack';
 import { PracticeGroundTypingArea } from './PracticeGroundTypingArea';
 import { PracticeGroundResults } from './PracticeGroundResults';
+import { PracticeGroundErrorBoundary } from './PracticeGroundErrorBoundary';
 import { soundEngine } from '../../utils/audio';
 import { useI18n } from '../../context/I18nContext';
+import { Loader2 } from 'lucide-react';
 
 interface Props {
   onBackToHub: () => void;
@@ -110,7 +112,7 @@ export const PracticeGroundView: React.FC<Props> = ({
         },
         settings: {
           maxPlayers: 2,
-          durationSeconds: 60,
+          durationSeconds: 150,
           language: currentLang || 'en',
         },
         text: raceText || 'The speedway is ready for racing champions.',
@@ -121,23 +123,87 @@ export const PracticeGroundView: React.FC<Props> = ({
     );
   }, [room, myPlayerId, phase, playerName, playerEmoji, raceText, raceTextTitle, currentLang]);
 
-  return (
-    <div className="w-full min-h-[calc(100vh-5rem)] flex flex-col justify-center relative py-6">
-      {/* Floating Status and Toast Notifications */}
-      <PracticeGroundConnectionBanner
-        status={status}
-        notifications={notifications}
-      />
+  // Fallback client timer: if race is ongoing and duration + 5s elapsed without RACE_FINISHED,
+  // or if local player is finished and 7 seconds have passed without server concluding,
+  // synthesize results so the player NEVER gets stranded on a blank or stuck screen!
+  const hasFinishedRef = useRef(false);
+  hasFinishedRef.current = myProgress.finished;
 
-      <AnimatePresence mode="wait">
-        {/* PHASE 1: MENU */}
-        {phase === 'MENU' && (
-          <motion.div
-            key="pg-menu"
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.96 }}
-            transition={{ duration: 0.2 }}
+  useEffect(() => {
+    if (phase !== 'RACING') return;
+
+    const start = activeRoom.raceStartAt || countdownStartAt || Date.now();
+    const duration = activeRoom.settings.durationSeconds || 150;
+    const maxAllowedMs = (duration + 5) * 1000;
+    let localFinishTs: number | null = null;
+
+    const checkInterval = setInterval(() => {
+      const now = Date.now();
+      const elapsed = now - start;
+
+      if (hasFinishedRef.current && !localFinishTs) {
+        localFinishTs = now;
+      }
+
+      const shouldTimeout = elapsed >= maxAllowedMs;
+      const shouldFinishLocally = hasFinishedRef.current && localFinishTs !== null && (now - localFinishTs) >= 7000;
+
+      if (shouldTimeout || shouldFinishLocally) {
+        // Synthesize fallback rankings from all players in room + local progress
+        const playersList = Object.values(activeRoom.players);
+        const fallbackRankings = playersList.map((p, idx) => {
+          const isMe = p.id === myPlayerId;
+          const opp = opponentsProgress[p.id];
+          const wpm = isMe ? myProgress.wpm : opp ? opp.wpm : p.wpm || 0;
+          const acc = isMe ? myProgress.accuracy : opp ? opp.accuracy : p.accuracy || 100;
+          const fin = isMe ? myProgress.finished : p.status === 'FINISHED' || (opp && opp.progress >= 100);
+          return {
+            playerId: p.id,
+            name: p.name || `Racer ${idx + 1}`,
+            avatarEmoji: p.avatarEmoji || '🐂',
+            rank: idx + 1,
+            wpm,
+            accuracy: acc,
+            finished: Boolean(fin),
+            durationSeconds: duration,
+          };
+        });
+
+        fallbackRankings.sort((a, b) => {
+          if (a.finished && !b.finished) return -1;
+          if (!a.finished && b.finished) return 1;
+          return b.wpm - a.wpm;
+        });
+
+        fallbackRankings.forEach((r, i) => {
+          r.rank = i + 1;
+        });
+
+        setPhase('RESULTS');
+      }
+    }, 1000);
+
+    return () => clearInterval(checkInterval);
+  }, [phase, activeRoom, countdownStartAt, myProgress.wpm, myProgress.accuracy, myProgress.finished, myPlayerId, opponentsProgress, setPhase]);
+
+  return (
+    <PracticeGroundErrorBoundary onReset={leaveRoom}>
+      <div className="w-full min-h-[calc(100vh-5rem)] flex flex-col justify-center relative py-6">
+        {/* Floating Status and Toast Notifications */}
+        <PracticeGroundConnectionBanner
+          status={status}
+          notifications={notifications}
+        />
+
+        <AnimatePresence>
+          {/* PHASE 1: MENU */}
+          {phase === 'MENU' && (
+            <motion.div
+              key="pg-menu"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              transition={{ duration: 0.2 }}
             className="w-full"
           >
             <PracticeGroundMenu
@@ -257,6 +323,25 @@ export const PracticeGroundView: React.FC<Props> = ({
           </motion.div>
         )}
 
+        {/* LOBBY FALLBACK IF ROOM DISCONNECTED */}
+        {phase === 'LOBBY' && !room && (
+          <motion.div
+            key="pg-lobby-loading"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-md mx-auto p-6 rounded-3xl bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 shadow-xl flex flex-col items-center text-center gap-4"
+          >
+            <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
+            <p className="text-sm font-black text-slate-800 dark:text-slate-100">Connecting to room lobby...</p>
+            <button
+              onClick={leaveRoom}
+              className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer transition-all"
+            >
+              Return to Menu
+            </button>
+          </motion.div>
+        )}
+
         {/* PHASE 4 & 5: LIVE RACING WITH COUNTDOWN OVERLAY */}
         {(phase === 'COUNTDOWN' || phase === 'RACING') && (
           <motion.div
@@ -278,8 +363,8 @@ export const PracticeGroundView: React.FC<Props> = ({
             <PracticeGroundTypingArea
               targetText={raceText || activeRoom.text}
               textTitle={raceTextTitle || activeRoom.textTitle}
-              raceStartAt={activeRoom.raceStartAt ?? countdownStartAt ?? 0}
-              durationSeconds={activeRoom.settings.durationSeconds}
+              raceStartAt={activeRoom.raceStartAt || countdownStartAt || Date.now()}
+              durationSeconds={activeRoom.settings.durationSeconds || 150}
               isFinished={myProgress.finished}
               onProgressUpdate={handleProgressUpdate}
               onLocalFinish={handleLocalFinish}
@@ -313,7 +398,7 @@ export const PracticeGroundView: React.FC<Props> = ({
               myProgress={myProgress}
               playerName={playerName}
               playerEmoji={playerEmoji}
-              durationSeconds={room?.settings?.durationSeconds ?? 60}
+              durationSeconds={room?.settings?.durationSeconds ?? 150}
               onPlayAgain={() => {
                 setMyProgress({ progress: 0, wpm: 0, accuracy: 100, finished: false });
                 requestRematch();
@@ -327,5 +412,6 @@ export const PracticeGroundView: React.FC<Props> = ({
         )}
       </AnimatePresence>
     </div>
+  </PracticeGroundErrorBoundary>
   );
 };

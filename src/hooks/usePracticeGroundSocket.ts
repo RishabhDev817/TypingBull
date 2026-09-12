@@ -62,8 +62,10 @@ export function usePracticeGroundSocket(initialRoomCode?: string) {
   });
 
   const socketRef = useRef<WebSocket | null>(null);
+  const currentRoomCodeRef = useRef<string>(initialRoomCode || '');
   const reconnectAttemptsRef = useRef<number>(0);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const heartbeatTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastProgressSentRef = useRef<number>(0);
   const pendingProgressRef = useRef<{
     correctChars: number;
@@ -140,14 +142,23 @@ export function usePracticeGroundSocket(initialRoomCode?: string) {
         reconnectAttemptsRef.current = 0;
         setErrorMessage(null);
 
-        // Check if we have an active session token to restore
+        // Start heartbeat ping every 12 seconds to prevent WebSocket / DO drop
+        if (heartbeatTimerRef.current) clearInterval(heartbeatTimerRef.current);
+        heartbeatTimerRef.current = setInterval(() => {
+          if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+            socketRef.current.send(JSON.stringify({ type: 'PING', payload: { timestamp: Date.now() } }));
+          }
+        }, 12000);
+
+        // Check if we have an active session token and room code to restore
         const savedToken = sessionStorage.getItem(SESSION_STORAGE_KEY);
-        if (savedToken && initialRoomCode) {
+        const activeCode = currentRoomCodeRef.current || initialRoomCode;
+        if (savedToken && activeCode) {
           ws.send(
             JSON.stringify({
               type: 'JOIN_ROOM',
               payload: {
-                roomCode: initialRoomCode,
+                roomCode: activeCode,
                 name: playerName,
                 avatarEmoji: playerEmoji,
                 sessionToken: savedToken,
@@ -169,6 +180,10 @@ export function usePracticeGroundSocket(initialRoomCode?: string) {
       ws.onclose = () => {
         setStatus('DISCONNECTED');
         socketRef.current = null;
+        if (heartbeatTimerRef.current) {
+          clearInterval(heartbeatTimerRef.current);
+          heartbeatTimerRef.current = null;
+        }
 
         // Auto-reconnect with exponential backoff (max 5 attempts)
         if (reconnectAttemptsRef.current < 5) {
@@ -201,6 +216,7 @@ export function usePracticeGroundSocket(initialRoomCode?: string) {
       case 'ROOM_CREATED':
       case 'ROOM_JOINED': {
         setRoom(msg.payload.room);
+        currentRoomCodeRef.current = msg.payload.room.id;
         setMyPlayerId(msg.payload.myPlayerId);
         setPhase('LOBBY');
         setErrorMessage(null);
@@ -209,7 +225,9 @@ export function usePracticeGroundSocket(initialRoomCode?: string) {
 
       case 'ROOM_UPDATED': {
         setRoom(msg.payload.room);
-        if (msg.payload.room.status === 'LOBBY' && phase !== 'LOBBY') {
+        currentRoomCodeRef.current = msg.payload.room.id;
+        // Don't yank player out of RESULTS podium if an opponent leaves or readies
+        if (msg.payload.room.status === 'LOBBY' && phase !== 'LOBBY' && phase !== 'RESULTS') {
           setPhase('LOBBY');
         }
         break;
@@ -221,8 +239,12 @@ export function usePracticeGroundSocket(initialRoomCode?: string) {
       }
 
       case 'MATCH_FOUND': {
+        if (msg.payload.roomCode) {
+          currentRoomCodeRef.current = msg.payload.roomCode;
+        }
         if (msg.payload.room) {
           setRoom(msg.payload.room);
+          currentRoomCodeRef.current = msg.payload.room.id;
         }
         setErrorMessage(null);
         break;
@@ -240,6 +262,23 @@ export function usePracticeGroundSocket(initialRoomCode?: string) {
 
       case 'RACE_STARTED': {
         setPhase('RACING');
+        if (msg.payload?.startAt) {
+          setCountdownStartAt(msg.payload.startAt);
+        }
+        setRoom((prev) =>
+          prev
+            ? {
+                ...prev,
+                status: 'RACING',
+                raceStartAt: msg.payload?.startAt || Date.now(),
+                settings: {
+                  ...prev.settings,
+                  durationSeconds:
+                    msg.payload?.durationSeconds || prev.settings?.durationSeconds || 150,
+                },
+              }
+            : prev
+        );
         break;
       }
 
@@ -408,6 +447,7 @@ export function usePracticeGroundSocket(initialRoomCode?: string) {
 
   const leaveRoom = () => {
     sendJson({ type: 'LEAVE_ROOM' });
+    currentRoomCodeRef.current = '';
     setRoom(null);
     setPhase('MENU');
     setOpponentsProgress({});
@@ -422,6 +462,10 @@ export function usePracticeGroundSocket(initialRoomCode?: string) {
     return () => {
       if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
       if (throttleTimerRef.current) clearTimeout(throttleTimerRef.current);
+      if (heartbeatTimerRef.current) {
+        clearInterval(heartbeatTimerRef.current);
+        heartbeatTimerRef.current = null;
+      }
       if (socketRef.current) {
         socketRef.current.close();
         socketRef.current = null;

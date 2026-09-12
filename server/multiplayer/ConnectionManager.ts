@@ -115,7 +115,9 @@ export class ConnectionManager {
       room = this.roomManager.getRoom(existing.currentRoomCode);
       if (room && room.players[existing.playerId]) {
         player = room.players[existing.playerId];
-        player.status = room.status === 'RACING' ? 'RACING' : 'CONNECTED';
+        if (player.status !== 'FINISHED') {
+          player.status = room.status === 'RACING' ? 'RACING' : 'CONNECTED';
+        }
         delete player.disconnectedAt;
       }
     }
