@@ -41,7 +41,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, 
 
   return (
     <aside
-      className={`fixed lg:sticky top-0 left-0 z-40 hidden lg:flex flex-col w-64 shrink-0 h-screen transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+      className={`fixed top-0 left-0 z-40 hidden lg:flex flex-col w-64 shrink-0 h-screen h-[100dvh] max-h-screen transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${
         isCollapsed ? '-translate-x-full !w-0 !px-0 overflow-hidden' : 'translate-x-0'
       }`}
       style={{
@@ -63,7 +63,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, 
       </button>
 
       {/* Logo with mascot */}
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-hairline/50">
+      <div className="flex items-center gap-3 px-5 py-4 border-b border-hairline/50 shrink-0">
         <Mascot mood="happy" size="xs" />
         <div className="flex flex-col">
           <h1 className="font-extrabold text-base tracking-tight leading-none text-ink">
@@ -75,8 +75,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, 
         </div>
       </div>
 
-      {/* Nav links */}
-      <nav className="flex-1 px-3 py-4 space-y-2 overflow-y-auto">
+      {/* Nav links with independent internal scrolling */}
+      <nav className="flex-1 min-h-0 px-3 py-4 space-y-2 overflow-y-auto overflow-x-hidden">
         {navItems.map(({ to, icon: Icon, label, color, badge }) => {
           const isItemActive = to === '/' ? normalizedCurrentPath === '/' : normalizedCurrentPath.startsWith(to);
 

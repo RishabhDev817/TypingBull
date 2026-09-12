@@ -36,6 +36,7 @@ function AnimatedRoutes() {
         <Route path="/learn" element={<LearnPage />} />
         <Route path="/learn/:lessonId" element={<LessonView />} />
         <Route path="/play" element={<PlayPage />} />
+        <Route path="/play/practice-ground" element={<PlayPage />} />
         <Route path="/practice" element={<PracticePage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/about-us" element={<AboutPage />} />
@@ -98,8 +99,10 @@ function MainLayout() {
 
       {/* Main content area with pb-24 for BullBot clearance */}
       <main
-        className={`flex-1 flex flex-col min-h-screen relative z-10 pb-24 lg:pb-24 transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          sidebarCollapsed ? 'w-full max-w-full px-6 lg:px-12 scale-[1.015] origin-top' : 'w-auto'
+        className={`flex-1 min-w-0 flex flex-col min-h-screen relative z-10 pb-24 lg:pb-24 transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          sidebarCollapsed
+            ? 'w-full max-w-full px-6 lg:px-12 scale-[1.015] origin-top lg:ml-0'
+            : 'w-auto lg:ml-64'
         }`}
       >
         <AnimatedRoutes />

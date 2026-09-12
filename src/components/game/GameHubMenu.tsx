@@ -7,9 +7,14 @@ import { useI18n } from '../../context/I18nContext';
 interface GameHubMenuProps {
   onSelectKidsGame: (level?: number) => void;
   onSelectNeonVelocity?: () => void;
+  onSelectPracticeGround?: () => void;
 }
 
-export const GameHubMenu: React.FC<GameHubMenuProps> = ({ onSelectKidsGame, onSelectNeonVelocity }) => {
+export const GameHubMenu: React.FC<GameHubMenuProps> = ({
+  onSelectKidsGame,
+  onSelectNeonVelocity,
+  onSelectPracticeGround,
+}) => {
   const { t } = useI18n();
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -35,7 +40,7 @@ export const GameHubMenu: React.FC<GameHubMenuProps> = ({ onSelectKidsGame, onSe
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="text-center mb-8"
+        className="text-center mb-6"
       >
         <motion.div variants={itemVariants} className="flex justify-center mb-3">
           <Mascot mood="happy" size="lg" />
@@ -59,6 +64,66 @@ export const GameHubMenu: React.FC<GameHubMenuProps> = ({ onSelectKidsGame, onSe
         >
           {t('game.hub.subtitle')}
         </motion.p>
+      </motion.div>
+
+      {/* ─── FEATURED MULTIPLAYER: PRACTICE GROUND ─── */}
+      <motion.div
+        variants={itemVariants}
+        initial="hidden"
+        animate="visible"
+        whileHover={{ y: -4 }}
+        className="w-full relative rounded-3xl p-6 sm:p-7 mb-8 overflow-hidden border-4 border-amber-400 dark:border-amber-500/80 shadow-2xl bg-gradient-to-r from-amber-500/15 via-rose-500/10 to-indigo-500/15 dark:from-amber-950/40 dark:via-slate-900 dark:to-indigo-950/40"
+      >
+        <div className="absolute -top-12 -right-12 w-48 h-48 bg-amber-400/20 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
+            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-amber-500 via-rose-500 to-indigo-600 flex items-center justify-center text-4xl shadow-xl text-white shrink-0">
+              🎮
+            </div>
+
+            <div>
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-1.5">
+                <span className="px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-rose-500 text-white font-black text-xs uppercase tracking-wider shadow-sm flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 fill-current" />
+                  Live Real-Time Multiplayer
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-400 text-[10px] font-black uppercase flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-sm" />
+                  Online Arena
+                </span>
+              </div>
+
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                Practice Ground
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-bold mt-1 max-w-xl">
+                Compete with real typists in the same live race. Synchronized countdown, identical race text, real-time progress bars, and instant rematch rankings!
+              </p>
+
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-3 text-[11px] font-extrabold text-slate-700 dark:text-slate-300">
+                <span className="px-2.5 py-0.5 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
+                  ⚡ Quick Match
+                </span>
+                <span className="px-2.5 py-0.5 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
+                  🔒 Private Rooms (Code & Link)
+                </span>
+                <span className="px-2.5 py-0.5 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
+                  👥 1v1 to 8 Players
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={onSelectPracticeGround}
+            className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 text-white font-black text-base shadow-xl shadow-amber-500/25 border-b-4 border-amber-700 flex items-center justify-center gap-2.5 cursor-pointer shrink-0"
+          >
+            <span>Enter Practice Ground 🎮</span>
+          </motion.button>
+        </div>
       </motion.div>
 
       {/* 3 Difficulty Tiers Cards Grid */}

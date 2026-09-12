@@ -4,6 +4,22 @@ import tailwindcss from '@tailwindcss/vite'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { resolve } from 'node:path'
 import { handleGeminiChat, type ChatRequestBody } from './server/geminiChat.ts'
+import { MultiplayerServer } from './server/multiplayer/multiplayerServer.ts'
+
+function multiplayerDevPlugin(): Plugin {
+  let mpServer: MultiplayerServer | null = null;
+  return {
+    name: 'multiplayer-dev-server',
+    configureServer(server: ViteDevServer) {
+      if (server.httpServer && !mpServer) {
+        mpServer = new MultiplayerServer({
+          server: server.httpServer,
+          path: '/practice-ground-ws',
+        });
+      }
+    },
+  };
+}
 
 function geminiDevApiPlugin(): Plugin {
   return {
@@ -63,7 +79,12 @@ export default defineConfig({
     react(),
     tailwindcss(),
     geminiDevApiPlugin(),
+    multiplayerDevPlugin(),
   ],
+  server: {
+    host: true,
+    port: 5173,
+  },
   build: {
     rollupOptions: {
       input: {

@@ -1,14 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSearchParams, useLocation } from 'react-router-dom';
 import { GameHubMenu } from '../components/game/GameHubMenu';
 import { LilypadLeapGame } from '../components/game/lilypad/LilypadLeapGame';
 import { NeonVelocityGame } from '../components/game/neon/NeonVelocityGame';
+import { PracticeGroundView } from '../components/practice-ground/PracticeGroundView';
 
-type PlayViewMode = 'hub' | 'lilypad-leap' | 'neon-velocity';
+type PlayViewMode = 'hub' | 'lilypad-leap' | 'neon-velocity' | 'practice-ground';
 
 export const PlayPage: React.FC = () => {
-  const [viewMode, setViewMode] = useState<PlayViewMode>('hub');
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const roomParam = searchParams.get('room') || '';
+  const modeParam = searchParams.get('mode') || '';
+  const isPracticeGroundRoute =
+    location.pathname.includes('/practice-ground') ||
+    modeParam === 'practice-ground' ||
+    Boolean(roomParam);
+
+  const [viewMode, setViewMode] = useState<PlayViewMode>(
+    isPracticeGroundRoute ? 'practice-ground' : 'hub'
+  );
   const [selectedLevel, setSelectedLevel] = useState<number>(1);
+
+  useEffect(() => {
+    if (isPracticeGroundRoute) {
+      setViewMode('practice-ground');
+    }
+  }, [isPracticeGroundRoute]);
 
   const handleLaunchKidsGame = (level = 1) => {
     setSelectedLevel(level);
@@ -17,6 +36,10 @@ export const PlayPage: React.FC = () => {
 
   const handleLaunchNeonVelocity = () => {
     setViewMode('neon-velocity');
+  };
+
+  const handleLaunchPracticeGround = () => {
+    setViewMode('practice-ground');
   };
 
   const handleReturnToHub = () => {
@@ -38,6 +61,7 @@ export const PlayPage: React.FC = () => {
             <GameHubMenu
               onSelectKidsGame={handleLaunchKidsGame}
               onSelectNeonVelocity={handleLaunchNeonVelocity}
+              onSelectPracticeGround={handleLaunchPracticeGround}
             />
           </motion.div>
         )}
@@ -69,6 +93,22 @@ export const PlayPage: React.FC = () => {
           >
             <NeonVelocityGame
               onBackToHub={handleReturnToHub}
+            />
+          </motion.div>
+        )}
+
+        {viewMode === 'practice-ground' && (
+          <motion.div
+            key="practice-ground-game"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.3 }}
+            className="w-full"
+          >
+            <PracticeGroundView
+              onBackToHub={handleReturnToHub}
+              initialRoomCode={roomParam}
             />
           </motion.div>
         )}
