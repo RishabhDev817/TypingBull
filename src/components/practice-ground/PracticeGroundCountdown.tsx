@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { soundEngine } from '../../utils/audio';
+import { useI18n } from '../../context/I18nContext';
 
 interface Props {
   startAt: number;
@@ -13,6 +14,7 @@ export const PracticeGroundCountdown: React.FC<Props> = ({
   textTitle,
   onCountdownComplete,
 }) => {
+  const { t } = useI18n();
   const [displayNumber, setDisplayNumber] = useState<number | string>(3);
   const [lastSoundNumber, setLastSoundNumber] = useState<number | string | null>(null);
   const completedRef = React.useRef(false);
@@ -63,7 +65,7 @@ export const PracticeGroundCountdown: React.FC<Props> = ({
         className="mb-8 px-5 py-2.5 rounded-2xl bg-white/10 border border-white/20 text-center"
       >
         <span className="text-xs font-black uppercase text-slate-300 block tracking-wider">
-          Upcoming Passage
+          {t('multiplayer.upcomingPassage')}
         </span>
         <span className="text-lg font-black text-white">"{textTitle}"</span>
       </motion.div>
@@ -92,7 +94,7 @@ export const PracticeGroundCountdown: React.FC<Props> = ({
         transition={{ delay: 0.2 }}
         className="mt-8 text-xs sm:text-sm font-black uppercase tracking-widest text-slate-300"
       >
-        Synchronizing with Racers...
+        {t('multiplayer.syncRacers')}
       </motion.span>
     </div>
   );

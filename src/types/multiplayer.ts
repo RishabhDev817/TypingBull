@@ -78,7 +78,7 @@ export type ClientMessage =
   | { type: 'CREATE_ROOM'; payload: { name: string; avatarEmoji?: string; settings?: Partial<RoomSettings> } }
   | { type: 'JOIN_ROOM'; payload: { roomCode: string; name: string; avatarEmoji?: string; sessionToken?: string } }
   | { type: 'LEAVE_ROOM'; payload?: Record<string, never> }
-  | { type: 'FIND_MATCH'; payload: { name: string; avatarEmoji?: string } }
+  | { type: 'FIND_MATCH'; payload: { name: string; avatarEmoji?: string; language?: string } }
   | { type: 'CANCEL_MATCH'; payload?: Record<string, never> }
   | { type: 'TOGGLE_READY'; payload?: { ready?: boolean } }
   | { type: 'START_RACE'; payload?: Record<string, never> }

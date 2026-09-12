@@ -10,6 +10,7 @@ import {
   type FeedbackSubmission,
 } from '../../engine/feedbackStore';
 import { Mascot } from '../Mascot';
+import { useI18n } from '../../context/I18nContext';
 
 interface FeedbackModalProps {
   isOpen: boolean;
@@ -18,36 +19,38 @@ interface FeedbackModalProps {
   contextTag?: string;
 }
 
-const FEEDBACK_TYPES: { id: FeedbackType; label: string; icon: string }[] = [
-  { id: 'feature_request', label: 'Feature Request', icon: '💡' },
-  { id: 'bug_report', label: 'Bug Report', icon: '🐛' },
-  { id: 'improvement', label: 'Improvement', icon: '🎯' },
-  { id: 'general', label: 'General Feedback', icon: '❤️' },
-];
-
-const USE_CASES = [
-  'SSC / Government Exams',
-  'RRB / Railway Exams',
-  'Banking Exams',
-  'College / Student',
-  'Coding / Programming',
-  'Improve Typing Speed',
-  'Just for Fun',
-  'Other',
-];
-
-const PRIORITIES: { id: FeedbackPriority; label: string; icon: string; border: string; bg: string }[] = [
-  { id: 'nice_to_have', label: 'Nice to have', icon: '🟢', border: 'border-emerald-500/30', bg: 'bg-emerald-500/10' },
-  { id: 'really_help', label: 'Would really help', icon: '🟡', border: 'border-amber-500/30', bg: 'bg-amber-500/10' },
-  { id: 'need_this', label: 'I really need this', icon: '🔴', border: 'border-rose-500/30', bg: 'bg-rose-500/10' },
-];
-
 export const FeedbackModal: React.FC<FeedbackModalProps> = ({
   isOpen,
   onClose,
   initialType = 'feature_request',
   contextTag,
 }) => {
+  const { t } = useI18n();
+
+  const feedbackTypes: { id: FeedbackType; label: string; icon: string }[] = [
+    { id: 'feature_request', label: t('feedback.typeFeature'), icon: '💡' },
+    { id: 'bug_report', label: t('feedback.typeBug'), icon: '🐛' },
+    { id: 'improvement', label: t('feedback.typeImprovement'), icon: '🎯' },
+    { id: 'general', label: t('feedback.typeGeneral'), icon: '❤️' },
+  ];
+
+  const useCases: { id: string; label: string }[] = [
+    { id: 'SSC / Government Exams', label: t('feedback.useCaseGov') },
+    { id: 'RRB / Railway Exams', label: t('feedback.useCaseRailway') },
+    { id: 'Banking Exams', label: t('feedback.useCaseBanking') },
+    { id: 'College / Student', label: t('feedback.useCaseStudent') },
+    { id: 'Coding / Programming', label: t('feedback.useCaseCoding') },
+    { id: 'Improve Typing Speed', label: t('feedback.useCaseSpeed') },
+    { id: 'Just for Fun', label: t('feedback.useCaseFun') },
+    { id: 'Other', label: t('feedback.useCaseOther') },
+  ];
+
+  const priorities: { id: FeedbackPriority; label: string; icon: string; border: string; bg: string }[] = [
+    { id: 'nice_to_have', label: t('feedback.priorityNice'), icon: '🟢', border: 'border-emerald-500/30', bg: 'bg-emerald-500/10' },
+    { id: 'really_help', label: t('feedback.priorityHelp'), icon: '🟡', border: 'border-amber-500/30', bg: 'bg-amber-500/10' },
+    { id: 'need_this', label: t('feedback.priorityNeed'), icon: '🔴', border: 'border-rose-500/30', bg: 'bg-rose-500/10' },
+  ];
+
   const [feedbackType, setFeedbackType] = useState<FeedbackType>(initialType);
   const [message, setMessage] = useState('');
   const [selectedUseCases, setSelectedUseCases] = useState<string[]>([]);
@@ -118,19 +121,19 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
     // Validation
     const trimmedMessage = message.trim();
     if (!trimmedMessage) {
-      setErrorMessage('Please enter your feedback or suggestion.');
+      setErrorMessage(t('feedback.errEmpty'));
       textareaRef.current?.focus();
       return;
     }
 
     if (trimmedMessage.length > 1000) {
-      setErrorMessage('Feedback must be 1000 characters or fewer.');
+      setErrorMessage(t('feedback.errLength'));
       return;
     }
 
     const trimmedEmail = email.trim();
     if (trimmedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
-      setErrorMessage('Please enter a valid email address or leave it blank.');
+      setErrorMessage(t('feedback.errEmail'));
       return;
     }
 
@@ -249,10 +252,10 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                     id="feedback-title"
                     className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight leading-tight"
                   >
-                    Help Us Make TypingBull Better 💡
+                    {t('feedback.title')}
                   </h2>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">
-                    Tell us what you love, what needs improvement, or what you'd like us to build next.
+                    {t('feedback.subtitle')}
                   </p>
                 </div>
               </div>
@@ -271,19 +274,19 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                     <CheckCircle2 size={36} />
                   </div>
                   <div className="space-y-1 max-w-sm">
-                    <h3 className="text-2xl font-black text-slate-900 dark:text-white">Thank you! 🐂❤️</h3>
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-white">{t('feedback.thankYou')}</h3>
                     <p className="text-sm text-slate-600 dark:text-slate-300 font-medium">
-                      Your feedback helps us make TypingBull better.
+                      {t('feedback.successDesc')}
                     </p>
                     <p className="text-xs text-slate-400 mt-2">
-                      We read every single suggestion and prioritize future updates based directly on learner requests.
+                      {t('feedback.successNote')}
                     </p>
                   </div>
                   <button
                     onClick={handleResetAndClose}
                     className="mt-4 px-8 py-3 rounded-2xl bg-primary hover:bg-primary-hover text-white font-black text-sm shadow-md hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
                   >
-                    Done
+                    {t('feedback.done')}
                   </button>
                 </motion.div>
               ) : (
@@ -292,10 +295,10 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                   {/* 1. Feedback Type Chips */}
                   <div className="space-y-2">
                     <label className="block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                      Feedback Type
+                      {t('feedback.typeLabel')}
                     </label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      {FEEDBACK_TYPES.map(({ id, label, icon }) => {
+                      {feedbackTypes.map(({ id, label, icon }) => {
                         const isSelected = feedbackType === id;
                         return (
                           <button
@@ -323,7 +326,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                         htmlFor="feedback-message"
                         className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400"
                       >
-                        What would you like to see in TypingBull? <span className="text-rose-500">*</span>
+                        {t('feedback.question')} <span className="text-rose-500">*</span>
                       </label>
                       <span
                         className={`text-[10px] font-bold ${
@@ -338,7 +341,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                       ref={textareaRef}
                       value={message}
                       onChange={(e) => setMessage(e.target.value.slice(0, 1000))}
-                      placeholder="Tell us what you need, what is missing, or what would make TypingBull more useful for you..."
+                      placeholder={t('feedback.placeholder')}
                       rows={4}
                       required
                       className="w-full rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 px-3.5 py-3 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500 transition-all resize-y min-h-[96px]"
@@ -348,17 +351,17 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                   {/* 3. User Context (What do you use TypingBull for?) */}
                   <div className="space-y-2">
                     <label className="block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                      What do you use TypingBull for?{' '}
-                      <span className="text-[10px] lowercase text-slate-400 font-medium">(optional, multi-select)</span>
+                      {t('feedback.useCaseLabel')}{' '}
+                      <span className="text-[10px] lowercase text-slate-400 font-medium">{t('feedback.useCaseOptional')}</span>
                     </label>
                     <div className="flex flex-wrap gap-1.5">
-                      {USE_CASES.map((useCase) => {
-                        const isChecked = selectedUseCases.includes(useCase);
+                      {useCases.map(({ id, label }) => {
+                        const isChecked = selectedUseCases.includes(id);
                         return (
                           <button
-                            key={useCase}
+                            key={id}
                             type="button"
-                            onClick={() => toggleUseCase(useCase)}
+                            onClick={() => toggleUseCase(id)}
                             className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                               isChecked
                                 ? 'bg-primary/15 border-primary text-primary dark:text-purple-300 shadow-2xs'
@@ -366,7 +369,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                             }`}
                           >
                             {isChecked ? '✓ ' : '+ '}
-                            {useCase}
+                            {label}
                           </button>
                         );
                       })}
@@ -376,10 +379,10 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                   {/* 4. Feature Priority */}
                   <div className="space-y-2">
                     <label className="block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                      How important is this to you?
+                      {t('feedback.priorityLabel')}
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      {PRIORITIES.map(({ id, label, icon, border, bg }) => {
+                      {priorities.map(({ id, label, icon, border, bg }) => {
                         const isSelected = priority === id;
                         return (
                           <button
@@ -407,7 +410,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                   <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/60 space-y-3">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <label className="text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                        How would you rate your experience with TypingBull?
+                        {t('feedback.ratingLabel')}
                       </label>
                       <div className="flex items-center gap-1">
                         {[1, 2, 3, 4, 5].map((star) => {
@@ -426,7 +429,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                               <Star
                                 size={18}
                                 className={
-                                  isFilled
+                                   isFilled
                                     ? 'text-amber-400 fill-amber-400'
                                     : 'text-slate-300 dark:text-slate-600'
                                 }
@@ -447,7 +450,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                           type="text"
                           value={ratingComment}
                           onChange={(e) => setRatingComment(e.target.value.slice(0, 300))}
-                          placeholder="What made you give this rating? (optional)"
+                          placeholder={t('feedback.ratingCommentPlaceholder')}
                           className="w-full rounded-xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700 px-3 py-2 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-1 focus:ring-purple-500"
                         />
                       </motion.div>
@@ -460,14 +463,14 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                       htmlFor="feedback-email"
                       className="block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400"
                     >
-                      Email (optional)
+                      {t('feedback.emailLabel')}
                     </label>
                     <input
                       id="feedback-email"
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter your email if you'd like us to follow up"
+                      placeholder={t('feedback.emailPlaceholder')}
                       className="w-full rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500 transition-all"
                     />
                   </div>
@@ -488,7 +491,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                   <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
                       <Sparkles size={12} className="text-purple-400" />
-                      <span>Typing stats attached automatically</span>
+                      <span>{t('feedback.autoAttach')}</span>
                     </div>
 
                     <button
@@ -503,12 +506,12 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                             transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
                             className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
                           />
-                          <span>Sending...</span>
+                          <span>{t('feedback.sendingBtn')}</span>
                         </>
                       ) : (
                         <>
                           <Send size={15} />
-                          <span>Send Feedback</span>
+                          <span>{t('feedback.sendBtn')}</span>
                         </>
                       )}
                     </button>

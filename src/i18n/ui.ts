@@ -4,6 +4,7 @@
  */
 
 import { EXTRA_TRANSLATIONS } from './translationsData';
+import { MULTIPLAYER_FEEDBACK_TRANSLATIONS } from './multiplayerFeedbackI18n';
 
 export const LANGUAGES = {
   en: { name: 'English', nativeName: 'English', flag: '🇺🇸', code: 'en' },
@@ -1107,7 +1108,11 @@ const rawUi = {
 export const ui: Record<SupportedLocale, Record<string, string>> = Object.fromEntries(
   Object.entries(rawUi).map(([locale, dict]) => [
     locale,
-    { ...dict, ...(EXTRA_TRANSLATIONS[locale] || {}) },
+    {
+      ...dict,
+      ...(EXTRA_TRANSLATIONS[locale] || {}),
+      ...(MULTIPLAYER_FEEDBACK_TRANSLATIONS[locale as SupportedLocale] || {}),
+    },
   ])
 ) as unknown as Record<SupportedLocale, Record<string, string>>;
 

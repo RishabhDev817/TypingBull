@@ -2,6 +2,7 @@ import React from 'react';
 import { Flag, Trophy } from 'lucide-react';
 import type { Player } from '../../types/multiplayer.ts';
 import type { OpponentProgress } from '../../hooks/usePracticeGroundSocket';
+import { useI18n } from '../../context/I18nContext';
 
 interface Props {
   players: Player[];
@@ -21,16 +22,18 @@ export const PracticeGroundRaceTrack: React.FC<Props> = ({
   opponentsProgress,
   myProgress,
 }) => {
+  const { t } = useI18n();
+
   return (
     <div className="w-full p-4 sm:p-5 rounded-3xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-2 border-slate-200 dark:border-slate-700/80 shadow-xl flex flex-col gap-3">
       <div className="flex items-center justify-between px-1">
         <span className="text-xs font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
           <Trophy className="w-3.5 h-3.5 text-amber-500" />
-          <span>Live Racing Track</span>
+          <span>{t('multiplayer.liveTrack')}</span>
         </span>
         <div className="flex items-center gap-1 text-[11px] font-bold text-slate-400">
           <Flag className="w-3.5 h-3.5 text-emerald-500" />
-          <span>Finish Line</span>
+          <span>{t('multiplayer.finishLine')}</span>
         </div>
       </div>
 
@@ -50,7 +53,7 @@ export const PracticeGroundRaceTrack: React.FC<Props> = ({
               className={`p-2.5 rounded-2xl border transition-all ${
                 isMe
                   ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-400 dark:border-emerald-600 shadow-sm'
-                  : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-200 dark:border-slate-750'
+                  : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-200 dark:border-slate-755'
               }`}
             >
               {/* Header Info: Avatar, Name, Stats */}
@@ -62,12 +65,12 @@ export const PracticeGroundRaceTrack: React.FC<Props> = ({
                   </span>
                   {isMe && (
                     <span className="px-1.5 py-0.2 rounded-md bg-emerald-500 text-white text-[9px] font-black uppercase">
-                      You
+                      {t('multiplayer.you')}
                     </span>
                   )}
                   {isFinished && (
                     <span className="px-2 py-0.2 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-400 text-[10px] font-black flex items-center gap-1">
-                      🏁 Finished
+                      {t('multiplayer.finishedStatus')}
                     </span>
                   )}
                 </div>

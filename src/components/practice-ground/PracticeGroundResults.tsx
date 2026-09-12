@@ -6,6 +6,7 @@ import { Mascot } from '../Mascot';
 import { ConfettiFireworks } from '../game/ConfettiFireworks';
 import { soundEngine } from '../../utils/audio';
 import { getHighScore, setHighScore } from '../../engine/sessionStore';
+import { useI18n } from '../../context/I18nContext';
 
 interface Props {
   rankings: RaceRankingItem[];
@@ -32,6 +33,7 @@ export const PracticeGroundResults: React.FC<Props> = ({
   onPlayAgain,
   onReturnToMenu,
 }) => {
+  const { t } = useI18n();
   const rawRankings = Array.isArray(rankings) ? rankings : [];
 
   let myResult = rawRankings.find((r) => r.playerId === myPlayerId);
@@ -83,17 +85,17 @@ export const PracticeGroundResults: React.FC<Props> = ({
 
         <div className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full bg-amber-100 dark:bg-amber-950/60 border border-amber-400 text-amber-800 dark:text-amber-300 text-xs font-black uppercase tracking-wider mb-2">
           <Trophy className="w-3.5 h-3.5" />
-          <span>Race Completed</span>
+          <span>{t('multiplayer.raceCompleted')}</span>
         </div>
 
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
-          {isWinner ? '🏆 Victory! Great Run!' : '🏁 Race Leaderboard'}
+          {isWinner ? t('multiplayer.victory') : t('multiplayer.leaderboard')}
         </h1>
 
         {isNewPersonalBest && (
           <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-black shadow-md">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>New Personal Best: {myResult?.wpm} WPM!</span>
+            <span>{t('multiplayer.newRecord').replace('{wpm}', String(myResult?.wpm || 0))}</span>
           </div>
         )}
       </div>
@@ -106,24 +108,24 @@ export const PracticeGroundResults: React.FC<Props> = ({
           className="w-full max-w-lg p-5 rounded-3xl bg-gradient-to-b from-indigo-500/15 via-white dark:via-slate-900 to-slate-100/50 dark:to-slate-900 border-4 border-indigo-400 dark:border-indigo-500 shadow-xl mb-6 flex flex-col items-center"
         >
           <span className="text-xs font-black uppercase tracking-wider text-indigo-700 dark:text-indigo-300 mb-2">
-            Your Race Performance
+            {t('multiplayer.performance')}
           </span>
 
           <div className="grid grid-cols-3 gap-3 w-full text-center">
             <div className="p-3 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 shadow-sm">
-              <span className="text-[10px] font-black uppercase text-slate-400 block">Rank</span>
+              <span className="text-[10px] font-black uppercase text-slate-400 block">{t('multiplayer.rank')}</span>
               <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400">
                 #{myResult.rank}
               </span>
             </div>
             <div className="p-3 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 shadow-sm">
-              <span className="text-[10px] font-black uppercase text-slate-400 block">Speed</span>
+              <span className="text-[10px] font-black uppercase text-slate-400 block">{t('multiplayer.speed')}</span>
               <span className="text-2xl font-black text-amber-500">
                 {myResult.wpm} <span className="text-xs font-bold">WPM</span>
               </span>
             </div>
             <div className="p-3 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 shadow-sm">
-              <span className="text-[10px] font-black uppercase text-slate-400 block">Accuracy</span>
+              <span className="text-[10px] font-black uppercase text-slate-400 block">{t('multiplayer.accuracy')}</span>
               <span className="text-2xl font-black text-emerald-500">
                 {myResult.accuracy}%
               </span>
@@ -135,7 +137,7 @@ export const PracticeGroundResults: React.FC<Props> = ({
       {/* Leaderboard Table List */}
       <div className="w-full max-w-2xl mb-8 flex flex-col gap-2.5">
         <span className="text-xs font-black uppercase tracking-wider text-slate-400 px-2">
-          Final Rankings
+          {t('multiplayer.finalRankings')}
         </span>
 
         {effectiveRankings.map((item) => {
@@ -173,12 +175,12 @@ export const PracticeGroundResults: React.FC<Props> = ({
                     </span>
                     {isMe && (
                       <span className="px-1.5 py-0.2 rounded bg-emerald-500 text-white text-[9px] font-black uppercase">
-                        You
+                        {t('multiplayer.you')}
                       </span>
                     )}
                   </div>
                   <span className="text-[10px] font-bold text-slate-400">
-                    {item.finished ? `${item.durationSeconds}s duration` : 'Did not finish'}
+                    {item.finished ? t('multiplayer.durationSec').replace('{s}', String(item.durationSeconds)) : t('multiplayer.didNotFinish')}
                   </span>
                 </div>
               </div>
@@ -187,11 +189,11 @@ export const PracticeGroundResults: React.FC<Props> = ({
               <div className="flex items-center gap-3 sm:gap-5 font-mono font-black text-sm sm:text-base">
                 <div className="text-right">
                   <span className="text-amber-500 block leading-tight">{item.wpm} WPM</span>
-                  <span className="text-[10px] text-slate-400">Speed</span>
+                  <span className="text-[10px] text-slate-400">{t('multiplayer.speed')}</span>
                 </div>
                 <div className="text-right">
                   <span className="text-emerald-500 block leading-tight">{item.accuracy}%</span>
-                  <span className="text-[10px] text-slate-400">Accuracy</span>
+                  <span className="text-[10px] text-slate-400">{t('multiplayer.accuracy')}</span>
                 </div>
               </div>
             </motion.div>
@@ -211,7 +213,7 @@ export const PracticeGroundResults: React.FC<Props> = ({
           className="px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 text-white font-black text-base shadow-xl shadow-emerald-500/30 border-b-4 border-emerald-700 flex items-center gap-2 cursor-pointer"
         >
           <RotateCcw className="w-5 h-5" />
-          <span>Play Again (Rematch)</span>
+          <span>{t('multiplayer.rematch')}</span>
         </motion.button>
 
         <motion.button
@@ -224,7 +226,7 @@ export const PracticeGroundResults: React.FC<Props> = ({
           className="px-6 py-4 rounded-2xl bg-white/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-black text-base border-2 border-slate-200 dark:border-slate-700 shadow-md flex items-center gap-2 cursor-pointer"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span>Return to Practice Ground</span>
+          <span>{t('multiplayer.returnHub')}</span>
         </motion.button>
       </div>
     </div>

@@ -333,14 +333,14 @@ export function usePracticeGroundSocket(initialRoomCode?: string) {
     });
   };
 
-  const findQuickMatch = (name?: string, emoji?: string) => {
+  const findQuickMatch = (name?: string, emoji?: string, language?: string) => {
     const finalName = name || playerName;
     const finalEmoji = emoji || playerEmoji;
     savePlayerProfile(finalName, finalEmoji);
 
     sendJson({
       type: 'FIND_MATCH',
-      payload: { name: finalName, avatarEmoji: finalEmoji },
+      payload: { name: finalName, avatarEmoji: finalEmoji, language },
     });
   };
 

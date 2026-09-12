@@ -329,6 +329,7 @@ export class MultiplayerArena extends DurableObject {
       case 'FIND_MATCH': {
         const cleanName = ResultValidator.sanitizeDisplayName(message.payload?.name);
         const emoji = message.payload?.avatarEmoji || '🐂';
+        const language = message.payload?.language || 'en';
 
         const player: Player = {
           id: conn.playerId,
@@ -346,7 +347,7 @@ export class MultiplayerArena extends DurableObject {
           accuracy: 100,
         };
 
-        const matchResult = this.matchmakingManager.findMatch(player);
+        const matchResult = this.matchmakingManager.findMatch(player, language);
 
         if (matchResult.status === 'MATCHED' && matchResult.roomCode) {
           const room = this.roomManager.getRoom(matchResult.roomCode);

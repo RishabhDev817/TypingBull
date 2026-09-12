@@ -46,14 +46,14 @@ export class RoomManager {
     isQuickMatch = false
   ): Room {
     const code = this.generateRoomCode();
-    const passage = getRandomRacePassage();
-
     const settings: RoomSettings = {
       maxPlayers: customSettings?.maxPlayers || MULTIPLAYER_CONSTANTS.MAX_PLAYERS,
       durationSeconds: customSettings?.durationSeconds || MULTIPLAYER_CONSTANTS.DEFAULT_RACE_DURATION_SECONDS,
       language: customSettings?.language || 'en',
       difficulty: customSettings?.difficulty || 'medium',
     };
+
+    const passage = getRandomRacePassage(settings.language);
 
     hostPlayer.isHost = true;
     hostPlayer.status = 'NOT_READY';
@@ -158,7 +158,7 @@ export class RoomManager {
     const room = this.getRoom(code);
     if (!room) return undefined;
 
-    const newPassage = getRandomRacePassage();
+    const newPassage = getRandomRacePassage(room.settings?.language || 'en');
     room.status = 'LOBBY';
     room.text = newPassage.text;
     room.textTitle = newPassage.title;

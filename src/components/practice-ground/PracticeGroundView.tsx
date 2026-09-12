@@ -9,6 +9,7 @@ import { PracticeGroundRaceTrack } from './PracticeGroundRaceTrack';
 import { PracticeGroundTypingArea } from './PracticeGroundTypingArea';
 import { PracticeGroundResults } from './PracticeGroundResults';
 import { soundEngine } from '../../utils/audio';
+import { useI18n } from '../../context/I18nContext';
 
 interface Props {
   onBackToHub: () => void;
@@ -19,6 +20,7 @@ export const PracticeGroundView: React.FC<Props> = ({
   onBackToHub,
   initialRoomCode,
 }) => {
+  const { t, currentLang } = useI18n();
   const {
     status,
     phase,
@@ -109,14 +111,15 @@ export const PracticeGroundView: React.FC<Props> = ({
         settings: {
           maxPlayers: 2,
           durationSeconds: 60,
-          language: 'english',
+          language: currentLang || 'en',
         },
         text: raceText || 'The speedway is ready for racing champions.',
         textTitle: raceTextTitle || 'Speed Speedway',
         createdAt: 0,
+        raceStartAt: undefined as number | undefined,
       }
     );
-  }, [room, myPlayerId, phase, playerName, playerEmoji, raceText, raceTextTitle]);
+  }, [room, myPlayerId, phase, playerName, playerEmoji, raceText, raceTextTitle, currentLang]);
 
   return (
     <div className="w-full min-h-[calc(100vh-5rem)] flex flex-col justify-center relative py-6">
@@ -141,9 +144,9 @@ export const PracticeGroundView: React.FC<Props> = ({
               playerName={playerName}
               playerEmoji={playerEmoji}
               onSaveProfile={savePlayerProfile}
-              onQuickMatch={() => findQuickMatch()}
-              onCreateRoom={() => createRoom()}
-              onJoinRoom={(code) => joinRoom(code)}
+              onQuickMatch={() => findQuickMatch(playerName, playerEmoji, currentLang)}
+              onCreateRoom={() => createRoom(playerName, playerEmoji, { language: currentLang })}
+              onJoinRoom={(code) => joinRoom(code, playerName, playerEmoji)}
               onBackToHub={onBackToHub}
               initialCode={initialRoomCode}
               errorMessage={errorMessage}
@@ -164,7 +167,7 @@ export const PracticeGroundView: React.FC<Props> = ({
             {/* Radar Header */}
             <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/80 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-700/80 text-emerald-800 dark:text-emerald-300 text-xs font-black uppercase tracking-wider mb-5 shadow-sm">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-              <span>Arena Radar Active</span>
+              <span>{t('multiplayer.radarActive')}</span>
             </div>
 
             {/* Concentric Radar Screen */}
@@ -212,10 +215,10 @@ export const PracticeGroundView: React.FC<Props> = ({
             </div>
 
             <h3 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              Searching for Opponents...
+              {t('multiplayer.searching')}
             </h3>
             <p className="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 mt-1 mb-6 max-w-xs">
-              Matching your speed against live typists on the speedway.
+              {t('multiplayer.matchingSpeed')}
             </p>
 
             <div className="flex items-center gap-3">
@@ -228,7 +231,7 @@ export const PracticeGroundView: React.FC<Props> = ({
                 }}
                 className="px-6 py-3 rounded-2xl bg-white dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs sm:text-sm font-black border-2 border-rose-200 dark:border-rose-900/60 shadow-md transition-all cursor-pointer"
               >
-                Cancel Search
+                {t('multiplayer.cancelSearch')}
               </motion.button>
             </div>
           </motion.div>

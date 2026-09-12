@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Clock, Zap, Target } from 'lucide-react';
 import { soundEngine } from '../../utils/audio';
+import { useI18n } from '../../context/I18nContext';
 
 interface Props {
   targetText: string;
@@ -29,6 +30,7 @@ export const PracticeGroundTypingArea: React.FC<Props> = ({
   onProgressUpdate,
   onLocalFinish,
 }) => {
+  const { t } = useI18n();
   const [userInput, setUserInput] = useState<string>('');
   const [mistakesCount, setMistakesCount] = useState<number>(0);
   const [totalKeystrokes, setTotalKeystrokes] = useState<number>(0);
@@ -103,50 +105,51 @@ export const PracticeGroundTypingArea: React.FC<Props> = ({
 
     setUserInput(value);
 
-    // Calculate local metrics using canonical formula
-    const elapsedSeconds = Math.max(1, (Date.now() - raceStartAt) / 1000);
-    const elapsedMinutes = elapsedSeconds / 60;
-    const correctChars = Math.max(0, value.length - newMistakesCount);
-    const calculatedWpm = elapsedMinutes > 0
-      ? Math.round((correctChars / 5) / elapsedMinutes)
-      : 0;
-    const calculatedAccuracy = newTotalKeystrokes > 0
-      ? Math.round(((newTotalKeystrokes - newMistakesCount) / newTotalKeystrokes) * 1000) / 10
-      : 100;
+    // Calculate accuracy and WPM
+    const correctCount = Math.max(0, value.length - newMistakesCount);
+    const accuracy =
+      value.length === 0 ? 100 : Math.max(0, Math.round((correctCount / value.length) * 100));
 
-    const completed = value.length >= targetText.length;
+    const elapsedSeconds = Math.max(0.5, (Date.now() - raceStartAt) / 1000);
+    const wordsTyped = correctCount / 5;
+    const wpm = Math.max(0, Math.round((wordsTyped / elapsedSeconds) * 60));
 
-    // Inform parent hook (runs independently in background)
+    const isCompleted = value.length >= targetText.length;
+
     onProgressUpdate(
-      correctChars,
+      correctCount,
       newMistakesCount,
-      newTotalKeystrokes,
-      calculatedWpm,
-      calculatedAccuracy,
-      completed
+      value.length,
+      wpm,
+      accuracy,
+      isCompleted
     );
 
-    if (completed && !isFinished) {
-      soundEngine.playVictory();
+    if (isCompleted) {
+      soundEngine.playLevelUnlock();
       onLocalFinish();
     }
   };
 
   // Local display metrics
-  const elapsedSeconds = Math.max(1, durationSeconds - timeRemaining);
-  const elapsedMinutes = elapsedSeconds / 60;
-  const correctChars = Math.max(0, userInput.length - mistakesCount);
-  const currentWpm = elapsedMinutes > 0 ? Math.round((correctChars / 5) / elapsedMinutes) : 0;
-  const currentAccuracy = totalKeystrokes > 0
-    ? Math.round(((totalKeystrokes - mistakesCount) / totalKeystrokes) * 100)
-    : 100;
+  const currentAccuracy =
+    userInput.length === 0
+      ? 100
+      : Math.max(0, Math.round(((userInput.length - mistakesCount) / userInput.length) * 100));
 
-  const isTimeCritical = timeRemaining <= 10 && !isFinished;
+  const elapsedSeconds = Math.max(0.5, (Date.now() - raceStartAt) / 1000);
+  const correctKeystrokes = Math.max(0, userInput.length - mistakesCount);
+  const currentWpm = Math.max(
+    0,
+    Math.round((correctKeystrokes / 5 / (elapsedSeconds / 60)))
+  );
 
-  const formatTime = (secs: number) => {
-    const mins = Math.floor(secs / 60);
-    const s = secs % 60;
-    return `${mins.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  const isTimeCritical = timeRemaining <= 10;
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
   return (
@@ -172,7 +175,7 @@ export const PracticeGroundTypingArea: React.FC<Props> = ({
       <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-2">
           <span className="px-2.5 py-1 rounded-lg bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 text-xs font-black">
-            Passage
+            {t('multiplayer.passageBadge')}
           </span>
           <span className="text-xs font-extrabold text-slate-600 dark:text-slate-300">
             "{textTitle}"
@@ -245,13 +248,13 @@ export const PracticeGroundTypingArea: React.FC<Props> = ({
       {/* Finished Overlay / Status Hint */}
       {isFinished ? (
         <div className="pt-3 mt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs font-black text-emerald-600 dark:text-emerald-400">
-          <span>🏁 You completed the race! Waiting for all racers to finish...</span>
-          <span>{userInput.length}/{targetText.length} chars</span>
+          <span>{t('multiplayer.completedWaiting')}</span>
+          <span>{userInput.length}/{targetText.length} {t('multiplayer.charsLabel')}</span>
         </div>
       ) : (
         <div className="pt-3 mt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs font-bold text-slate-400">
-          <span>⚡ Keep typing without stopping! Focus on smooth accuracy.</span>
-          <span>{userInput.length}/{targetText.length} chars</span>
+          <span>{t('multiplayer.typingTip')}</span>
+          <span>{userInput.length}/{targetText.length} {t('multiplayer.charsLabel')}</span>
         </div>
       )}
     </div>

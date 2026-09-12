@@ -9,6 +9,7 @@ import { RoomManager } from './RoomManager.ts';
 export interface QueuedPlayer {
   player: Player;
   queuedAt: number;
+  language?: string;
 }
 
 const BOT_CHALLENGERS = [
@@ -57,14 +58,14 @@ export class MatchmakingManager {
   /**
    * Immediately matches a player with an arena challenger bot.
    */
-  matchWithBot(player: Player): { roomCode: string; botPlayer: Player } {
+  matchWithBot(player: Player, language?: string): { roomCode: string; botPlayer: Player } {
     this.removePlayer(player.id);
     const botPlayer = this.createChallengerBot();
 
-    // Create a 2-player quick match room with the human as host
+    // Create a 2-player quick match room with the human as host and designated language
     const room = this.roomManager.createRoom(
       player,
-      { maxPlayers: 2 },
+      { maxPlayers: 2, language: language || 'en' },
       true
     );
 
@@ -78,17 +79,21 @@ export class MatchmakingManager {
    * Enqueues a player searching for a match.
    * If an opponent is found, creates a new 2-player room and returns the room code.
    */
-  findMatch(player: Player): { status: 'QUEUED' | 'MATCHED'; roomCode?: string } {
+  findMatch(player: Player, language?: string): { status: 'QUEUED' | 'MATCHED'; roomCode?: string } {
     // Remove if already in queue
     this.removePlayer(player.id);
 
     // Look for a compatible waiting player
-    const opponent = this.queue.shift();
+    const opponentIdx = this.queue.findIndex(
+      (q) => q.player.id !== player.id && (!language || !q.language || q.language === language)
+    );
+    const opponent = opponentIdx !== -1 ? this.queue.splice(opponentIdx, 1)[0] : this.queue.shift();
+
     if (opponent && opponent.player.id !== player.id) {
       // Create a room with the opponent as initial host
       const room = this.roomManager.createRoom(
         opponent.player,
-        { maxPlayers: MULTIPLAYER_CONSTANTS.MAX_PLAYERS },
+        { maxPlayers: MULTIPLAYER_CONSTANTS.MAX_PLAYERS, language: opponent.language || language || 'en' },
         true
       );
 
@@ -102,6 +107,7 @@ export class MatchmakingManager {
     this.queue.push({
       player,
       queuedAt: Date.now(),
+      language,
     });
 
     return { status: 'QUEUED' };
@@ -116,7 +122,7 @@ export class MatchmakingManager {
     if (queueIdx === -1) return null;
 
     const [queued] = this.queue.splice(queueIdx, 1);
-    const { roomCode, botPlayer } = this.matchWithBot(queued.player);
+    const { roomCode, botPlayer } = this.matchWithBot(queued.player, queued.language);
     return { roomCode, botPlayer, player: queued.player };
   }
 

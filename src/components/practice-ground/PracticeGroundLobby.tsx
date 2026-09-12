@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import type { Room } from '../../types/multiplayer.ts';
 import { soundEngine } from '../../utils/audio';
+import { useI18n } from '../../context/I18nContext';
 
 interface Props {
   room: Room;
@@ -30,6 +31,7 @@ export const PracticeGroundLobby: React.FC<Props> = ({
   onStartRace,
   onLeaveRoom,
 }) => {
+  const { t } = useI18n();
   const [copiedCode, setCopiedCode] = useState<boolean>(false);
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
 
@@ -75,13 +77,13 @@ export const PracticeGroundLobby: React.FC<Props> = ({
           className="flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-white/90 dark:bg-slate-900/90 border-2 border-slate-200 dark:border-slate-700/80 text-xs font-black text-slate-700 dark:text-slate-300 hover:text-rose-600 hover:border-rose-300 shadow-sm cursor-pointer transition-all active:scale-95"
         >
           <LogOut className="w-3.5 h-3.5" />
-          <span>Leave Room</span>
+          <span>{t('multiplayer.leaveRoom')}</span>
         </button>
 
         <div className="flex items-center gap-2">
           <span className="px-3.5 py-1.5 rounded-full bg-indigo-100/90 dark:bg-indigo-950/80 border-2 border-indigo-300 dark:border-indigo-700 text-indigo-800 dark:text-indigo-300 text-xs font-black uppercase flex items-center gap-1.5 shadow-sm">
             <Users className="w-3.5 h-3.5" />
-            <span>Racers {connectedPlayers.length}/{room.settings.maxPlayers}</span>
+            <span>{t('multiplayer.racersCount', { current: connectedPlayers.length, max: room.settings.maxPlayers })}</span>
           </span>
         </div>
       </div>
@@ -99,10 +101,10 @@ export const PracticeGroundLobby: React.FC<Props> = ({
           <div>
             <div className="flex items-center gap-2 mb-0.5">
               <span className="text-[11px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                Arena Match Pass
+                {t('multiplayer.matchPass')}
               </span>
               <span className="text-[10px] font-bold px-2 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
-                Private Room
+                {t('multiplayer.privateRoom')}
               </span>
             </div>
             <span className="text-3xl sm:text-4xl font-mono font-black tracking-widest text-slate-900 dark:text-white">
@@ -119,7 +121,7 @@ export const PracticeGroundLobby: React.FC<Props> = ({
             className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-black text-slate-800 dark:text-slate-100 border-2 border-slate-300 dark:border-slate-700 border-b-4 transition-all cursor-pointer shadow-sm"
           >
             {copiedCode ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
-            <span>{copiedCode ? 'Code Copied!' : 'Copy Code'}</span>
+            <span>{copiedCode ? t('multiplayer.codeCopied') : t('multiplayer.copyCode')}</span>
           </motion.button>
 
           <motion.button
@@ -129,7 +131,7 @@ export const PracticeGroundLobby: React.FC<Props> = ({
             className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-black border-2 border-indigo-600 border-b-4 border-b-indigo-800 transition-all cursor-pointer shadow-md shadow-indigo-500/20"
           >
             {copiedLink ? <Check className="w-4 h-4 text-emerald-200" /> : <Share2 className="w-4 h-4" />}
-            <span>{copiedLink ? 'Link Copied!' : 'Share Invite'}</span>
+            <span>{copiedLink ? t('multiplayer.linkCopied') : t('multiplayer.shareInvite')}</span>
           </motion.button>
         </div>
       </motion.div>
@@ -139,14 +141,14 @@ export const PracticeGroundLobby: React.FC<Props> = ({
         <div className="flex items-center justify-between mb-4 px-1">
           <div className="flex items-center gap-2">
             <h3 className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
-              Racers at Starting Line
+              {t('multiplayer.startingLine')}
             </h3>
             <span className="px-2.5 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 text-[10px] font-black border border-indigo-300 dark:border-indigo-800">
               {connectedPlayers.length} / {room.settings.maxPlayers}
             </span>
           </div>
           <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-            {allReady ? 'All racers ready to launch!' : 'Waiting for racers to ready up'}
+            {allReady ? t('multiplayer.allRacersReady') : t('multiplayer.waitingRacers')}
           </span>
         </div>
 
@@ -179,12 +181,12 @@ export const PracticeGroundLobby: React.FC<Props> = ({
                       {isPlayerHost && (
                         <span className="px-2.5 py-1 rounded-full bg-amber-100/90 dark:bg-amber-950/90 text-amber-800 dark:text-amber-300 border border-amber-400/80 text-[10px] font-black uppercase flex items-center gap-1 shadow-[0_0_10px_rgba(245,158,11,0.25)]">
                           <Crown className="w-3 h-3 fill-current text-amber-500" />
-                          Host
+                          {t('multiplayer.host')}
                         </span>
                       )}
                       {isMe && (
                         <span className="px-2 py-0.5 rounded-full bg-emerald-500 text-white text-[10px] font-black uppercase shadow-sm tracking-wider">
-                          YOU
+                          {t('multiplayer.you')}
                         </span>
                       )}
                     </div>
@@ -201,16 +203,16 @@ export const PracticeGroundLobby: React.FC<Props> = ({
                   {isDisconnected ? (
                     <span className="text-[11px] font-black text-amber-500 flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" />
-                      Reconnecting...
+                      {t('multiplayer.reconnecting')}
                     </span>
                   ) : player.ready || isPlayerHost ? (
                     <span className="px-2.5 py-1 rounded-full bg-emerald-100/90 dark:bg-emerald-950/90 text-emerald-800 dark:text-emerald-300 border border-emerald-400 text-[10px] font-black uppercase flex items-center gap-1.5 shadow-sm">
                       <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                      Ready to Race
+                      {t('multiplayer.readyToRace')}
                     </span>
                   ) : (
                     <span className="px-2.5 py-1 rounded-full bg-slate-100/90 dark:bg-slate-800/90 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 text-[10px] font-black uppercase">
-                      Waiting...
+                      {t('multiplayer.waiting')}
                     </span>
                   )}
                 </div>
@@ -227,7 +229,7 @@ export const PracticeGroundLobby: React.FC<Props> = ({
               whileTap={{ scale: 0.98 }}
               onClick={handleCopyLink}
               className="group relative p-4 rounded-2xl border-2 border-dashed border-indigo-300/80 dark:border-indigo-500/40 hover:border-indigo-500 dark:hover:border-indigo-400 bg-white/85 dark:bg-slate-900/85 backdrop-blur-2xl flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 min-h-[165px] shadow-lg shadow-indigo-500/5 hover:shadow-xl hover:shadow-indigo-500/15"
-              title="Click to copy invite link"
+              title={t('multiplayer.clickToCopy')}
             >
               {/* Corner HUD reticles */}
               <div className="absolute top-2.5 left-2.5 w-2.5 h-2.5 border-t-2 border-l-2 border-indigo-400/70 group-hover:border-indigo-600 transition-colors" />
@@ -242,10 +244,10 @@ export const PracticeGroundLobby: React.FC<Props> = ({
 
               {/* Pulsing Invite Prompt */}
               <span className="text-xs font-black text-indigo-700 dark:text-indigo-300 uppercase tracking-wide group-hover:text-indigo-800 dark:group-hover:text-indigo-200 flex items-center gap-1">
-                <span>+ Invite Player</span>
+                <span>{t('multiplayer.invitePlayer')}</span>
               </span>
               <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 mt-1">
-                {copiedLink ? 'Link Copied! 📋' : 'Click to Copy Invite'}
+                {copiedLink ? t('multiplayer.linkCopied') : t('multiplayer.clickToCopy')}
               </span>
             </motion.button>
           ))}
@@ -269,14 +271,14 @@ export const PracticeGroundLobby: React.FC<Props> = ({
               className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 text-white font-black text-lg shadow-xl shadow-emerald-500/30 border-b-4 border-emerald-700 flex items-center justify-center gap-2 cursor-pointer transition-transform"
             >
               <Play className="w-5 h-5 fill-current" />
-              <span>Launch Match 🚀</span>
+              <span>{t('multiplayer.launchMatch')}</span>
             </motion.button>
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 text-center">
               {connectedPlayers.length < 2
-                ? 'Invite friends or start solo practice!'
+                ? t('multiplayer.hostSoloTip')
                 : allReady
-                ? 'All players are ready! Click Launch Match.'
-                : 'Waiting for other players to ready up...'}
+                ? t('multiplayer.hostReadyTip')
+                : t('multiplayer.hostWaitTip')}
             </span>
           </>
         ) : (
@@ -295,12 +297,12 @@ export const PracticeGroundLobby: React.FC<Props> = ({
               }`}
             >
               <Sparkles className="w-5 h-5" />
-              <span>{myPlayer?.ready ? 'Cancel Ready' : 'Ready Up! 🚀'}</span>
+              <span>{myPlayer?.ready ? t('multiplayer.cancelReady') : t('multiplayer.readyUp')}</span>
             </motion.button>
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 text-center">
               {myPlayer?.ready
-                ? 'You are ready! Waiting for the host to launch.'
-                : 'Press Ready Up when you are prepared to race!'}
+                ? t('multiplayer.playerReadyTip')
+                : t('multiplayer.playerWaitTip')}
             </span>
           </>
         )}

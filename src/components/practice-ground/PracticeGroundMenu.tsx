@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Mascot } from '../Mascot';
 import { soundEngine } from '../../utils/audio';
+import { useI18n } from '../../context/I18nContext';
 
 interface Props {
   playerName: string;
@@ -38,6 +39,7 @@ export const PracticeGroundMenu: React.FC<Props> = ({
   initialCode = '',
   errorMessage,
 }) => {
+  const { t } = useI18n();
   const [nameInput, setNameInput] = useState<string>(playerName);
   const [selectedEmoji, setSelectedEmoji] = useState<string>(playerEmoji);
   const [roomCodeInput, setRoomCodeInput] = useState<string>(initialCode);
@@ -109,7 +111,7 @@ export const PracticeGroundMenu: React.FC<Props> = ({
           className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700/80 text-xs font-black text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 shadow-md backdrop-blur-md cursor-pointer transition-all hover:scale-105 active:scale-95"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to Arcade</span>
+          <span>{t('multiplayer.backToArcade')}</span>
         </button>
 
         {/* Right Group: Racer Passport Pill & Live Online Indicator */}
@@ -123,20 +125,20 @@ export const PracticeGroundMenu: React.FC<Props> = ({
               setIsEditingProfile(true);
             }}
             className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-white/90 dark:bg-slate-900/90 border-2 border-indigo-400 dark:border-indigo-500 shadow-md backdrop-blur-md text-xs font-black text-slate-800 dark:text-slate-200 cursor-pointer"
-            title="Edit your racer nickname and mascot avatar"
+            title={t('multiplayer.editProfileDesc')}
           >
             <span className="text-base">{playerEmoji}</span>
             <span className="max-w-[120px] truncate">{playerName}</span>
             <span className="px-1.5 py-0.2 rounded-md bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 text-[10px] font-black uppercase flex items-center gap-1">
               <Edit3 className="w-2.5 h-2.5" />
-              Edit
+              {t('multiplayer.editProfile')}
             </span>
           </motion.button>
 
           {/* Live Online Badge */}
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-emerald-50/90 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 text-[11px] font-black uppercase tracking-wider shadow-sm backdrop-blur-md">
             <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-sm" />
-            <span>Multiplayer Online</span>
+            <span>{t('multiplayer.onlineBadge')}</span>
           </div>
         </div>
       </motion.div>
@@ -157,21 +159,21 @@ export const PracticeGroundMenu: React.FC<Props> = ({
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500/15 via-rose-500/15 to-purple-500/15 border border-amber-400/50 text-slate-900 dark:text-slate-100 text-xs font-black uppercase tracking-wider mb-2.5 shadow-sm"
         >
           <Trophy className="w-3.5 h-3.5 text-amber-500" />
-          <span>Real-Time PvP Typing Race</span>
+          <span>{t('multiplayer.heroBadge')}</span>
         </motion.div>
 
         <motion.h1
           variants={itemVariants}
           className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-none"
         >
-          Practice Ground
+          {t('multiplayer.heroTitle')}
         </motion.h1>
 
         <motion.p
           variants={itemVariants}
           className="text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-xl mx-auto mt-2 font-bold leading-relaxed"
         >
-          Race against real typists in real-time. Same text, live progress, and instant rankings.
+          {t('multiplayer.heroSubtitle')}
         </motion.p>
       </motion.div>
 
@@ -207,7 +209,7 @@ export const PracticeGroundMenu: React.FC<Props> = ({
             <div className="flex items-center justify-between mb-4">
               <span className="px-3 py-1 rounded-full bg-emerald-500 text-white font-black text-xs uppercase tracking-wider shadow-sm flex items-center gap-1.5">
                 <Zap className="w-3.5 h-3.5 fill-current" />
-                Instant Action
+                {t('multiplayer.quickMatchBadge')}
               </span>
               <span className="text-2xl">⚡</span>
             </div>
@@ -219,38 +221,38 @@ export const PracticeGroundMenu: React.FC<Props> = ({
               <div className="relative z-10 flex flex-col items-center text-center">
                 <span className="text-5xl drop-shadow-md mb-1 animate-bounce">🏎️💨</span>
                 <span className="text-white font-black text-xs tracking-wider uppercase drop-shadow">
-                  High-Speed Speedway
+                  {t('multiplayer.speedway')}
                 </span>
                 <span className="text-[10px] font-bold text-emerald-100/90 mt-0.5">
-                  Instant Matchmaking
+                  {t('multiplayer.instantMatchmaking')}
                 </span>
               </div>
             </div>
 
             {/* Title & Description */}
             <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              Quick Match
+              {t('multiplayer.quickMatchTitle')}
             </h3>
             <p className="text-xs font-black text-emerald-800 dark:text-emerald-300 mt-0.5">
-              Focus: 1v1 & Group Speed Races
+              {t('multiplayer.quickMatchFocus')}
             </p>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-semibold mt-2.5 leading-relaxed">
-              Hop into a race immediately! We'll pair you with waiting typists in the live queue in seconds.
+              {t('multiplayer.quickMatchDesc')}
             </p>
 
             {/* Feature Pills */}
             <div className="flex flex-wrap gap-1.5 mt-4">
               <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-extrabold text-[11px] border border-emerald-300 dark:border-emerald-700">
-                1v1 or Group
+                {t('multiplayer.qmFeat1')}
               </span>
               <span className="px-2 py-0.5 rounded-md bg-teal-100 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300 font-extrabold text-[11px] border border-teal-300 dark:border-teal-700">
-                Auto-Pairing
+                {t('multiplayer.qmFeat2')}
               </span>
               <span className="px-2 py-0.5 rounded-md bg-cyan-100 dark:bg-cyan-950/60 text-cyan-800 dark:text-cyan-300 font-extrabold text-[11px] border border-cyan-300 dark:border-cyan-700">
-                60s Race
+                {t('multiplayer.qmFeat3')}
               </span>
               <span className="px-2 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 font-extrabold text-[11px] border border-indigo-300 dark:border-indigo-700">
-                Live Progress
+                {t('multiplayer.qmFeat4')}
               </span>
             </div>
           </div>
@@ -264,7 +266,7 @@ export const PracticeGroundMenu: React.FC<Props> = ({
               className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 text-white font-black text-base shadow-lg shadow-emerald-500/30 border-b-4 border-emerald-700 flex items-center justify-center gap-2 cursor-pointer"
             >
               <Zap className="w-5 h-5 fill-current" />
-              <span>Find Opponent Now</span>
+              <span>{t('multiplayer.findOpponent')}</span>
             </motion.button>
           </div>
         </motion.div>
@@ -283,7 +285,7 @@ export const PracticeGroundMenu: React.FC<Props> = ({
             <div className="flex items-center justify-between mb-4">
               <span className="px-3 py-1 rounded-full bg-cyan-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-sm flex items-center gap-1.5">
                 <Users className="w-3.5 h-3.5" />
-                Host a Match
+                {t('multiplayer.hostMatchBadge')}
               </span>
               <span className="text-2xl">🎮</span>
             </div>
@@ -295,38 +297,38 @@ export const PracticeGroundMenu: React.FC<Props> = ({
               <div className="relative z-10 flex flex-col items-center text-center">
                 <span className="text-4xl drop-shadow mb-1 animate-pulse">👑🏆</span>
                 <span className="text-cyan-300 font-black text-xs tracking-wider uppercase drop-shadow-[0_0_10px_rgba(6,182,212,0.8)]">
-                  Private Arena
+                  {t('multiplayer.privateArena')}
                 </span>
                 <span className="text-[10px] font-bold text-cyan-400/90 mt-0.5">
-                  Custom Code & Invite Link
+                  {t('multiplayer.customCodeInvite')}
                 </span>
               </div>
             </div>
 
             {/* Title & Description */}
             <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              Create Room
+              {t('multiplayer.createRoomTitle')}
             </h3>
             <p className="text-xs font-black text-cyan-700 dark:text-cyan-300 mt-0.5">
-              Focus: Friends & Team Challenges
+              {t('multiplayer.createRoomFocus')}
             </p>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-semibold mt-2.5 leading-relaxed">
-              Create a custom private arena. Share your 5-letter room code or instant link to race together.
+              {t('multiplayer.createRoomDesc')}
             </p>
 
             {/* Feature Pills */}
             <div className="flex flex-wrap gap-1.5 mt-4">
               <span className="px-2 py-0.5 rounded-md bg-cyan-100 dark:bg-cyan-950/60 text-cyan-800 dark:text-cyan-300 font-extrabold text-[11px] border border-cyan-300 dark:border-cyan-700">
-                Up to 8 Players
+                {t('multiplayer.crFeat1')}
               </span>
               <span className="px-2 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 font-extrabold text-[11px] border border-indigo-300 dark:border-indigo-700">
-                Private Code
+                {t('multiplayer.crFeat2')}
               </span>
               <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 font-extrabold text-[11px] border border-blue-300 dark:border-blue-700">
-                Invite Link
+                {t('multiplayer.crFeat3')}
               </span>
               <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-extrabold text-[11px] border border-amber-300 dark:border-amber-700">
-                Host Start
+                {t('multiplayer.crFeat4')}
               </span>
             </div>
           </div>
@@ -340,7 +342,7 @@ export const PracticeGroundMenu: React.FC<Props> = ({
               className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 text-white font-black text-base shadow-lg shadow-cyan-500/30 border-b-4 border-cyan-700 flex items-center justify-center gap-2 cursor-pointer"
             >
               <Users className="w-5 h-5" />
-              <span>Create Private Room</span>
+              <span>{t('multiplayer.createRoomBtn')}</span>
             </motion.button>
           </div>
         </motion.div>
@@ -359,7 +361,7 @@ export const PracticeGroundMenu: React.FC<Props> = ({
             <div className="flex items-center justify-between mb-4">
               <span className="px-3 py-1 rounded-full bg-purple-500 text-white font-black text-xs uppercase tracking-wider shadow-sm flex items-center gap-1.5">
                 <LogIn className="w-3.5 h-3.5" />
-                Direct Entry
+                {t('multiplayer.directEntryBadge')}
               </span>
               <span className="text-2xl">🔑</span>
             </div>
@@ -371,23 +373,23 @@ export const PracticeGroundMenu: React.FC<Props> = ({
               <div className="relative z-10 flex flex-col items-center text-center">
                 <span className="text-4xl drop-shadow mb-1 animate-pulse">🎟️📟</span>
                 <span className="text-purple-300 font-black text-xs tracking-wider uppercase drop-shadow-[0_0_10px_rgba(168,85,247,0.8)]">
-                  Enter Room Code
+                  {t('multiplayer.enterRoomCode')}
                 </span>
                 <span className="text-[10px] font-bold text-purple-400/80 mt-0.5">
-                  Join Friend's Arena
+                  {t('multiplayer.joinFriendArena')}
                 </span>
               </div>
             </div>
 
             {/* Title & Description */}
             <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              Join with Code
+              {t('multiplayer.joinCodeTitle')}
             </h3>
             <p className="text-xs font-black text-purple-800 dark:text-purple-300 mt-0.5">
-              Focus: Jump into an Active Match
+              {t('multiplayer.joinCodeFocus')}
             </p>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-semibold mt-2.5 leading-relaxed">
-              Have a 5-letter room code from a friend? Enter it below to immediately connect to their race lobby.
+              {t('multiplayer.joinCodeDesc')}
             </p>
 
             {/* Embedded Room Code Input Box */}
@@ -397,7 +399,7 @@ export const PracticeGroundMenu: React.FC<Props> = ({
                 maxLength={6}
                 value={roomCodeInput}
                 onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
-                placeholder="e.g. ABX7K"
+                placeholder={t('multiplayer.enterRoomCode')}
                 className="w-full px-4 py-2.5 rounded-2xl bg-white/90 dark:bg-slate-800/90 border-2 border-purple-300 dark:border-purple-700 font-mono font-black text-base tracking-widest text-center text-slate-900 dark:text-white uppercase placeholder:text-slate-400 focus:outline-none focus:border-purple-500 shadow-inner"
               />
             </form>
@@ -413,7 +415,7 @@ export const PracticeGroundMenu: React.FC<Props> = ({
               className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-purple-500 via-indigo-600 to-purple-600 text-white font-black text-base shadow-lg shadow-purple-500/30 border-b-4 border-purple-700 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <LogIn className="w-5 h-5" />
-              <span>Join Arena Match</span>
+              <span>{t('multiplayer.joinMatchBtn')}</span>
             </motion.button>
           </div>
         </motion.div>
@@ -443,10 +445,10 @@ export const PracticeGroundMenu: React.FC<Props> = ({
                 </span>
                 <div>
                   <h4 className="text-xl font-black text-slate-900 dark:text-white">
-                    Edit Racer Profile
+                    {t('multiplayer.editProfileTitle')}
                   </h4>
                   <span className="text-xs font-bold text-slate-500">
-                    Customize your name & mascot avatar
+                    {t('multiplayer.editProfileDesc')}
                   </span>
                 </div>
               </div>
@@ -454,21 +456,21 @@ export const PracticeGroundMenu: React.FC<Props> = ({
               <form onSubmit={handleSaveProfile} className="flex flex-col gap-4">
                 <div>
                   <label className="text-xs font-black uppercase text-slate-500 block mb-1.5">
-                    Racer Nickname:
+                    {t('multiplayer.racerNickname')}:
                   </label>
                   <input
                     type="text"
                     maxLength={20}
                     value={nameInput}
                     onChange={(e) => setNameInput(e.target.value)}
-                    placeholder="Enter your name"
+                    placeholder="Typist-101"
                     className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-bold text-sm text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500"
                   />
                 </div>
 
                 <div>
                   <label className="text-xs font-black uppercase text-slate-500 block mb-2">
-                    Choose Mascot Avatar:
+                    {t('multiplayer.chooseAvatar')}:
                   </label>
                   <div className="grid grid-cols-5 gap-2">
                     {AVATAR_OPTIONS.map((emoji) => (
@@ -494,14 +496,14 @@ export const PracticeGroundMenu: React.FC<Props> = ({
                     className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-sm shadow-md border-b-4 border-emerald-700 cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <Check className="w-4 h-4" />
-                    <span>Save Changes</span>
+                    <span>{t('multiplayer.saveProfile')}</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setIsEditingProfile(false)}
                     className="px-4 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-black text-sm cursor-pointer"
                   >
-                    Cancel
+                    {t('feedback.done')}
                   </button>
                 </div>
               </form>
