@@ -15,6 +15,12 @@ import { RaceManager } from '../../server/multiplayer/RaceManager.ts';
 import { ConnectionManager, type UniversalWebSocket } from '../../server/multiplayer/ConnectionManager.ts';
 import { CleanupManager } from '../../server/multiplayer/CleanupManager.ts';
 import { ResultValidator } from '../../server/multiplayer/ResultValidator.ts';
+import { ClassroomManager } from '../../server/classroom/ClassroomManager.ts';
+import { ClassroomCleanupManager } from '../../server/classroom/ClassroomCleanupManager.ts';
+import {
+  type ClientMessage as ClassroomClientMessage,
+  type ServerMessage as ClassroomServerMessage,
+} from '../../server/classroom/types.ts';
 
 export class MultiplayerArena extends DurableObject {
   public roomManager: RoomManager;
@@ -25,6 +31,16 @@ export class MultiplayerArena extends DurableObject {
   private matchmakingTimers: Map<string, ReturnType<typeof setTimeout>> = new Map();
   private botSimTimers: Map<string, ReturnType<typeof setInterval>> = new Map();
 
+  // Classroom State
+  public classroomManager: ClassroomManager;
+  public classroomCleanupManager: ClassroomCleanupManager;
+  private classroomSockets = new Map<
+    UniversalWebSocket,
+    { sessionToken: string; playerId: string; code?: string; role?: 'teacher' | 'student' }
+  >();
+  private classroomRoomSockets = new Map<string, Set<UniversalWebSocket>>();
+  private classroomSessionTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
   constructor(ctx: DurableObjectState, env: any) {
     super(ctx, env);
     this.roomManager = new RoomManager();
@@ -32,6 +48,10 @@ export class MultiplayerArena extends DurableObject {
     this.connectionManager = new ConnectionManager(this.roomManager);
     this.cleanupManager = new CleanupManager(this.roomManager, this.matchmakingManager);
     this.cleanupManager.start();
+
+    this.classroomManager = new ClassroomManager();
+    this.classroomCleanupManager = new ClassroomCleanupManager(this.classroomManager);
+    this.classroomCleanupManager.start();
   }
 
   async fetch(request: Request): Promise<Response> {
@@ -44,7 +64,9 @@ export class MultiplayerArena extends DurableObject {
           status: 'ok',
           service: 'typingbull-multiplayer-worker',
           rooms: this.roomManager.getRoomCount(),
+          classroomRooms: this.classroomManager.getRoomCount(),
           connections: this.connectionManager.getConnectionCount(),
+          classroomConnections: this.classroomSockets.size,
         }),
         {
           status: 200,
@@ -61,8 +83,10 @@ export class MultiplayerArena extends DurableObject {
       return new Response(
         JSON.stringify({
           rooms: this.roomManager.getRoomCount(),
+          classroomRooms: this.classroomManager.getRoomCount(),
           connections: this.connectionManager.getConnectionCount(),
           queueSize: this.matchmakingManager.getQueueSize(),
+          classroomConnections: this.classroomSockets.size,
         }),
         {
           status: 200,
@@ -86,16 +110,29 @@ export class MultiplayerArena extends DurableObject {
     // Accept WebSocket into Durable Object context
     this.ctx.acceptWebSocket(server);
 
-    // Register connection and send initial handshake
-    const conn = this.connectionManager.registerConnection(server as unknown as UniversalWebSocket);
+    const isClassroom = url.pathname.includes('classroom');
+    if (isClassroom) {
+      const sessionToken = `st_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      const playerId = `p_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+      const socket = server as unknown as UniversalWebSocket;
+      this.classroomSockets.set(socket, { sessionToken, playerId });
 
-    this.connectionManager.sendToSocket(server as unknown as UniversalWebSocket, {
-      type: 'CONNECTED',
-      payload: {
-        sessionToken: conn.sessionToken,
-        playerId: conn.playerId,
-      },
-    });
+      this.sendToClassroomSocket(socket, {
+        type: 'CONNECTED',
+        payload: { sessionToken },
+      });
+    } else {
+      // Register connection and send initial handshake for practice ground
+      const conn = this.connectionManager.registerConnection(server as unknown as UniversalWebSocket);
+
+      this.connectionManager.sendToSocket(server as unknown as UniversalWebSocket, {
+        type: 'CONNECTED',
+        payload: {
+          sessionToken: conn.sessionToken,
+          playerId: conn.playerId,
+        },
+      });
+    }
 
     return new Response(null, {
       status: 101,
@@ -105,6 +142,21 @@ export class MultiplayerArena extends DurableObject {
 
   async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
     const socket = ws as unknown as UniversalWebSocket;
+    if (this.classroomSockets.has(socket)) {
+      try {
+        const raw = typeof message === 'string' ? message : new TextDecoder().decode(message);
+        const msg: ClassroomClientMessage = JSON.parse(raw);
+        this.handleClassroomMessage(socket, msg);
+      } catch (err) {
+        console.error('[Classroom Worker] Malformed message:', err);
+        this.sendToClassroomSocket(socket, {
+          type: 'ERROR',
+          payload: { code: 'INVALID_PAYLOAD', message: 'Malformed message received.' },
+        });
+      }
+      return;
+    }
+
     try {
       const raw = typeof message === 'string' ? message : new TextDecoder().decode(message);
       const msg: ClientMessage = JSON.parse(raw);
@@ -119,11 +171,21 @@ export class MultiplayerArena extends DurableObject {
   }
 
   async webSocketClose(ws: WebSocket): Promise<void> {
-    this.handleDisconnect(ws as unknown as UniversalWebSocket);
+    const socket = ws as unknown as UniversalWebSocket;
+    if (this.classroomSockets.has(socket)) {
+      this.handleClassroomDisconnect(socket);
+      return;
+    }
+    this.handleDisconnect(socket);
   }
 
   async webSocketError(ws: WebSocket): Promise<void> {
-    this.handleDisconnect(ws as unknown as UniversalWebSocket);
+    const socket = ws as unknown as UniversalWebSocket;
+    if (this.classroomSockets.has(socket)) {
+      this.handleClassroomDisconnect(socket);
+      return;
+    }
+    this.handleDisconnect(socket);
   }
 
   private handleDisconnect(socket: UniversalWebSocket): void {
@@ -719,6 +781,370 @@ export class MultiplayerArena extends DurableObject {
       clearInterval(timer);
       this.botSimTimers.delete(roomId);
     }
+  }
+
+  // ==========================================
+  // Classroom Methods
+  // ==========================================
+
+  private sendToClassroomSocket(socket: UniversalWebSocket, message: ClassroomServerMessage): void {
+    if (socket.readyState === 1 /* WebSocket.OPEN */) {
+      socket.send(JSON.stringify(message));
+    }
+  }
+
+  private broadcastToClassroomRoom(code: string, message: ClassroomServerMessage): void {
+    const sockets = this.classroomRoomSockets.get(code.toUpperCase());
+    if (!sockets) return;
+    const data = JSON.stringify(message);
+    for (const ws of sockets) {
+      if (ws.readyState === 1 /* WebSocket.OPEN */) {
+        ws.send(data);
+      }
+    }
+  }
+
+  private registerClassroomSocketToRoom(code: string, socket: UniversalWebSocket): void {
+    const normalized = code.toUpperCase();
+    if (!this.classroomRoomSockets.has(normalized)) {
+      this.classroomRoomSockets.set(normalized, new Set());
+    }
+    this.classroomRoomSockets.get(normalized)!.add(socket);
+  }
+
+  private unregisterClassroomSocketFromRoom(code: string, socket: UniversalWebSocket): void {
+    const normalized = code.toUpperCase();
+    const set = this.classroomRoomSockets.get(normalized);
+    if (set) {
+      set.delete(socket);
+      if (set.size === 0) {
+        this.classroomRoomSockets.delete(normalized);
+      }
+    }
+  }
+
+  private handleClassroomMessage(socket: UniversalWebSocket, msg: ClassroomClientMessage): void {
+    const meta = this.classroomSockets.get(socket);
+    if (!meta) return;
+
+    switch (msg.type) {
+      case 'CREATE_CLASSROOM': {
+        const teacherToken = `tt_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+        const room = this.classroomManager.createRoom(meta.playerId, teacherToken, msg.payload.teacherName);
+
+        meta.code = room.code;
+        meta.role = 'teacher';
+        this.registerClassroomSocketToRoom(room.code, socket);
+
+        this.sendToClassroomSocket(socket, {
+          type: 'CLASSROOM_CREATED',
+          payload: {
+            code: room.code,
+            teacherToken,
+            room: this.classroomManager.toRoomView(room),
+          },
+        });
+        break;
+      }
+
+      case 'JOIN_CLASSROOM': {
+        const { code, studentName, avatarEmoji, sessionToken } = msg.payload;
+        const effectiveSessionToken = sessionToken || meta.sessionToken;
+        const result = this.classroomManager.joinRoom(
+          code,
+          meta.playerId,
+          effectiveSessionToken,
+          studentName,
+          avatarEmoji
+        );
+
+        if ('error' in result) {
+          this.sendToClassroomSocket(socket, {
+            type: 'ERROR',
+            payload: result.error,
+          });
+          return;
+        }
+
+        const { room, student } = result;
+        meta.code = room.code;
+        meta.role = 'student';
+        meta.sessionToken = effectiveSessionToken;
+        this.registerClassroomSocketToRoom(room.code, socket);
+
+        this.sendToClassroomSocket(socket, {
+          type: 'CLASSROOM_JOINED',
+          payload: {
+            studentId: student.id,
+            sessionToken: effectiveSessionToken,
+            room: this.classroomManager.toRoomView(room),
+          },
+        });
+
+        const roomView = this.classroomManager.toRoomView(room);
+        this.broadcastToClassroomRoom(room.code, {
+          type: 'STUDENT_LIST_UPDATED',
+          payload: {
+            students: roomView.students,
+            studentCount: roomView.studentCount,
+            readyCount: roomView.readyCount,
+          },
+        });
+        break;
+      }
+
+      case 'STUDENT_READY': {
+        if (!meta.code) return;
+        const room = this.classroomManager.setStudentReady(meta.code, meta.playerId, Boolean(msg.payload.isReady));
+        if (room) {
+          const roomView = this.classroomManager.toRoomView(room);
+          this.broadcastToClassroomRoom(room.code, {
+            type: 'STUDENT_LIST_UPDATED',
+            payload: {
+              students: roomView.students,
+              studentCount: roomView.studentCount,
+              readyCount: roomView.readyCount,
+            },
+          });
+        }
+        break;
+      }
+
+      case 'UPDATE_SETTINGS': {
+        if (!meta.code) return;
+        const room = this.classroomManager.updateSettings(meta.code, msg.payload.teacherToken, msg.payload.settings);
+        if (room) {
+          this.broadcastToClassroomRoom(room.code, {
+            type: 'ROOM_UPDATED',
+            payload: { room: this.classroomManager.toRoomView(room) },
+          });
+        }
+        break;
+      }
+
+      case 'START_SESSION': {
+        if (!meta.code) return;
+        const result = this.classroomManager.startSession(meta.code, msg.payload.teacherToken);
+        if ('error' in result) {
+          this.sendToClassroomSocket(socket, {
+            type: 'ERROR',
+            payload: result.error,
+          });
+          return;
+        }
+
+        const { room, countdownStartAt, sessionStartAt, sessionEndAt } = result;
+
+        this.broadcastToClassroomRoom(room.code, {
+          type: 'SESSION_START_SCHEDULED',
+          payload: {
+            countdownStartAt,
+            sessionStartAt,
+            sessionEndAt,
+            settings: room.settings,
+          },
+        });
+
+        const countdownDelay = Math.max(0, sessionStartAt - Date.now());
+        setTimeout(() => {
+          if (room.status === 'STARTING') {
+            room.status = 'ACTIVE';
+            this.broadcastToClassroomRoom(room.code, {
+              type: 'SESSION_STARTED',
+              payload: { sessionStartAt, sessionEndAt },
+            });
+          }
+        }, countdownDelay);
+
+        const sessionTotalDelay = Math.max(0, sessionEndAt - Date.now());
+        if (this.classroomSessionTimers.has(room.code)) {
+          clearTimeout(this.classroomSessionTimers.get(room.code)!);
+        }
+
+        const timer = setTimeout(() => {
+          this.handleClassroomSessionTimeout(room.code);
+        }, sessionTotalDelay);
+
+        this.classroomSessionTimers.set(room.code, timer);
+        break;
+      }
+
+      case 'STUDENT_PROGRESS': {
+        if (!meta.code) return;
+        const result = this.classroomManager.updateStudentProgress(meta.code, meta.playerId, msg.payload);
+        if (result) {
+          this.broadcastToClassroomRoom(result.room.code, {
+            type: 'STUDENT_PROGRESS_BROADCAST',
+            payload: {
+              studentId: result.student.id,
+              progress: result.student.progress,
+              wpm: result.student.wpm,
+              accuracy: result.student.accuracy,
+              finished: result.student.status === 'FINISHED',
+            },
+          });
+        }
+        break;
+      }
+
+      case 'STUDENT_FINISH': {
+        if (!meta.code) return;
+        const result = this.classroomManager.finishStudent(meta.code, meta.playerId, msg.payload);
+        if (result) {
+          const { room, student, allFinished, results } = result;
+
+          this.broadcastToClassroomRoom(room.code, {
+            type: 'STUDENT_FINISHED_BROADCAST',
+            payload: {
+              studentId: student.id,
+              studentName: student.name,
+              rank: student.rank || 1,
+              wpm: student.wpm,
+              accuracy: student.accuracy,
+            },
+          });
+
+          if (allFinished && results) {
+            if (this.classroomSessionTimers.has(room.code)) {
+              clearTimeout(this.classroomSessionTimers.get(room.code)!);
+              this.classroomSessionTimers.delete(room.code);
+            }
+            this.broadcastToClassroomRoom(room.code, {
+              type: 'SESSION_FINISHED',
+              payload: { results },
+            });
+          }
+        }
+        break;
+      }
+
+      case 'END_CLASSROOM': {
+        if (!meta.code) return;
+        const ended = this.classroomManager.endRoom(meta.code, msg.payload.teacherToken);
+        if (ended) {
+          if (this.classroomSessionTimers.has(meta.code)) {
+            clearTimeout(this.classroomSessionTimers.get(meta.code)!);
+            this.classroomSessionTimers.delete(meta.code);
+          }
+          this.broadcastToClassroomRoom(meta.code, {
+            type: 'CLASSROOM_ENDED',
+            payload: { reason: 'The teacher ended the classroom session.' },
+          });
+        }
+        break;
+      }
+
+      case 'RECONNECT': {
+        const { code, sessionToken, role } = msg.payload;
+        const room = this.classroomManager.getRoom(code);
+        if (!room) {
+          this.sendToClassroomSocket(socket, {
+            type: 'ERROR',
+            payload: { code: 'ROOM_NOT_FOUND', message: 'Classroom not found or expired.' },
+          });
+          return;
+        }
+
+        meta.code = room.code;
+        meta.role = role;
+        meta.sessionToken = sessionToken;
+        this.registerClassroomSocketToRoom(room.code, socket);
+
+        if (role === 'teacher') {
+          room.teacherId = meta.playerId;
+          room.teacherDisconnectedAt = undefined;
+          this.sendToClassroomSocket(socket, {
+            type: 'RECONNECT_SUCCESS',
+            payload: { role: 'teacher', room: this.classroomManager.toRoomView(room) },
+          });
+        } else {
+          const student = Object.values(room.students).find((s) => s.sessionToken === sessionToken);
+          if (student) {
+            student.id = meta.playerId;
+            student.disconnectedAt = undefined;
+            if (student.status === 'DISCONNECTED') {
+              student.status = student.isReady ? 'READY' : 'NOT_READY';
+            }
+            this.sendToClassroomSocket(socket, {
+              type: 'RECONNECT_SUCCESS',
+              payload: { role: 'student', studentId: student.id, room: this.classroomManager.toRoomView(room) },
+            });
+
+            const roomView = this.classroomManager.toRoomView(room);
+            this.broadcastToClassroomRoom(room.code, {
+              type: 'STUDENT_LIST_UPDATED',
+              payload: {
+                students: roomView.students,
+                studentCount: roomView.studentCount,
+                readyCount: roomView.readyCount,
+              },
+            });
+          } else {
+            this.sendToClassroomSocket(socket, {
+              type: 'ERROR',
+              payload: { code: 'STUDENT_NOT_FOUND', message: 'Session expired. Please join again.' },
+            });
+          }
+        }
+        break;
+      }
+
+      case 'PING': {
+        this.sendToClassroomSocket(socket, {
+          type: 'PONG',
+          payload: { timestamp: Date.now() },
+        });
+        break;
+      }
+    }
+  }
+
+  private handleClassroomDisconnect(socket: UniversalWebSocket): void {
+    const meta = this.classroomSockets.get(socket);
+    if (!meta) return;
+
+    if (meta.code) {
+      this.unregisterClassroomSocketFromRoom(meta.code, socket);
+      const room = this.classroomManager.getRoom(meta.code);
+      if (room) {
+        if (meta.role === 'teacher') {
+          room.teacherDisconnectedAt = Date.now();
+          this.broadcastToClassroomRoom(room.code, {
+            type: 'TEACHER_DISCONNECTED',
+            payload: { message: 'Teacher disconnected. Waiting for reconnection...' },
+          });
+        } else if (meta.role === 'student') {
+          const student = room.students[meta.playerId];
+          if (student) {
+            student.status = 'DISCONNECTED';
+            student.disconnectedAt = Date.now();
+            const roomView = this.classroomManager.toRoomView(room);
+            this.broadcastToClassroomRoom(room.code, {
+              type: 'STUDENT_LIST_UPDATED',
+              payload: {
+                students: roomView.students,
+                studentCount: roomView.studentCount,
+                readyCount: roomView.readyCount,
+              },
+            });
+          }
+        }
+      }
+    }
+
+    this.classroomSockets.delete(socket);
+  }
+
+  private handleClassroomSessionTimeout(roomCode: string): void {
+    const room = this.classroomManager.getRoom(roomCode);
+    if (!room || room.status !== 'ACTIVE') return;
+
+    room.status = 'ENDED';
+    const results = this.classroomManager.buildResults(room);
+    this.broadcastToClassroomRoom(room.code, {
+      type: 'SESSION_FINISHED',
+      payload: { results },
+    });
   }
 }
 

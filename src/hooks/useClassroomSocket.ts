@@ -82,8 +82,8 @@ export function useClassroomSocket(initialRoomCode?: string) {
       hostname.startsWith('10.');
 
     if (!isLocal) {
-      // In production, can use dedicated classroom websocket route or worker
-      return `wss://${window.location.host}/classroom-ws`;
+      // Production Cloudflare Worker WebSocket server with Durable Objects
+      return 'wss://typingbull-multiplayer.rishabhrajmahato.workers.dev/classroom-ws';
     }
 
     const isHttps = window.location.protocol === 'https:';
