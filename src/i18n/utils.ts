@@ -10,7 +10,7 @@ import {
  * Returns a translation helper scoped to the specified language.
  * Automatically falls back to English (DEFAULT_LOCALE) if key is missing.
  */
-export function useTranslations(lang: SupportedLocale = DEFAULT_LOCALE) {
+export function getTranslations(lang: SupportedLocale = DEFAULT_LOCALE) {
   return function t(key: TranslationKey | string, vars?: Record<string, string | number>): string {
     const localeDict = ui[lang] as Record<string, string> | undefined;
     const defaultDict = ui[DEFAULT_LOCALE] as Record<string, string>;
@@ -24,6 +24,8 @@ export function useTranslations(lang: SupportedLocale = DEFAULT_LOCALE) {
     return text;
   };
 }
+
+export const useTranslations = getTranslations;
 
 /**
  * Extracts active locale from a URL or pathname.

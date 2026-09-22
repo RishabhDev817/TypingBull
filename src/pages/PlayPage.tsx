@@ -5,12 +5,17 @@ import { GameHubMenu } from '../components/game/GameHubMenu';
 import { LilypadLeapGame } from '../components/game/lilypad/LilypadLeapGame';
 import { NeonVelocityGame } from '../components/game/neon/NeonVelocityGame';
 import { PracticeGroundView } from '../components/practice-ground/PracticeGroundView';
+import { usePageSEO } from '../hooks/usePageSEO';
+import { useI18n } from '../context/I18nContext';
+import { PlayGuideSection } from '../components/educational/PlayGuideSection';
+import { SiteFooter } from '../components/navigation/SiteFooter';
 
 type PlayViewMode = 'hub' | 'lilypad-leap' | 'neon-velocity' | 'practice-ground';
 
 export const PlayPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
+  const { currentLang } = useI18n();
   const roomParam = searchParams.get('room') || '';
   const modeParam = searchParams.get('mode') || '';
   const isPracticeGroundRoute =
@@ -18,6 +23,18 @@ export const PlayPage: React.FC = () => {
     location.pathname.includes('/multiplayer') ||
     modeParam === 'practice-ground' ||
     Boolean(roomParam);
+
+  usePageSEO({
+    lang: currentLang,
+    canonicalPath: isPracticeGroundRoute ? '/practice-ground/' : '/play/',
+    title: isPracticeGroundRoute
+      ? 'Practice Ground — TypingBull | Real-Time Multiplayer Speedway Races'
+      : 'Typing Games Arcade — TypingBull | Lilypad Leap & Neon Velocity',
+    description: isPracticeGroundRoute
+      ? 'Race head-to-head against live players or AI challenger bots in the Practice Ground speedway. Real-time WPM progress tracking and post-race telemetry.'
+      : 'Fun, gamified typing arcade modes on TypingBull. Play Lilypad Leap for young typists or Neon Velocity for high-cadence highway speed flow.',
+    noindex: Boolean(roomParam),
+  });
 
   const [viewMode, setViewMode] = useState<PlayViewMode>(
     isPracticeGroundRoute ? 'practice-ground' : 'hub'
@@ -64,6 +81,14 @@ export const PlayPage: React.FC = () => {
               onSelectNeonVelocity={handleLaunchNeonVelocity}
               onSelectPracticeGround={handleLaunchPracticeGround}
             />
+
+            <div className="max-w-6xl mx-auto w-full px-4 mt-8">
+              <PlayGuideSection />
+            </div>
+
+            <div className="mt-14 max-w-6xl mx-auto w-full">
+              <SiteFooter />
+            </div>
           </motion.div>
         )}
 

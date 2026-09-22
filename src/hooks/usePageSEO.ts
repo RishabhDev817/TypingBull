@@ -137,19 +137,88 @@ export const HREFLANG_CONFIG: { lang: string; href: string }[] = [
   { lang: 'hi-IN', href: 'https://typingbull.com/hi/' },
 ];
 
+export interface PageSEOOptions {
+  lang?: SupportedLocale;
+  title?: string;
+  description?: string;
+  keywords?: string;
+  canonicalPath?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+  noindex?: boolean;
+  includeFaqSchema?: boolean;
+}
+
+const PRODUCTION_DOMAIN = 'https://typingbull.com';
+
+/**
+ * Normalizes a pathname into a consistent canonical path with a trailing slash.
+ */
+export function normalizeCanonicalPath(rawPath: string): string {
+  // Strip query and hash
+  const clean = rawPath.split('?')[0].split('#')[0].trim();
+  if (!clean || clean === '/') return '/';
+  return clean.endsWith('/') ? clean : `${clean}/`;
+}
+
+/**
+ * Builds the canonical URL for a given path and optional locale.
+ */
+export function buildCanonicalUrl(path: string, lang: SupportedLocale = 'en'): string {
+  const normalized = normalizeCanonicalPath(path);
+  if (normalized === '/') {
+    return lang === 'en' ? `${PRODUCTION_DOMAIN}/` : `${PRODUCTION_DOMAIN}/${lang}/`;
+  }
+
+  // Check if path already starts with a locale
+  const segments = normalized.split('/').filter(Boolean);
+  const supportedLocales: string[] = ['en', 'es', 'fr', 'de', 'pt', 'it', 'ja', 'ko', 'hi'];
+
+  let pureSubpath = normalized;
+  if (segments.length > 0 && supportedLocales.includes(segments[0])) {
+    pureSubpath = '/' + segments.slice(1).join('/') + (segments.length > 1 ? '/' : '');
+  }
+
+  if (lang === 'en' || pureSubpath === '/') {
+    return `${PRODUCTION_DOMAIN}${pureSubpath}`;
+  }
+
+  return `${PRODUCTION_DOMAIN}/${lang}${pureSubpath}`;
+}
+
 /**
  * Custom React hook to dynamically update document title, description,
- * keywords, Open Graph, Twitter metadata, canonical link, and hreflang tags
- * according to active locale.
+ * keywords, Open Graph, Twitter metadata, canonical link, hreflang tags,
+ * and robots directives according to active route and locale.
  */
-export function usePageSEO(lang: SupportedLocale): void {
+export function usePageSEO(optionsOrLang: SupportedLocale | PageSEOOptions = 'en'): void {
+  const options: PageSEOOptions =
+    typeof optionsOrLang === 'string' ? { lang: optionsOrLang } : optionsOrLang;
+
+  const lang: SupportedLocale = options.lang || 'en';
+
   useEffect(() => {
     if (typeof document === 'undefined') return;
 
-    const seo = SEO_DATA_BY_LANG[lang] || SEO_DATA_BY_LANG.en;
+    const currentPath =
+      options.canonicalPath || (typeof window !== 'undefined' ? window.location.pathname : '/');
+    const searchParams =
+      typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams();
+
+    // Check if this is an ephemeral/private state (e.g. room codes) or explicitly marked noindex
+    const hasRoomCode = searchParams.has('code') || searchParams.has('room');
+    const isNoIndex = Boolean(options.noindex || hasRoomCode);
+
+    const baseSEO = SEO_DATA_BY_LANG[lang] || SEO_DATA_BY_LANG.en;
+    const title = options.title || baseSEO.title;
+    const description = options.description || baseSEO.description;
+    const ogTitle = options.ogTitle || options.title || baseSEO.ogTitle;
+    const ogDescription = options.ogDescription || options.description || baseSEO.ogDescription;
+    const ogImage = options.ogImage || `${PRODUCTION_DOMAIN}/assets/og-image.png`;
 
     // 1. Page Title
-    document.title = seo.title;
+    document.title = title;
 
     // Helper to safely upsert meta tag
     const setMetaTag = (attrName: 'name' | 'property', attrValue: string, content: string) => {
@@ -163,66 +232,131 @@ export function usePageSEO(lang: SupportedLocale): void {
     };
 
     // 2. Standard Meta Tags
-    setMetaTag('name', 'description', seo.description);
-    setMetaTag('name', 'keywords', seo.keywords);
+    setMetaTag('name', 'description', description);
+    if (options.keywords) {
+      setMetaTag('name', 'keywords', options.keywords);
+    } else {
+      // Remove any keyword tag to prevent spam flags unless specifically provided
+      const existingKw = document.querySelector('meta[name="keywords"]');
+      if (existingKw) existingKw.remove();
+    }
 
-    // 3. Open Graph Tags
-    setMetaTag('property', 'og:title', seo.ogTitle);
-    setMetaTag('property', 'og:description', seo.ogDescription);
-    setMetaTag('property', 'og:locale', seo.locale);
+    // 3. Robots Meta Tag (Enforce noindex on temporary rooms or designated pages)
+    if (isNoIndex) {
+      setMetaTag('name', 'robots', 'noindex, nofollow');
+    } else {
+      setMetaTag('name', 'robots', 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1');
+    }
 
-    // 4. Twitter Card Tags
-    setMetaTag('name', 'twitter:title', seo.ogTitle);
-    setMetaTag('name', 'twitter:description', seo.ogDescription);
-
-    // 5. HTML lang attribute
-    document.documentElement.lang = lang;
-
-    // 6. Canonical URL
+    // 4. Canonical URL
+    const canonicalUrl = buildCanonicalUrl(currentPath, lang);
     let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
     if (!canonicalLink) {
       canonicalLink = document.createElement('link');
       canonicalLink.setAttribute('rel', 'canonical');
       document.head.appendChild(canonicalLink);
     }
-    canonicalLink.setAttribute('href', lang === 'en' ? 'https://typingbull.com/' : `https://typingbull.com/${lang}/`);
+    canonicalLink.setAttribute('href', canonicalUrl);
 
-    // 7. Dynamic Hreflang Alternates for each language
-    HREFLANG_CONFIG.forEach(({ lang: hLang, href }) => {
-      let link = document.querySelector(`link[rel="alternate"][hreflang="${hLang}"]`) as HTMLLinkElement | null;
-      if (!link) {
-        link = document.createElement('link');
-        link.setAttribute('rel', 'alternate');
-        link.setAttribute('hreflang', hLang);
-        document.head.appendChild(link);
-      }
-      link.setAttribute('href', href);
-    });
+    // 5. Open Graph Tags
+    setMetaTag('property', 'og:type', 'website');
+    setMetaTag('property', 'og:site_name', 'TypingBull');
+    setMetaTag('property', 'og:url', canonicalUrl);
+    setMetaTag('property', 'og:title', ogTitle);
+    setMetaTag('property', 'og:description', ogDescription);
+    setMetaTag('property', 'og:image', ogImage);
+    setMetaTag('property', 'og:locale', baseSEO.locale);
 
-    // 8. Dynamic Localized FAQ Schema (FAQPage JSON-LD)
-    const localizedFaqItems = getLocalizedFaqData(lang);
-    const faqSchema = {
-      '@context': 'https://schema.org',
-      '@type': 'FAQPage',
-      mainEntity: localizedFaqItems.map((item) => ({
-        '@type': 'Question',
-        name: item.question,
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: item.answer,
-        },
-      })),
-    };
+    // 6. Twitter Card Tags
+    setMetaTag('name', 'twitter:card', 'summary_large_image');
+    setMetaTag('name', 'twitter:site', '@typingbull');
+    setMetaTag('name', 'twitter:title', ogTitle);
+    setMetaTag('name', 'twitter:description', ogDescription);
+    setMetaTag('name', 'twitter:image', ogImage);
+
+    // 7. HTML lang attribute
+    document.documentElement.lang = lang;
+
+    // 8. Dynamic Hreflang Alternates mapped to this specific subpage
+    if (!isNoIndex) {
+      const locales: { langCode: string; hreflang: string }[] = [
+        { langCode: 'en', hreflang: 'x-default' },
+        { langCode: 'en', hreflang: 'en' },
+        { langCode: 'en', hreflang: 'en-US' },
+        { langCode: 'en', hreflang: 'en-GB' },
+        { langCode: 'es', hreflang: 'es' },
+        { langCode: 'es', hreflang: 'es-ES' },
+        { langCode: 'es', hreflang: 'es-MX' },
+        { langCode: 'fr', hreflang: 'fr' },
+        { langCode: 'fr', hreflang: 'fr-FR' },
+        { langCode: 'de', hreflang: 'de' },
+        { langCode: 'de', hreflang: 'de-DE' },
+        { langCode: 'pt', hreflang: 'pt' },
+        { langCode: 'pt', hreflang: 'pt-BR' },
+        { langCode: 'it', hreflang: 'it' },
+        { langCode: 'it', hreflang: 'it-IT' },
+        { langCode: 'ja', hreflang: 'ja' },
+        { langCode: 'ja', hreflang: 'ja-JP' },
+        { langCode: 'ko', hreflang: 'ko' },
+        { langCode: 'ko', hreflang: 'ko-KR' },
+        { langCode: 'hi', hreflang: 'hi' },
+        { langCode: 'hi', hreflang: 'hi-IN' },
+      ];
+
+      locales.forEach(({ langCode, hreflang }) => {
+        let link = document.querySelector(`link[rel="alternate"][hreflang="${hreflang}"]`) as HTMLLinkElement | null;
+        if (!link) {
+          link = document.createElement('link');
+          link.setAttribute('rel', 'alternate');
+          link.setAttribute('hreflang', hreflang);
+          document.head.appendChild(link);
+        }
+        link.setAttribute('href', buildCanonicalUrl(currentPath, langCode as SupportedLocale));
+      });
+    }
+
+    // 9. FAQ Schema (FAQPage JSON-LD) — strictly Homepage only
+    const isHomepage = normalizeCanonicalPath(currentPath) === '/';
+    const shouldIncludeFaq = options.includeFaqSchema ?? isHomepage;
 
     let faqScript = document.getElementById('faq-schema-jsonld') as HTMLScriptElement | null;
-    if (!faqScript) {
-      faqScript = document.createElement('script');
-      faqScript.id = 'faq-schema-jsonld';
-      faqScript.type = 'application/ld+json';
-      document.head.appendChild(faqScript);
+    if (shouldIncludeFaq && !isNoIndex) {
+      const localizedFaqItems = getLocalizedFaqData(lang);
+      const faqSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: localizedFaqItems.map((item) => ({
+          '@type': 'Question',
+          name: item.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: item.answer,
+          },
+        })),
+      };
+
+      if (!faqScript) {
+        faqScript = document.createElement('script');
+        faqScript.id = 'faq-schema-jsonld';
+        faqScript.type = 'application/ld+json';
+        document.head.appendChild(faqScript);
+      }
+      faqScript.textContent = JSON.stringify(faqSchema, null, 2);
+    } else if (faqScript) {
+      faqScript.remove();
     }
-    faqScript.textContent = JSON.stringify(faqSchema, null, 2);
-  }, [lang]);
+  }, [
+    lang,
+    options.canonicalPath,
+    options.title,
+    options.description,
+    options.ogTitle,
+    options.ogDescription,
+    options.ogImage,
+    options.noindex,
+    options.includeFaqSchema,
+    options.keywords,
+  ]);
 }
 
 export default usePageSEO;

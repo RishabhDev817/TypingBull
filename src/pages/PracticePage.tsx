@@ -13,11 +13,20 @@ import { saveSession } from '../engine/sessionStore';
 import { useI18n } from '../context/I18nContext';
 import { ProductRoadmap } from '../components/ProductRoadmap';
 import { SiteFooter } from '../components/navigation/SiteFooter';
+import { usePageSEO } from '../hooks/usePageSEO';
+import { PracticeGuideSection } from '../components/educational/PracticeGuideSection';
 
 type PracticeStatus = 'idle' | 'typing' | 'completed' | 'failed';
 
 export const PracticePage: React.FC = () => {
   const { t, currentLang } = useI18n();
+  usePageSEO({
+    lang: currentLang,
+    canonicalPath: '/practice/',
+    title: 'Typing Speed Practice & WPM Drills — TypingBull | 12-Tier Speed Arena',
+    description:
+      'Improve typing speed and accuracy with timed typing practice tests. 12 difficulty tiers, fables, coding syntax, and essays with real-time WPM analytics.',
+  });
   // Level & Passage State (12 Levels)
   const [currentLevelNum, setCurrentLevelNum] = useState<number>(1);
   const [passageIndex, setPassageIndex] = useState<number>(0);
@@ -748,6 +757,11 @@ export const PracticePage: React.FC = () => {
             </span>
           </div>
         </div>
+      </div>
+
+      {/* ─── Practice Guide Section ─── */}
+      <div className="mt-14 max-w-6xl mx-auto w-full">
+        <PracticeGuideSection />
       </div>
 
       {/* ─── Coming Soon / Product Roadmap Section (Down in Practice Section) ─── */}

@@ -9,7 +9,13 @@ import { SUBPAGES_I18N } from '../i18n/subpagesI18n';
 
 export const ContactPage: React.FC = () => {
   const { currentLang } = useI18n();
-  usePageSEO(currentLang);
+  usePageSEO({
+    lang: currentLang,
+    canonicalPath: '/contact/',
+    title: 'Contact Us — TypingBull | Help, Feedback & Educational Inquiries',
+    description:
+      'Get in touch with the TypingBull team. Submit direct feedback, report bugs, ask classroom setup questions, or request features.',
+  });
 
   const t = SUBPAGES_I18N[currentLang]?.contact || SUBPAGES_I18N.en.contact;
 
@@ -21,20 +27,70 @@ export const ContactPage: React.FC = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) return;
+    setErrorMessage(null);
+
+    const cleanName = formData.name.trim();
+    const cleanEmail = formData.email.trim();
+    const cleanMessage = formData.message.trim();
+
+    if (cleanName.length < 2) {
+      setErrorMessage('Please enter your name (at least 2 characters).');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(cleanEmail)) {
+      setErrorMessage('Please enter a valid email address.');
+      return;
+    }
+
+    if (cleanMessage.length < 10) {
+      setErrorMessage('Please write a message with at least 10 characters.');
+      return;
+    }
+
+    if (cleanMessage.length > 1000) {
+      setErrorMessage('Messages are limited to 1,000 characters.');
+      return;
+    }
 
     soundEngine.playPop();
     setIsSubmitting(true);
 
-    // Simulate sending contact form message
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const res = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          feedbackType: cleanMessage.toLowerCase().includes('bug') || formData.category.includes('Bug') ? 'bug_report' : 'general',
+          email: cleanEmail,
+          message: cleanMessage,
+          priority: 'really_help',
+          metadata: {
+            name: cleanName,
+            category: formData.category,
+            source: 'contact_page',
+          },
+        }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to submit message. Please try again.');
+      }
+
       setIsSubmitted(true);
       soundEngine.playStarEarn();
-    }, 900);
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : 'Unable to send message right now.';
+      setErrorMessage(`${errMsg} If this persists, please email support@typingbull.com directly.`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -245,6 +301,12 @@ export const ContactPage: React.FC = () => {
                           />
                         </div>
                       </div>
+
+                      {errorMessage && (
+                        <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/25 text-rose-600 dark:text-rose-400 text-xs font-bold leading-relaxed">
+                          {errorMessage}
+                        </div>
+                      )}
 
                       <button
                         type="submit"

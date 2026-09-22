@@ -4,7 +4,7 @@
  * Teases upcoming features on the landing page or dashboard.
  * Usage: <ProductRoadmap />
  */
-import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import { getLangFromUrl, getTranslations } from '../i18n/utils';
 
 interface Props {
   className?: string;
@@ -12,7 +12,7 @@ interface Props {
 
 const { className = '' } = Astro.props;
 const currentLang = getLangFromUrl(Astro.url);
-const t = useTranslations(currentLang);
+const t = getTranslations(currentLang);
 
 const ROADMAP_ITEMS = [
   {

@@ -22,7 +22,13 @@ import { SUBPAGES_I18N } from '../i18n/subpagesI18n';
 export const AboutPage: React.FC = () => {
   const navigate = useNavigate();
   const { currentLang } = useI18n();
-  usePageSEO(currentLang);
+  usePageSEO({
+    lang: currentLang,
+    canonicalPath: '/about/',
+    title: 'About Us — TypingBull | Free Gamified Touch Typing Platform',
+    description:
+      "Learn about TypingBull's mission to make touch typing education engaging and accessible for all ages. Discover The Great Typing Railway, arcade velocity games, and BullBot AI diagnostics.",
+  });
 
   const t = SUBPAGES_I18N[currentLang]?.about || SUBPAGES_I18N.en.about;
 

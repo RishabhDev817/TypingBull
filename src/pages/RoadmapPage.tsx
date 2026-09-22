@@ -7,7 +7,13 @@ import { usePageSEO } from '../hooks/usePageSEO';
 
 export const RoadmapPage: React.FC = () => {
   const { currentLang } = useI18n();
-  usePageSEO(currentLang);
+  usePageSEO({
+    lang: currentLang,
+    canonicalPath: '/roadmap/',
+    title: 'Product Roadmap — TypingBull | Upcoming Feature Announcements',
+    description: 'Preview upcoming features, multiplayer developments, and curriculum expansions on the TypingBull platform roadmap.',
+    noindex: true,
+  });
 
   return (
     <motion.div

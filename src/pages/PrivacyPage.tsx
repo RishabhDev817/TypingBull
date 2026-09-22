@@ -8,7 +8,13 @@ import { SUBPAGES_I18N } from '../i18n/subpagesI18n';
 
 export const PrivacyPage: React.FC = () => {
   const { currentLang } = useI18n();
-  usePageSEO(currentLang);
+  usePageSEO({
+    lang: currentLang,
+    canonicalPath: '/privacy/',
+    title: 'Privacy Policy — TypingBull | Transparent Data Protection & Local-First Telemetry',
+    description:
+      'Read TypingBull’s transparent privacy policy. Learn how our local-first storage protects your typing telemetry, COPPA student compliance, and our analytics disclosure.',
+  });
 
   const t = SUBPAGES_I18N[currentLang]?.privacy || SUBPAGES_I18N.en.privacy;
 

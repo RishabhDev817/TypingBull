@@ -9,9 +9,19 @@ import { ChapterSelector } from '../components/ChapterSelector';
 import { Mascot } from '../components/Mascot';
 import { CoinCounter } from '../components/CoinCounter';
 import { useI18n } from '../context/I18nContext';
+import { usePageSEO } from '../hooks/usePageSEO';
+import { LearnGuideSection } from '../components/educational/LearnGuideSection';
+import { SiteFooter } from '../components/navigation/SiteFooter';
 
 export const LearnPage: React.FC = () => {
-  const { t } = useI18n();
+  const { t, currentLang } = useI18n();
+  usePageSEO({
+    lang: currentLang,
+    canonicalPath: '/learn/',
+    title: 'The Great Typing Railway — TypingBull | Structured Touch Typing Curriculum',
+    description:
+      'Learn touch typing step-by-step through The Great Typing Railway. Master home row anchors, upper row reach drills, shift coordination, and numeric keypads.',
+  });
   const totalStars = getTotalStars();
   const completedCount = getCompletedLessonCount();
 
@@ -213,6 +223,15 @@ export const LearnPage: React.FC = () => {
             className="flex-1 w-full"
           />
         </motion.div>
+      </div>
+
+      {/* Educational Curriculum Guide */}
+      <div className="max-w-6xl mx-auto w-full px-2">
+        <LearnGuideSection />
+      </div>
+
+      <div className="mt-12 max-w-6xl mx-auto w-full">
+        <SiteFooter />
       </div>
     </div>
   );

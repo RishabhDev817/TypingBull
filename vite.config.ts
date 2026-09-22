@@ -5,6 +5,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 import { resolve } from 'node:path'
 import { handleGeminiChat, type ChatRequestBody } from './server/geminiChat.ts'
 import { MultiplayerServer } from './server/multiplayer/multiplayerServer.ts'
+import { ClassroomServer } from './server/classroom/ClassroomServer.ts'
 
 function multiplayerDevPlugin(): Plugin {
   let mpServer: MultiplayerServer | null = null;
@@ -15,6 +16,21 @@ function multiplayerDevPlugin(): Plugin {
         mpServer = new MultiplayerServer({
           server: server.httpServer,
           path: '/practice-ground-ws',
+        });
+      }
+    },
+  };
+}
+
+function classroomDevPlugin(): Plugin {
+  let classroomServer: ClassroomServer | null = null;
+  return {
+    name: 'classroom-dev-server',
+    configureServer(server: ViteDevServer) {
+      if (server.httpServer && !classroomServer) {
+        classroomServer = new ClassroomServer({
+          server: server.httpServer,
+          path: '/classroom-ws',
         });
       }
     },
@@ -67,6 +83,33 @@ function geminiDevApiPlugin(): Plugin {
           });
           return;
         }
+
+        if (req.url === '/api/feedback' && req.method === 'POST') {
+          let rawBody = '';
+          req.on('data', (chunk: Buffer) => {
+            rawBody += chunk.toString();
+          });
+          req.on('end', async () => {
+            res.setHeader('Content-Type', 'application/json');
+            try {
+              const body = JSON.parse(rawBody || '{}');
+              if (!body.message || typeof body.message !== 'string' || body.message.trim().length === 0) {
+                res.statusCode = 400;
+                res.end(JSON.stringify({ error: 'Message is required.' }));
+                return;
+              }
+              const feedbackId = `dev_${Date.now()}`;
+              console.log('[Vite Dev Feedback API Received]:', body);
+              res.statusCode = 200;
+              res.end(JSON.stringify({ success: true, id: feedbackId }));
+            } catch (err: unknown) {
+              res.statusCode = 400;
+              res.end(JSON.stringify({ error: 'Invalid JSON payload' }));
+            }
+          });
+          return;
+        }
+
         next();
       });
     },
@@ -80,6 +123,7 @@ export default defineConfig({
     tailwindcss(),
     geminiDevApiPlugin(),
     multiplayerDevPlugin(),
+    classroomDevPlugin(),
   ],
   server: {
     host: true,

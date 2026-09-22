@@ -11,6 +11,7 @@ import type {
   RaceRankingItem,
   RoomSettings,
 } from '../types/multiplayer.ts';
+import { sanitizeAndModerateName } from '../utils/nameModeration';
 
 export type PracticeGroundPhase =
   | 'MENU'
@@ -55,7 +56,8 @@ export function usePracticeGroundSocket(initialRoomCode?: string) {
 
   // User Profile
   const [playerName, setPlayerName] = useState<string>(() => {
-    return localStorage.getItem(SAVED_NAME_KEY) || `Typist-${Math.floor(100 + Math.random() * 900)}`;
+    const saved = localStorage.getItem(SAVED_NAME_KEY);
+    return sanitizeAndModerateName(saved, 'Racer');
   });
   const [playerEmoji, setPlayerEmoji] = useState<string>(() => {
     return localStorage.getItem(SAVED_EMOJI_KEY) || '🐂';
@@ -86,9 +88,10 @@ export function usePracticeGroundSocket(initialRoomCode?: string) {
   }, []);
 
   const savePlayerProfile = (name: string, emoji: string) => {
-    setPlayerName(name);
+    const moderated = sanitizeAndModerateName(name, 'Racer');
+    setPlayerName(moderated);
     setPlayerEmoji(emoji);
-    localStorage.setItem(SAVED_NAME_KEY, name);
+    localStorage.setItem(SAVED_NAME_KEY, moderated);
     localStorage.setItem(SAVED_EMOJI_KEY, emoji);
   };
 

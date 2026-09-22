@@ -187,9 +187,9 @@ export const SUBPAGES_I18N: Record<SupportedLocale, SubpagesTranslation> = {
       s2Title: '2. Local Storage Architecture',
       s2Content:
         'All your streak data, completed railway stations, and arcade high scores are persisted within your browser’s localStorage API. You maintain total sovereignty over your typing data and can clear it at any time.',
-      s3Title: '3. Third-Party Services & Analytics',
+      s3Title: '3. Analytics, Cookies & Advertising Disclosures',
       s3Content:
-        'We do not load third-party ad networks or surveillance trackers. Any network requests are strictly limited to core static asset delivery and secure form processing.',
+        'We use Google Analytics to collect aggregate, anonymous statistics regarding website traffic and technical performance. Keystroke telemetry and lesson progression remain strictly within your device’s local browser storage. In accordance with Google publisher requirements, please note that third-party vendors, including Google, use cookies to serve ads based on prior visits to this website and other internet sites. Users may opt out of personalized advertising by visiting Google Ads Settings (adssettings.google.com) or www.aboutads.info. We do not sell personal data, and interest-based advertising is strictly prohibited during active classroom and child-directed sessions.',
       s4Title: '4. Contact & Inquiries',
       s4Content:
         'If you have questions regarding this Privacy Policy or wish to request data deletion, please contact privacy@typingbull.com.',
@@ -300,9 +300,9 @@ export const SUBPAGES_I18N: Record<SupportedLocale, SubpagesTranslation> = {
       s2Title: '2. Arquitectura de Almacenamiento Local',
       s2Content:
         'Tu racha, estaciones ferroviarias y récords se guardan en el localStorage de tu dispositivo. Tienes control total y puedes borrarlos cuando desees.',
-      s3Title: '3. Servicios de Terceros',
+      s3Title: '3. Analítica, Cookies y Divulgación de Publicidad',
       s3Content:
-        'No cargamos redes publicitarias ni rastreadores invasivos. Cualquier solicitud se limita a servir archivos estáticos seguros.',
+        'Utilizamos Google Analytics para recopilar estadísticas anónimas y agregadas sobre el tráfico y rendimiento web. La telemetría de pulsaciones se almacena únicamente en el almacenamiento local de tu navegador. Conforme a las directrices de Google, proveedores externos como Google pueden usar cookies para mostrar anuncios basados en visitas anteriores a este sitio u otros sitios web. Los usuarios pueden inhabilitar la publicidad personalizada visitando la Configuración de anuncios de Google (adssettings.google.com) o www.aboutads.info. No vendemos datos personales ni publicamos anuncios basados en intereses en sesiones de aula ni en modos infantiles.',
       s4Title: '4. Contacto de Privacidad',
       s4Content:
         'Si tienes dudas sobre esta política o deseas solicitar eliminación de datos, escribe a privacy@typingbull.com.',
@@ -413,9 +413,9 @@ export const SUBPAGES_I18N: Record<SupportedLocale, SubpagesTranslation> = {
       s2Title: '2. Fonctionnement du Stockage Local',
       s2Content:
         'Vos séries quotidiennes et vos succès sont enregistrés via l’API localStorage. Vous pouvez les effacer à tout moment.',
-      s3Title: '3. Services Tiers',
+      s3Title: '3. Statistiques, Cookies et Mentions Publicitaires',
       s3Content:
-        'Nous n’utilisons aucun réseau publicitaire ni traceur invasif.',
+        'Nous utilisons Google Analytics pour mesurer anonymement l’audience et la performance de la plateforme. Vos données de frappe et vos séries restent stockées localement dans votre navigateur. Conformément aux règles des éditeurs Google, des tiers (dont Google) peuvent utiliser des cookies pour diffuser des annonces basées sur vos visites antérieures. Vous pouvez désactiver la publicité personnalisée sur Google Ads Settings (adssettings.google.com) ou www.aboutads.info. Nous ne vendons aucune donnée personnelle et n’affichons aucune publicité ciblée dans les classes ni les modes pour enfants.',
       s4Title: '4. Nous Contacter',
       s4Content:
         'Pour toute question relative à vos données, contactez privacy@typingbull.com.',
@@ -526,9 +526,9 @@ export const SUBPAGES_I18N: Record<SupportedLocale, SubpagesTranslation> = {
       s2Title: '2. Lokale Speicherung',
       s2Content:
         'Deine Serien und Highscores verbleiben im Browser. Du hast die volle Hoheit und kannst sie jederzeit löschen.',
-      s3Title: '3. Drittanbieter',
+      s3Title: '3. Analytik, Cookies & Werbehinweise',
       s3Content:
-        'Wir binden keine invasiven Tracking-Dienste oder Werbenetzwerke ein.',
+        'Wir nutzen Google Analytics zur Erfassung anonymer und aggregierter Nutzungsdaten zur Optimierung der Plattform. Tippdaten und Lernfortschritte verbleiben ausschließlich im lokalen Browser-Speicher. Gemäß den Google-Richtlinien verwenden Drittanbieter einschließlich Google Cookies zur Anzeigenschaltung basierend auf vorherigen Besuchen dieser oder anderer Websites. Nutzer können personalisierte Werbung in den Google-Anzeigeneinstellungen (adssettings.google.com) oder unter www.aboutads.info deaktivieren. Wir verkaufen keine persönlichen Daten und schalten keine interessenbezogene Werbung in Klassenzimmern oder Kinder-Modi.',
       s4Title: '4. Kontakt',
       s4Content:
         'Bei Fragen zum Datenschutz wende dich bitte an privacy@typingbull.com.',
@@ -639,9 +639,9 @@ export const SUBPAGES_I18N: Record<SupportedLocale, SubpagesTranslation> = {
       s2Title: '2. Funcionamento Local',
       s2Content:
         'Tudo é guardado no localStorage do seu navegador e você pode apagar seus dados quando quiser.',
-      s3Title: '3. Parceiros e Rastreamento',
+      s3Title: '3. Métricas, Cookies e Divulgação de Publicidade',
       s3Content:
-        'Não utilizamos rastreadores de vigilância nem anúncios invasivos.',
+        'Utilizamos o Google Analytics para coletar métricas anônimas e agregadas de tráfego e estabilidade. A telemetria de digitação permanece exclusivamente no armazenamento local do seu navegador. Em conformidade com os requisitos do Google, fornecedores terceiros, incluindo o Google, utilizam cookies para veicular anúncios com base em visitas anteriores. Os usuários podem desativar a publicidade personalizada acessando as Configurações de Anúncios do Google (adssettings.google.com) ou www.aboutads.info. Não vendemos dados pessoais nem exibimos anúncios baseados em interesses nas sessões escolares ou infantis.',
       s4Title: '4. Fale Conosco',
       s4Content:
         'Para dúvidas sobre privacidade, envie um e-mail para privacy@typingbull.com.',
@@ -752,9 +752,9 @@ export const SUBPAGES_I18N: Record<SupportedLocale, SubpagesTranslation> = {
       s2Title: '2. Memoria Locale',
       s2Content:
         'Tutti i punteggi restano nel tuo browser e possono essere azzerati quando preferisci.',
-      s3Title: '3. Servizi di Terze Parti',
+      s3Title: '3. Statistiche, Cookie e Informazioni Pubblicitarie',
       s3Content:
-        'Non usiamo tracker invadenti o circuiti di banner pubblicitari.',
+        'Utilizziamo Google Analytics per raccogliere statistiche anonime e aggregate sul traffico e sulle prestazioni del sito. La telemetria di digitazione resta unicamente nella memoria locale del tuo browser. Secondo i requisiti Google, fornitori terzi, incluso Google, utilizzano cookie per pubblicare annunci basati sulle visite precedenti a questo o ad altri siti web. Gli utenti possono disattivare gli annunci personalizzati visitando Impostazioni annunci Google (adssettings.google.com) o www.aboutads.info. Non vendiamo dati personali né serviamo annunci basati su interessi nelle sessioni scolastiche o per minori.',
       s4Title: '4. Contatti Privacy',
       s4Content:
         'Per informazioni sui dati, scrivi a privacy@typingbull.com.',
@@ -865,9 +865,9 @@ export const SUBPAGES_I18N: Record<SupportedLocale, SubpagesTranslation> = {
       s2Title: '2. ローカルストレージの運用',
       s2Content:
         '連続記録やスコアはお客様の端末に保存され、ブラウザのデータ消去機能によりいつでもリセット可能です。',
-      s3Title: '3. 外部トラッカーの不使用',
+      s3Title: '3. アクセス解析・Cookie・広告に関する開示',
       s3Content:
-        '侵略的な行動追跡や広告表示のためのサードパーティトラッカーは採用しておりません。',
+        '当サイトでは、利用状況の把握とサービス改善のためGoogle Analyticsによる匿名のトラフィック分析を実施しています。打鍵速度や練習記録は利用者の端末内（localStorage）にのみ保持されます。また、Google等の第三者配信事業者がCookieを使用して、当サイトや他のウェブサイトへの過去のアクセス情報に基づいて広告を配信する場合があります。パーソナライズ広告の無効化はGoogle広告設定（adssettings.google.com）または www.aboutads.info より設定可能です。個人情報の販売は一切行わず、教育現場や子ども向けセッションでの行動追跡型広告の配信は行いません。',
       s4Title: '4. お問い合わせ先',
       s4Content:
         'プライバシーに関するご質問は privacy@typingbull.com までご連絡ください。',
@@ -978,9 +978,9 @@ export const SUBPAGES_I18N: Record<SupportedLocale, SubpagesTranslation> = {
       s2Title: '2. 로컬 스토리지 보관',
       s2Content:
         '학습 스트릭과 획득 점수는 브라우저에 저장되며, 사용자가 원할 때 언제든지 직접 삭제할 수 있습니다.',
-      s3Title: '3. 외부 트래커 배제',
+      s3Title: '3. 웹 분석, 쿠키 및 광고 관련 안내',
       s3Content:
-        '광고 목적의 악성 트래커나 사용자 감시 스크립트를 사용하지 않습니다.',
+        'TypingBull은 웹사이트 품질 및 트래픽 분석을 위해 Google Analytics를 통해 익명의 집계 데이터를 수집합니다. 타건 기록과 학습 진행도는 사용자의 브라우저 로컬 저장소에만 보관됩니다. 향후 Google AdSense 등 타사 광고 도입에 대비하여, Google을 포함한 제3자 광고 사업자는 사용자의 과거 방문 기록을 바탕으로 쿠키를 사용하여 광고를 게재할 수 있습니다. 사용자는 Google 광고 설정(adssettings.google.com) 또는 www.aboutads.info를 통해 맞춤형 광고 수신을 거부할 수 있습니다. 당사는 개인정보를 판매하지 않으며, 교실 및 아동 모드에서는 맞춤형 광고를 제공하지 않습니다.',
       s4Title: '4. 문의하기',
       s4Content:
         '개인정보 관련 문의는 privacy@typingbull.com으로 메일을 보내주시기 바랍니다.',
@@ -1091,9 +1091,9 @@ export const SUBPAGES_I18N: Record<SupportedLocale, SubpagesTranslation> = {
       s2Title: '2. स्थानीय भंडारण की व्यवस्था',
       s2Content:
         'आपके स्ट्रीक और स्कोर आपके डिवाइस पर रहते हैं और आप जब चाहें इन्हें हटा सकते हैं।',
-      s3Title: '3. बाहरी ट्रैकर्स का अभाव',
+      s3Title: '3. एनालिटिक्स, कुकीज़ और विज्ञापन संबंधी जानकारी',
       s3Content:
-        'हम किसी भी विज्ञापन नेटवर्क या जासूसी ट्रैकर्स का इस्तेमाल नहीं करते हैं।',
+        'हम वेबसाइट के प्रदर्शन और ट्रैफ़िक को समझने के लिए Google Analytics के माध्यम से अनाम और समग्र आंकड़े एकत्र करते हैं। आपकी टाइपिंग गति और प्रगति की जानकारी केवल आपके ब्राउज़र के स्थानीय भंडारण (localStorage) में ही सुरक्षित रहती है। Google प्रकाशक नीतियों के अनुसार, Google सहित तीसरे पक्ष के विक्रेता इस या अन्य वेबसाइटों पर पिछली यात्राओं के आधार पर विज्ञापन दिखाने के लिए कुकीज़ का उपयोग कर सकते हैं। उपयोगकर्ता Google विज्ञापन सेटिंग्स (adssettings.google.com) या www.aboutads.info पर जाकर वैयक्तिकृत विज्ञापनों से ऑप्ट-आउट कर सकते हैं। हम किसी भी व्यक्तिगत डेटा को नहीं बेचते हैं और कक्षाओं या बच्चों के सत्रों में रुचि-आधारित विज्ञापन नहीं दिखाते हैं।',
       s4Title: '4. संपर्क करें',
       s4Content:
         'गोपनीयता से जुड़े किसी भी सवाल के लिए कृपया privacy@typingbull.com पर लिखें।',

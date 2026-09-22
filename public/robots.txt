@@ -1,5 +1,12 @@
 User-agent: *
 Allow: /
+Disallow: /*?code=*
+Disallow: /*?room=*
+Disallow: /*?mode=*
+Disallow: /*?action=*
+Disallow: /roadmap/
+Disallow: /roadmap
+Disallow: /coming-soon
 
 # Host
 Host: https://typingbull.com

@@ -1,5 +1,13 @@
 /sitemap /sitemap.xml 301
 /sitemap_index.xml /sitemap.xml 301
+/multiplayer /practice-ground/ 301
+/play/practice-ground /practice-ground/ 301
+/about-us /about/ 301
+/privacy-policy /privacy/ 301
+/terms-and-conditions /terms/ 301
+/contact-us /contact/ 301
+/guide /guidelines/ 301
+/coming-soon /roadmap/ 301
 /sitemap.xml /sitemap.xml 200
 /robots.txt /robots.txt 200
 /* /index.html 200

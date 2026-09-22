@@ -8,7 +8,13 @@ import { SUBPAGES_I18N } from '../i18n/subpagesI18n';
 
 export const TermsPage: React.FC = () => {
   const { currentLang } = useI18n();
-  usePageSEO(currentLang);
+  usePageSEO({
+    lang: currentLang,
+    canonicalPath: '/terms/',
+    title: 'Terms & Conditions — TypingBull | Platform Terms & Classroom Usage Guidelines',
+    description:
+      'Review the terms and conditions for using TypingBull. Free educational use for schools, classrooms, and individual typists.',
+  });
 
   const t = SUBPAGES_I18N[currentLang]?.terms || SUBPAGES_I18N.en.terms;
 

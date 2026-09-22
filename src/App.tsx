@@ -1,26 +1,38 @@
-import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { useState, useEffect, lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import { Sidebar } from './components/navigation/Sidebar';
 import { BottomNav } from './components/navigation/BottomNav';
-import { DashboardPage } from './pages/DashboardPage';
-import { GuidelinesPage } from './pages/GuidelinesPage';
-import { LearnPage } from './pages/LearnPage';
-import { LessonView } from './pages/LessonView';
-import { PlayPage } from './pages/PlayPage';
-import { PracticePage } from './pages/PracticePage';
-import { AboutPage } from './pages/AboutPage';
-import { PrivacyPage } from './pages/PrivacyPage';
-import { TermsPage } from './pages/TermsPage';
-import { ContactPage } from './pages/ContactPage';
-import { RoadmapPage } from './pages/RoadmapPage';
 import { ThemeProvider } from './context/ThemeContext';
 import { I18nProvider } from './context/I18nContext';
 import { FeedbackProvider } from './context/FeedbackContext';
 import { FloatingBot } from './components/navigation/FloatingBot';
-import { LivingBackground } from './components/LivingBackground';
 import { stripLocaleFromPathname } from './i18n/utils';
+
+// Route-level code-splitting to eliminate monolithic bundle
+const DashboardPage = lazy(() => import('./pages/DashboardPage'));
+const GuidelinesPage = lazy(() => import('./pages/GuidelinesPage'));
+const LearnPage = lazy(() => import('./pages/LearnPage'));
+const LessonView = lazy(() => import('./pages/LessonView'));
+const PlayPage = lazy(() => import('./pages/PlayPage'));
+const PracticePage = lazy(() => import('./pages/PracticePage'));
+const ClassroomPage = lazy(() => import('./pages/ClassroomPage'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
+const TermsPage = lazy(() => import('./pages/TermsPage'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
+const RoadmapPage = lazy(() => import('./pages/RoadmapPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+const LivingBackground = lazy(() => import('./components/LivingBackground'));
+
+function RouteLoadingFallback() {
+  return (
+    <div className="flex-1 flex items-center justify-center min-h-[60vh]">
+      <div className="w-8 h-8 rounded-full border-2 border-purple-500/20 border-t-purple-500 animate-spin" />
+    </div>
+  );
+}
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -28,31 +40,36 @@ function AnimatedRoutes() {
   const normalizedLocation = { ...location, pathname: normalizedPathname };
 
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={normalizedLocation} key={normalizedPathname}>
-        <Route path="/" element={<DashboardPage />} />
-        <Route path="/guidelines" element={<GuidelinesPage />} />
-        <Route path="/guide" element={<GuidelinesPage />} />
-        <Route path="/learn" element={<LearnPage />} />
-        <Route path="/learn/:lessonId" element={<LessonView />} />
-        <Route path="/play" element={<PlayPage />} />
-        <Route path="/play/practice-ground" element={<PlayPage />} />
-        <Route path="/practice-ground" element={<PlayPage />} />
-        <Route path="/multiplayer" element={<PlayPage />} />
-        <Route path="/practice" element={<PracticePage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/about-us" element={<AboutPage />} />
-        <Route path="/privacy" element={<PrivacyPage />} />
-        <Route path="/privacy-policy" element={<PrivacyPage />} />
-        <Route path="/terms" element={<TermsPage />} />
-        <Route path="/terms-and-conditions" element={<TermsPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/contact-us" element={<ContactPage />} />
-        <Route path="/roadmap" element={<RoadmapPage />} />
-        <Route path="/coming-soon" element={<RoadmapPage />} />
-        <Route path="*" element={<DashboardPage />} />
-      </Routes>
-    </AnimatePresence>
+    <Suspense fallback={<RouteLoadingFallback />}>
+      <AnimatePresence mode="wait">
+        <Routes location={normalizedLocation} key={normalizedPathname}>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/guidelines" element={<GuidelinesPage />} />
+          <Route path="/guide" element={<Navigate to="/guidelines" replace />} />
+          <Route path="/learn" element={<LearnPage />} />
+          <Route path="/learn/:lessonId" element={<LessonView />} />
+          <Route path="/play" element={<PlayPage />} />
+          <Route path="/play/practice-ground" element={<Navigate to="/practice-ground" replace />} />
+          <Route path="/practice-ground" element={<PlayPage />} />
+          <Route path="/multiplayer" element={<Navigate to="/practice-ground" replace />} />
+          <Route path="/practice" element={<PracticePage />} />
+          <Route path="/classroom" element={<ClassroomPage />} />
+          <Route path="/classroom/create" element={<ClassroomPage />} />
+          <Route path="/classroom/join" element={<ClassroomPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/about-us" element={<Navigate to="/about" replace />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/privacy-policy" element={<Navigate to="/privacy" replace />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/terms-and-conditions" element={<Navigate to="/terms" replace />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/contact-us" element={<Navigate to="/contact" replace />} />
+          <Route path="/roadmap" element={<RoadmapPage />} />
+          <Route path="/coming-soon" element={<Navigate to="/roadmap" replace />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </AnimatePresence>
+    </Suspense>
   );
 }
 

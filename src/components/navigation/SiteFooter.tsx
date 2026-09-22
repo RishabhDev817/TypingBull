@@ -97,6 +97,16 @@ export const SiteFooter: React.FC = () => {
                   Finger Placement Guide
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/classroom"
+                  onClick={onLinkClick}
+                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors flex items-center gap-1.5"
+                >
+                  <span>Classroom Lab Mode</span>
+                  <span className="px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider rounded bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">Free</span>
+                </Link>
+              </li>
             </ul>
           </div>
 

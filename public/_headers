@@ -1,2 +1,8 @@
-https://typingbull-bxe.pages.dev/*
-  X-Robots-Tag: noindex
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+https://*.pages.dev/*
+  X-Robots-Tag: noindex, nofollow

@@ -5,7 +5,7 @@
  * along with canonical URL, localized meta title, and description.
  */
 import { LANGUAGES, LOCALES, DEFAULT_LOCALE, type SupportedLocale } from '../i18n/ui';
-import { getLangFromUrl, generateHreflangLinks, useTranslations } from '../i18n/utils';
+import { getLangFromUrl, generateHreflangLinks, getTranslations } from '../i18n/utils';
 
 interface Props {
   title?: string;
@@ -19,7 +19,7 @@ const { title, description, image = '/og-image.png', canonicalUrl } = Astro.prop
 // Current route information
 const currentPathname = Astro.url.pathname;
 const currentLang = getLangFromUrl(Astro.url);
-const t = useTranslations(currentLang);
+const t = getTranslations(currentLang);
 
 const metaTitle = title || t('seo.defaultTitle');
 const metaDescription = description || t('seo.defaultDescription');

@@ -38,7 +38,25 @@ export class ResultValidator {
       return `Typist-${Math.floor(100 + Math.random() * 900)}`;
     }
 
-    return clean.slice(0, 20);
+    const truncated = clean.slice(0, 20);
+
+    // Screen for severe profanity / hate speech / slurs
+    const normalized = truncated
+      .toLowerCase()
+      .replace(/[@4]/g, 'a')
+      .replace(/[$5]/g, 's')
+      .replace(/[1!|]/g, 'i')
+      .replace(/[0]/g, 'o')
+      .replace(/[3]/g, 'e')
+      .replace(/[^a-z]/g, '')
+      .replace(/(.)\1{2,}/g, '$1$1');
+
+    const blockedWords = ['nigger', 'nigga', 'faggot', 'fag', 'kike', 'chink', 'spic', 'cunt', 'whore', 'slut', 'retard', 'hitler', 'nazi', 'pedophile', 'pedo', 'dickhead', 'motherfucker', 'asshole', 'bitch', 'fuck', 'shit', 'penis', 'vagina', 'dildo', 'cock', 'pussy'];
+    if (blockedWords.some((word) => normalized.includes(word))) {
+      return `Typist-${Math.floor(100 + Math.random() * 900)}`;
+    }
+
+    return truncated;
   }
 
   /**

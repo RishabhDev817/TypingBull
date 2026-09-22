@@ -7,6 +7,7 @@ import { FingerGuide } from '../components/keyboard/FingerGuide';
 import { Mascot } from '../components/Mascot';
 import { soundEngine } from '../utils/audio';
 import { useI18n } from '../context/I18nContext';
+import { usePageSEO } from '../hooks/usePageSEO';
 
 const FINGER_MAP_DATA = [
   {
@@ -69,7 +70,14 @@ const FINGER_MAP_DATA = [
 
 export const GuidelinesPage: React.FC = () => {
   const navigate = useNavigate();
-  const { t } = useI18n();
+  const { t, currentLang } = useI18n();
+  usePageSEO({
+    lang: currentLang,
+    canonicalPath: '/guidelines/',
+    title: 'Touch Typing Guidelines & Ergonomics — TypingBull | Hand Posture & Finger Placement Map',
+    description:
+      'Learn proper touch typing technique, finger coordinates for every key, healthy ergonomic hand posture, and home row anchor guidelines.',
+  });
   const [hoveredFingerIdx, setHoveredFingerIdx] = useState<number | null>(null);
   const [colorblindAssist, setColorblindAssist] = useState(true);
   const [showHands, setShowHands] = useState(true);

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, BookOpen, Gamepad2, Keyboard, Info, ChevronLeft, ChevronRight, Sparkles, MessageSquareHeart } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Gamepad2, Keyboard, Info, ChevronLeft, ChevronRight, Sparkles, MessageSquareHeart, School } from 'lucide-react';
 import { Mascot } from '../Mascot';
 import { soundEngine } from '../../utils/audio';
 import { useI18n } from '../../context/I18nContext';
@@ -27,6 +27,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, 
     { to: '/learn', icon: BookOpen, label: t('nav.learn'), color: '#4CAF50' },
     { to: '/play', icon: Gamepad2, label: t('nav.play'), color: '#FF4081', badge: 'LIVE', isLive: true },
     { to: '/practice', icon: Keyboard, label: t('nav.practice'), color: '#FF9800' },
+    { to: '/classroom', icon: School, label: t('nav.classroom') || 'Classroom', color: '#3B82F6' },
     { to: '/roadmap', icon: Sparkles, label: t('nav.roadmap'), color: '#06B6D4' },
   ];
 
@@ -66,9 +67,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, 
       <div className="flex items-center gap-3 px-5 py-4 border-b border-hairline/50 shrink-0">
         <Mascot mood="happy" size="xs" />
         <div className="flex flex-col">
-          <h1 className="font-extrabold text-base tracking-tight leading-none text-ink">
+          <span className="font-extrabold text-base tracking-tight leading-none text-ink">
             Typing<span className="text-primary">Bull</span>
-          </h1>
+          </span>
           <span className="text-[10px] text-body font-bold uppercase tracking-widest leading-none mt-0.5">
             typing coach
           </span>
@@ -84,6 +85,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, 
             <NavLink
               key={to}
               to={to}
+              id={to === '/classroom' ? 'sidebar-nav-classroom' : undefined}
               end={to === '/'}
               onClick={() => soundEngine.playPop()}
               className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all ${
