@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
   Copy,
@@ -13,6 +13,10 @@ import {
   FileText,
   Target,
   GraduationCap,
+  Gamepad2,
+  ChevronDown,
+  ChevronUp,
+  Keyboard,
 } from 'lucide-react';
 import type { ClassroomRoomView, ClassroomSettings } from '../../types/classroom';
 import { Mascot } from '../Mascot';
@@ -87,13 +91,44 @@ const CLASSROOM_ACTIVITIES = [
   },
 ];
 
+const CLASSROOM_GAMES = [
+  {
+    id: 'game-lilypad-leap',
+    gameId: 'lilypad-leap' as const,
+    title: 'Lilypad Leap (Kids & Beginners)',
+    badge: 'Kids & Beginners',
+    category: 'Arcade Game',
+    description: 'Help the frog leap across lilypads by typing words cleanly. Great for building confidence, letter recognition, and early keystroke rhythm in classroom labs.',
+    focus: 'Beginner Word Flow & Accuracy',
+    duration: 180,
+    gradient: 'from-emerald-500/20 via-teal-500/10 to-transparent',
+    borderColor: 'border-emerald-300 dark:border-emerald-800',
+    badgeColor: 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300',
+    tags: ['Levels 1–5', 'Water Lilypad Track', 'Sound Effects', 'Zero Account Needed'],
+  },
+  {
+    id: 'game-neon-velocity',
+    gameId: 'neon-velocity' as const,
+    title: 'Neon Velocity (Cyberpunk Flow)',
+    badge: 'High Cadence',
+    category: 'Racing Game',
+    description: 'High-speed cyberpunk highway racer where typed words trigger laser strikes and nitro lane boosts. Exciting competitive arcade energy for classroom sprints.',
+    focus: 'High-Velocity Cadence & Reflexes',
+    duration: 180,
+    gradient: 'from-purple-500/20 via-indigo-500/10 to-transparent',
+    borderColor: 'border-purple-300 dark:border-purple-800',
+    badgeColor: 'bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300',
+    tags: ['Cyberpunk Highway', 'Combo Multipliers', 'Fast Reflexes', 'Nitro Boosts'],
+  },
+];
+
 const DURATION_OPTIONS = [
   { label: '1 Min', seconds: 60 },
   { label: '3 Mins', seconds: 180 },
   { label: '5 Mins', seconds: 300 },
 ];
 
-type TeacherTab = 'overview' | 'lessons' | 'activities' | 'passages' | 'students';
+type TeacherTab = 'overview' | 'lessons' | 'games' | 'activities' | 'passages' | 'students';
 
 export const TeacherClassroomLobby: React.FC<Props> = ({
   room,
@@ -104,6 +139,7 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<TeacherTab>('overview');
   const [selectedLesson, setSelectedLesson] = useState<ClassroomLesson | null>(null);
+  const [expandedLessonDrillsId, setExpandedLessonDrillsId] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [showEndModal, setShowEndModal] = useState(false);
@@ -123,15 +159,36 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
     setTimeout(() => setCopiedLink(false), 2000);
   };
 
-  const handleAssignLessonToClassroom = (text: string, title: string) => {
+  const handleAssignLessonToClassroom = useCallback((
+    text: string,
+    title: string,
+    category: string = 'lesson',
+    lessonId?: string
+  ) => {
     onUpdateSettings({
-      passageId: `lesson-custom-${Date.now()}`,
+      activityType: 'lesson',
+      passageId: lessonId || `lesson-custom-${Date.now()}`,
       passageTitle: title,
       targetText: text,
+      assignmentCategory: category,
+      lessonId,
     });
     setSelectedLesson(null);
     setActiveTab('overview');
-  };
+  }, [onUpdateSettings]);
+
+  const handleAssignGameToClassroom = useCallback((game: (typeof CLASSROOM_GAMES)[number]) => {
+    onUpdateSettings({
+      activityType: 'game',
+      gameId: game.gameId,
+      passageId: game.id,
+      passageTitle: game.title,
+      targetText: `Classroom Arcade Challenge: ${game.title}`,
+      assignmentCategory: 'game',
+      durationSeconds: game.duration,
+    });
+    setActiveTab('overview');
+  }, [onUpdateSettings]);
 
   const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(
     joinUrl
@@ -154,6 +211,7 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
   const tabs: { key: TeacherTab; label: string; icon: React.FC<{ className?: string }> }[] = [
     { key: 'overview', label: 'Overview', icon: Target },
     { key: 'lessons', label: 'Lessons (6)', icon: GraduationCap },
+    { key: 'games', label: 'Games (2)', icon: Gamepad2 },
     { key: 'activities', label: 'Activities', icon: Sparkles },
     { key: 'passages', label: 'Passages', icon: FileText },
     { key: 'students', label: `Students (${room.studentCount})`, icon: Users },
@@ -299,11 +357,37 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
               </div>
 
               <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 mb-4">
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  {room.settings.activityType === 'game' ? (
+                    <span className="px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-mono text-[10px] font-black uppercase flex items-center gap-1">
+                      <Gamepad2 className="w-3 h-3" />
+                      <span>Classroom Arcade Game</span>
+                    </span>
+                  ) : room.settings.assignmentCategory === 'homerow' || room.settings.passageTitle?.toLowerCase().includes('homerow') || room.settings.passageTitle?.toLowerCase().includes('home row') ? (
+                    <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-mono text-[10px] font-black uppercase flex items-center gap-1">
+                      <Keyboard className="w-3 h-3" />
+                      <span>Home Row Practice Drill</span>
+                    </span>
+                  ) : room.settings.activityType === 'lesson' ? (
+                    <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono text-[10px] font-black uppercase flex items-center gap-1">
+                      <GraduationCap className="w-3 h-3" />
+                      <span>Classroom Curriculum Lesson</span>
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 font-mono text-[10px] font-black uppercase flex items-center gap-1">
+                      <FileText className="w-3 h-3" />
+                      <span>Synchronized Passage</span>
+                    </span>
+                  )}
+                </div>
+
                 <div className="text-sm font-black text-slate-900 dark:text-white mb-1">
                   {room.settings.passageTitle}
                 </div>
                 <div className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 italic">
-                  "{room.settings.targetText}"
+                  {room.settings.activityType === 'game'
+                    ? 'All connected students will play this live arcade typing game synchronously in the classroom.'
+                    : `"${room.settings.targetText}"`}
                 </div>
               </div>
 
@@ -461,51 +545,243 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {CLASSROOM_LESSONS.map((lesson) => (
-              <div
-                key={lesson.id}
-                className="p-5 rounded-3xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 shadow-lg flex flex-col justify-between hover:border-primary/50 transition"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="px-2.5 py-0.5 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono text-xs font-black">
-                      Lesson {lesson.lessonNumber}
-                    </span>
-                    <span className="text-[10px] font-black uppercase text-slate-400">
-                      {lesson.badge}
-                    </span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {CLASSROOM_LESSONS.map((lesson) => {
+              const isDrillExpanded = expandedLessonDrillsId === lesson.id;
+              const isSelected = room.settings.lessonId === lesson.id || room.settings.passageTitle.includes(lesson.shortTitle);
+
+              return (
+                <div
+                  key={lesson.id}
+                  className={`p-5 rounded-3xl bg-white dark:bg-slate-900 border-2 transition-all shadow-lg flex flex-col justify-between ${
+                    isSelected
+                      ? 'border-blue-500 ring-2 ring-blue-500/20'
+                      : 'border-slate-200 dark:border-slate-800 hover:border-primary/50'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="px-2.5 py-0.5 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono text-xs font-black">
+                        Lesson {lesson.lessonNumber}
+                      </span>
+                      <span className="text-[10px] font-black uppercase text-slate-400">
+                        {lesson.badge}
+                      </span>
+                    </div>
+
+                    <h4 className="text-base font-black text-slate-900 dark:text-white mb-1.5 line-clamp-1">
+                      {lesson.title}
+                    </h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium line-clamp-2 mb-3 leading-relaxed">
+                      {lesson.description}
+                    </p>
+
+                    {/* Key Highlights Pill */}
+                    <div className="flex items-center gap-1.5 flex-wrap mb-4">
+                      <span className="text-[10px] font-bold text-slate-400">Keys:</span>
+                      {lesson.typingConcept.keyHighlights.slice(0, 6).map((k) => (
+                        <span
+                          key={k}
+                          className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono text-[10px] font-black text-slate-700 dark:text-slate-300"
+                        >
+                          {k}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Expandable Homerow / Guided Drills Drawer */}
+                    {isDrillExpanded && (
+                      <div className="mb-4 p-3 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/80 space-y-2.5 animate-fadeIn">
+                        <div className="text-[11px] font-black uppercase tracking-wider text-indigo-700 dark:text-indigo-300 flex items-center justify-between">
+                          <span>Guided Homerow Drills</span>
+                          <span className="text-[10px] font-bold text-indigo-500">Pick any drill</span>
+                        </div>
+
+                        {lesson.guidedPractice.map((drill, idx) => (
+                          <div
+                            key={idx}
+                            className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-indigo-100 dark:border-indigo-900/60 shadow-xs flex flex-col gap-1.5"
+                          >
+                            <div className="text-[11px] font-bold text-slate-800 dark:text-slate-200 line-clamp-1">
+                              {drill.prompt}
+                            </div>
+                            <div className="p-1.5 rounded-lg bg-slate-950 text-white font-mono text-xs tracking-wider text-center overflow-x-auto truncate">
+                              {drill.pattern}
+                            </div>
+                            <div className="flex items-center justify-between pt-1">
+                              <div className="flex gap-1">
+                                {drill.focusKeys.map((fk) => (
+                                  <span
+                                    key={fk}
+                                    className="px-1 py-0.2 rounded bg-indigo-50 dark:bg-indigo-950 font-mono text-[9px] font-black text-indigo-600 dark:text-indigo-400"
+                                  >
+                                    {fk}
+                                  </span>
+                                ))}
+                              </div>
+                              <button
+                                type="button"
+                                id={`assign-drill-${lesson.id}-${idx}`}
+                                onClick={() =>
+                                  handleAssignLessonToClassroom(
+                                    drill.pattern,
+                                    `Lesson ${lesson.lessonNumber} Drill ${idx + 1}: ${drill.prompt}`,
+                                    'homerow',
+                                    lesson.id
+                                  )
+                                }
+                                className="py-1 px-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-black transition cursor-pointer"
+                              >
+                                Assign Drill
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
-                  <h4 className="text-base font-black text-slate-900 dark:text-white mb-1.5 line-clamp-1">
-                    {lesson.title}
-                  </h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium line-clamp-2 mb-4 leading-relaxed">
-                    {lesson.description}
-                  </p>
-                </div>
+                  <div className="space-y-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedLesson(lesson)}
+                        className="flex-1 py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-black hover:bg-slate-200 transition cursor-pointer text-center"
+                      >
+                        View Lesson
+                      </button>
 
-                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedLesson(lesson)}
-                    className="flex-1 py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-black hover:bg-slate-200 transition cursor-pointer text-center"
-                  >
-                    View Lesson
-                  </button>
+                      <button
+                        type="button"
+                        id={`assign-lesson-${lesson.id}`}
+                        onClick={() =>
+                          handleAssignLessonToClassroom(
+                            lesson.typingExercise.targetText,
+                            `Lesson ${lesson.lessonNumber}: ${lesson.shortTitle} (Exercise)`,
+                            'lesson',
+                            lesson.id
+                          )
+                        }
+                        className="py-2 px-3 rounded-xl bg-primary text-white text-xs font-black hover:bg-primary-dark transition cursor-pointer shrink-0"
+                        title="Assign cadence exercise to classroom"
+                      >
+                        Assign Exercise
+                      </button>
+                    </div>
 
-                  <button
-                    type="button"
-                    id={`assign-lesson-${lesson.id}`}
-                    onClick={() => handleAssignLessonToClassroom(lesson.typingExercise.targetText, `Lesson ${lesson.lessonNumber}: ${lesson.shortTitle}`)}
-                    className="py-2 px-3 rounded-xl bg-primary text-white text-xs font-black hover:bg-primary-dark transition cursor-pointer shrink-0"
-                    title="Assign to active classroom session"
-                  >
-                    Assign
-                  </button>
+                    {/* Toggle Homerow / Guided Drills */}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setExpandedLessonDrillsId(isDrillExpanded ? null : lesson.id)
+                      }
+                      className="w-full py-1.5 px-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 text-[11px] font-black transition cursor-pointer flex items-center justify-center gap-1.5 border border-indigo-200/50 dark:border-indigo-800/50"
+                    >
+                      <Keyboard className="w-3.5 h-3.5" />
+                      <span>
+                        {isDrillExpanded
+                          ? 'Hide Homerow Drills'
+                          : `Practice Homerow Drills (${lesson.guidedPractice.length})`}
+                      </span>
+                      {isDrillExpanded ? (
+                        <ChevronUp className="w-3.5 h-3.5" />
+                      ) : (
+                        <ChevronDown className="w-3.5 h-3.5" />
+                      )}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ─── TAB 3: GAMES ARCADE ─── */}
+      {activeTab === 'games' && (
+        <div className="space-y-6">
+          <div className="p-6 rounded-3xl bg-gradient-to-r from-purple-900/30 via-indigo-900/20 to-slate-900/30 dark:bg-slate-900 border-2 border-purple-200 dark:border-purple-900/50 shadow-md">
+            <div className="flex items-center gap-2 mb-1">
+              <Gamepad2 className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+              <h3 className="text-xl font-black text-slate-900 dark:text-white">
+                Typing Games Arcade — Classroom Edition
+              </h3>
+            </div>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium max-w-2xl">
+              Engage students with synchronized multiplayer arcade games. When you start the session, all connected student screens launch the chosen game with real-time class monitoring.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {CLASSROOM_GAMES.map((game) => {
+              const isSelected =
+                room.settings.activityType === 'game' && room.settings.gameId === game.gameId;
+              return (
+                <div
+                  key={game.id}
+                  className={`p-6 rounded-3xl border-2 transition shadow-xl flex flex-col justify-between ${
+                    isSelected
+                      ? 'border-purple-500 bg-purple-500/10 dark:bg-purple-950/40 ring-2 ring-purple-500/30'
+                      : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <span className={`px-2.5 py-0.5 rounded-lg text-xs font-black uppercase ${game.badgeColor}`}>
+                        {game.badge}
+                      </span>
+                      <span className="text-xs font-bold text-slate-400">
+                        {game.duration}s Session
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-500/20 to-indigo-500/20 flex items-center justify-center text-2xl">
+                        {game.gameId === 'lilypad-leap' ? '🐸' : '🏎️'}
+                      </div>
+                      <h4 className="text-xl font-black text-slate-900 dark:text-white">
+                        {game.title}
+                      </h4>
+                    </div>
+
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed mb-4">
+                      {game.description}
+                    </p>
+
+                    <div className="flex flex-wrap gap-1.5 mb-6">
+                      {game.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-bold"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                      {game.focus}
+                    </span>
+
+                    <button
+                      type="button"
+                      id={`assign-${game.id}`}
+                      onClick={() => handleAssignGameToClassroom(game)}
+                      className={`py-2.5 px-5 rounded-2xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
+                        isSelected
+                          ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+                          : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-md shadow-purple-600/25'
+                      }`}
+                    >
+                      <Gamepad2 className="w-4 h-4" />
+                      <span>{isSelected ? 'Currently Assigned' : 'Assign to Classroom'}</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

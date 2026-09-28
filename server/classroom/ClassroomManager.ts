@@ -236,17 +236,44 @@ export class ClassroomManager {
     if (room.teacherToken !== teacherToken) return null;
     if (room.status !== 'WAITING') return null;
 
-    if (newSettings.passageId) {
-      const found = DEFAULT_CLASSROOM_PASSAGES.find((p) => p.id === newSettings.passageId);
-      if (found) {
-        room.settings.passageId = found.id;
-        room.settings.passageTitle = found.title;
-        room.settings.targetText = found.text;
+    if (newSettings.activityType && ['practice', 'lesson', 'game'].includes(newSettings.activityType)) {
+      room.settings.activityType = newSettings.activityType;
+    }
+
+    if (newSettings.gameId !== undefined) {
+      room.settings.gameId = newSettings.gameId;
+    }
+
+    if (newSettings.lessonId !== undefined) {
+      room.settings.lessonId = newSettings.lessonId;
+    }
+
+    if (newSettings.assignmentCategory !== undefined) {
+      room.settings.assignmentCategory = newSettings.assignmentCategory;
+    }
+
+    if (newSettings.targetText && typeof newSettings.targetText === 'string') {
+      room.settings.targetText = newSettings.targetText.slice(0, 5000);
+    }
+
+    if (newSettings.passageTitle && typeof newSettings.passageTitle === 'string') {
+      room.settings.passageTitle = newSettings.passageTitle.slice(0, 100);
+    }
+
+    if (newSettings.passageId && typeof newSettings.passageId === 'string') {
+      room.settings.passageId = newSettings.passageId.slice(0, 100);
+      // If targetText wasn't passed, check default passages catalog
+      if (!newSettings.targetText) {
+        const found = DEFAULT_CLASSROOM_PASSAGES.find((p) => p.id === newSettings.passageId);
+        if (found) {
+          room.settings.passageTitle = found.title;
+          room.settings.targetText = found.text;
+        }
       }
     }
 
-    if (newSettings.durationSeconds && [60, 180, 300].includes(newSettings.durationSeconds)) {
-      room.settings.durationSeconds = newSettings.durationSeconds;
+    if (newSettings.durationSeconds && typeof newSettings.durationSeconds === 'number' && newSettings.durationSeconds > 0) {
+      room.settings.durationSeconds = Math.min(1800, Math.max(30, newSettings.durationSeconds));
     }
 
     room.lastActivityAt = Date.now();

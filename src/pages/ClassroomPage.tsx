@@ -9,6 +9,7 @@ import { TeacherClassroomLobby } from '../components/classroom/TeacherClassroomL
 import { StudentClassroomLobby } from '../components/classroom/StudentClassroomLobby';
 import { ClassroomCountdown } from '../components/classroom/ClassroomCountdown';
 import { ClassroomTypingArea } from '../components/classroom/ClassroomTypingArea';
+import { ClassroomGameArea } from '../components/classroom/ClassroomGameArea';
 import { TeacherLiveMonitoring } from '../components/classroom/TeacherLiveMonitoring';
 import { StudentClassroomResults } from '../components/classroom/StudentClassroomResults';
 import { TeacherClassroomResults } from '../components/classroom/TeacherClassroomResults';
@@ -283,14 +284,24 @@ export const ClassroomPage: React.FC = () => {
             )}
 
             {room.status === 'ACTIVE' && sessionStartAt && sessionEndAt && (
-              <ClassroomTypingArea
-                targetText={room.settings.targetText}
-                passageTitle={room.settings.passageTitle}
-                sessionStartAt={sessionStartAt}
-                sessionEndAt={sessionEndAt}
-                onProgressUpdate={sendProgress}
-                onFinish={finishSession}
-              />
+              room.settings.activityType === 'game' ? (
+                <ClassroomGameArea
+                  room={room}
+                  sessionStartAt={sessionStartAt}
+                  sessionEndAt={sessionEndAt}
+                  onProgressUpdate={sendProgress}
+                  onFinish={finishSession}
+                />
+              ) : (
+                <ClassroomTypingArea
+                  targetText={room.settings.targetText}
+                  passageTitle={room.settings.passageTitle}
+                  sessionStartAt={sessionStartAt}
+                  sessionEndAt={sessionEndAt}
+                  onProgressUpdate={sendProgress}
+                  onFinish={finishSession}
+                />
+              )
             )}
 
             {room.status === 'FINISHED' && sessionResults && (

@@ -20,7 +20,7 @@ interface Props {
   lesson: ClassroomLesson;
   onBack: () => void;
   isTeacher?: boolean;
-  onAssignToClassroom?: (text: string, title: string) => void;
+  onAssignToClassroom?: (text: string, title: string, category?: string, lessonId?: string) => void;
 }
 
 type Step = 'overview' | 'concept' | 'guided' | 'exercise' | 'completed';
@@ -363,6 +363,34 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                       ))}
                     </div>
                   </div>
+
+                  {isTeacher && onAssignToClassroom && (
+                    <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-indigo-50/60 dark:bg-indigo-950/30 p-3.5 rounded-2xl border border-indigo-200/80 dark:border-indigo-800/80">
+                      <div className="flex items-center gap-2">
+                        <Zap className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                        <span className="text-xs font-bold text-indigo-900 dark:text-indigo-200">
+                          Teach this Homerow pattern to your classroom
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        id={`assign-drill-btn-${guidedIndex}`}
+                        onClick={() => {
+                          onAssignToClassroom(
+                            lesson.guidedPractice[guidedIndex].pattern,
+                            `Lesson ${lesson.lessonNumber} Drill: ${lesson.guidedPractice[guidedIndex].prompt}`,
+                            'homerow',
+                            lesson.id
+                          );
+                          soundEngine.playVictory();
+                        }}
+                        className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black transition cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/20 shrink-0"
+                      >
+                        <GraduationCap className="w-4 h-4" />
+                        <span>Assign This Drill</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -577,6 +605,26 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                   <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium italic leading-relaxed">
                     "{lesson.passage.text}"
                   </p>
+                  {isTeacher && onAssignToClassroom && (
+                    <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onAssignToClassroom(
+                            lesson.passage!.text,
+                            `Lesson ${lesson.lessonNumber} Passage: ${lesson.passage!.title}`,
+                            'passage',
+                            lesson.id
+                          );
+                          soundEngine.playVictory();
+                        }}
+                        className="px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-black transition cursor-pointer flex items-center gap-1.5 shadow-sm"
+                      >
+                        <GraduationCap className="w-4 h-4" />
+                        <span>Assign Passage to Classroom</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 

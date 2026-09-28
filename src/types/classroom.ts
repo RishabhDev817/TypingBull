@@ -7,14 +7,19 @@ export type StudentStatus = 'NOT_READY' | 'READY' | 'TYPING' | 'FINISHED' | 'DIS
 export type SocketStatus = 'CONNECTING' | 'CONNECTED' | 'DISCONNECTED' | 'RECONNECTING' | 'ERROR';
 export type ClassroomRole = 'teacher' | 'student';
 
+export type ClassroomActivityType = 'practice' | 'lesson' | 'game';
+
 export interface ClassroomSettings {
-  activityType: 'practice';
+  activityType: ClassroomActivityType;
   passageId: string;
   passageTitle: string;
   targetText: string;
   durationSeconds: number;
   minStudents: number;
   maxStudents: number;
+  lessonId?: string;
+  gameId?: 'lilypad-leap' | 'neon-velocity';
+  assignmentCategory?: string;
 }
 
 export interface ClassroomStudentView {

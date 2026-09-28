@@ -8,6 +8,8 @@ import {
   ArrowLeft,
   GraduationCap,
   Target,
+  Gamepad2,
+  Keyboard,
 } from 'lucide-react';
 import type { ClassroomRoomView } from '../../types/classroom';
 import { Mascot } from '../Mascot';
@@ -153,16 +155,37 @@ export const StudentClassroomLobby: React.FC<Props> = ({
 
           {/* Activity Preview */}
           <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
-              Assigned Activity
-            </span>
+            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Assigned Activity
+              </span>
+              {room.settings.activityType === 'game' ? (
+                <span className="px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-mono text-[9px] font-black uppercase flex items-center gap-1">
+                  <Gamepad2 className="w-3 h-3" />
+                  <span>Arcade Game Challenge</span>
+                </span>
+              ) : room.settings.assignmentCategory === 'homerow' || room.settings.passageTitle?.toLowerCase().includes('homerow') || room.settings.passageTitle?.toLowerCase().includes('home row') ? (
+                <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-mono text-[9px] font-black uppercase flex items-center gap-1">
+                  <Keyboard className="w-3 h-3" />
+                  <span>Home Row Practice Drill</span>
+                </span>
+              ) : room.settings.activityType === 'lesson' ? (
+                <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono text-[9px] font-black uppercase flex items-center gap-1">
+                  <GraduationCap className="w-3 h-3" />
+                  <span>Classroom Curriculum Lesson</span>
+                </span>
+              ) : null}
+            </div>
+
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm font-black text-slate-900 dark:text-white">
                   {room.settings.passageTitle}
                 </div>
                 <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                  Everyone types the same synchronized text
+                  {room.settings.activityType === 'game'
+                    ? 'Synchronous classroom multiplayer game challenge'
+                    : 'Everyone types the same synchronized text'}
                 </div>
               </div>
               <div className="flex items-center gap-1 text-xs font-black text-primary px-2.5 py-1 rounded-full bg-primary/10">

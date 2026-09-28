@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Clock, Users, Zap, Target, CheckCircle2, LogOut } from 'lucide-react';
+import { Clock, Users, Zap, Target, CheckCircle2, LogOut, Gamepad2, GraduationCap, Keyboard } from 'lucide-react';
 import type { ClassroomRoomView } from '../../types/classroom';
 import { ClassroomEndModal } from './ClassroomEndModal';
 import { StudentAvatarBadge } from './StudentAvatar';
@@ -52,10 +52,28 @@ export const TeacherLiveMonitoring: React.FC<Props> = ({
       {/* Top Header & Emergency Controls */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Live Classroom Session Active</span>
-          </span>
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
+            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Live Classroom Session Active</span>
+            </span>
+            {room.settings.activityType === 'game' ? (
+              <span className="px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-mono text-[9px] font-black uppercase flex items-center gap-1">
+                <Gamepad2 className="w-3 h-3" />
+                <span>Arcade Game Challenge</span>
+              </span>
+            ) : room.settings.assignmentCategory === 'homerow' || room.settings.passageTitle?.toLowerCase().includes('homerow') || room.settings.passageTitle?.toLowerCase().includes('home row') ? (
+              <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-mono text-[9px] font-black uppercase flex items-center gap-1">
+                <Keyboard className="w-3 h-3" />
+                <span>Home Row Drill</span>
+              </span>
+            ) : room.settings.activityType === 'lesson' ? (
+              <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono text-[9px] font-black uppercase flex items-center gap-1">
+                <GraduationCap className="w-3 h-3" />
+                <span>Curriculum Lesson</span>
+              </span>
+            ) : null}
+          </div>
           <h2 className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">
             {room.settings.passageTitle}
           </h2>
