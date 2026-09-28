@@ -298,6 +298,8 @@ export const ClassroomPage: React.FC = () => {
                   passageTitle={room.settings.passageTitle}
                   sessionStartAt={sessionStartAt}
                   sessionEndAt={sessionEndAt}
+                  targetKeys={room.settings.targetKeys}
+                  assignmentCategory={room.settings.assignmentCategory}
                   onProgressUpdate={sendProgress}
                   onFinish={finishSession}
                 />

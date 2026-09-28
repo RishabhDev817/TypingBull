@@ -10,6 +10,7 @@ import {
   Target,
   Gamepad2,
   Keyboard,
+  BookOpen,
 } from 'lucide-react';
 import type { ClassroomRoomView } from '../../types/classroom';
 import { Mascot } from '../Mascot';
@@ -164,6 +165,11 @@ export const StudentClassroomLobby: React.FC<Props> = ({
                   <Gamepad2 className="w-3 h-3" />
                   <span>Arcade Game Challenge</span>
                 </span>
+              ) : room.settings.assignmentCategory === 'learn-curriculum' ? (
+                <span className="px-2 py-0.5 rounded-md bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-mono text-[9px] font-black uppercase flex items-center gap-1">
+                  <BookOpen className="w-3 h-3" />
+                  <span>Step-by-Step Curriculum</span>
+                </span>
               ) : room.settings.assignmentCategory === 'homerow' || room.settings.passageTitle?.toLowerCase().includes('homerow') || room.settings.passageTitle?.toLowerCase().includes('home row') ? (
                 <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-mono text-[9px] font-black uppercase flex items-center gap-1">
                   <Keyboard className="w-3 h-3" />
@@ -187,6 +193,19 @@ export const StudentClassroomLobby: React.FC<Props> = ({
                     ? 'Synchronous classroom multiplayer game challenge'
                     : 'Everyone types the same synchronized text'}
                 </div>
+                {room.settings.targetKeys && room.settings.targetKeys.length > 0 && (
+                  <div className="flex items-center gap-1 flex-wrap mt-2">
+                    <span className="text-[10px] font-bold text-slate-400">Focus Keys:</span>
+                    {room.settings.targetKeys.map((k) => (
+                      <span
+                        key={k}
+                        className="px-1.5 py-0.2 rounded bg-sky-100 dark:bg-sky-950 font-mono text-[10px] font-black text-sky-700 dark:text-sky-300 border border-sky-300 dark:border-sky-800"
+                      >
+                        {k === ' ' ? 'Space' : k.toUpperCase()}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="flex items-center gap-1 text-xs font-black text-primary px-2.5 py-1 rounded-full bg-primary/10">
                 <Clock className="w-3.5 h-3.5" />

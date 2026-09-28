@@ -9,6 +9,8 @@ interface Props {
   passageTitle: string;
   sessionStartAt: number;
   sessionEndAt: number;
+  targetKeys?: string[];
+  assignmentCategory?: string;
   onProgressUpdate: (update: StudentProgressUpdate) => void;
   onFinish: (payload: StudentFinishPayload) => void;
 }
@@ -18,6 +20,8 @@ export const ClassroomTypingArea: React.FC<Props> = ({
   passageTitle,
   sessionStartAt,
   sessionEndAt,
+  targetKeys,
+  assignmentCategory,
   onProgressUpdate,
   onFinish,
 }) => {
@@ -203,12 +207,36 @@ export const ClassroomTypingArea: React.FC<Props> = ({
       {/* Top HUD Card */}
       <div className="rounded-3xl p-4 sm:p-5 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 shadow-xl mb-4 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
-            Classroom Exercise
-          </span>
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
+            <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
+              {assignmentCategory === 'learn-curriculum'
+                ? 'Step-by-Step Curriculum'
+                : assignmentCategory === 'homerow'
+                ? 'Home Row Drill'
+                : 'Classroom Exercise'}
+            </span>
+            {assignmentCategory === 'learn-curriculum' && (
+              <span className="px-2 py-0.5 rounded-md bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-mono text-[9px] font-black uppercase border border-sky-200 dark:border-sky-800">
+                Learn Section
+              </span>
+            )}
+          </div>
           <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
             {passageTitle}
           </h2>
+          {targetKeys && targetKeys.length > 0 && (
+            <div className="flex items-center gap-1.5 flex-wrap mt-2">
+              <span className="text-[10px] font-bold text-slate-400">Target Keys:</span>
+              {targetKeys.map((k) => (
+                <span
+                  key={k}
+                  className="px-2 py-0.5 rounded-md bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-mono text-xs font-black border border-sky-300 dark:border-sky-800 shadow-xs"
+                >
+                  {k === ' ' ? 'Space' : k.toUpperCase()}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-3 sm:gap-6">

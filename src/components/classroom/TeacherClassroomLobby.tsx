@@ -17,11 +17,15 @@ import {
   ChevronDown,
   ChevronUp,
   Keyboard,
+  BookOpen,
+  Search,
 } from 'lucide-react';
 import type { ClassroomRoomView, ClassroomSettings } from '../../types/classroom';
 import { Mascot } from '../Mascot';
 import { ClassroomEndModal } from './ClassroomEndModal';
 import { CLASSROOM_LESSONS, type ClassroomLesson } from '../../data/classroom/classroomLessons';
+import { CHAPTERS } from '../../data/curriculum';
+import { getLessonsForChapter, type LessonDef } from '../../data/lessonData';
 import { ClassroomLessonViewer } from './ClassroomLessonViewer';
 import { StudentAvatarBadge } from './StudentAvatar';
 
@@ -128,7 +132,7 @@ const DURATION_OPTIONS = [
   { label: '5 Mins', seconds: 300 },
 ];
 
-type TeacherTab = 'overview' | 'lessons' | 'games' | 'activities' | 'passages' | 'students';
+type TeacherTab = 'overview' | 'learn' | 'lessons' | 'games' | 'activities' | 'passages' | 'students';
 
 export const TeacherClassroomLobby: React.FC<Props> = ({
   room,
@@ -140,6 +144,8 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
   const [activeTab, setActiveTab] = useState<TeacherTab>('overview');
   const [selectedLesson, setSelectedLesson] = useState<ClassroomLesson | null>(null);
   const [expandedLessonDrillsId, setExpandedLessonDrillsId] = useState<string | null>(null);
+  const [selectedCurriculumChapterId, setSelectedCurriculumChapterId] = useState<string>('home-row');
+  const [curriculumSearchQuery, setCurriculumSearchQuery] = useState<string>('');
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [showEndModal, setShowEndModal] = useState(false);
@@ -177,6 +183,23 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
     setActiveTab('overview');
   }, [onUpdateSettings]);
 
+  const handleAssignLearnLesson = useCallback(
+    (lesson: LessonDef, chapterTitle: string) => {
+      onUpdateSettings({
+        activityType: 'lesson',
+        lessonId: `learn-${lesson.id}`,
+        passageId: `learn-lesson-${lesson.id}`,
+        passageTitle: `Learn Step ${lesson.id}: ${lesson.title} (${chapterTitle})`,
+        targetText: lesson.content || 'Practice typing drill',
+        assignmentCategory: 'learn-curriculum',
+        targetKeys: lesson.targetKeys,
+        durationSeconds: room.settings.durationSeconds || 180,
+      });
+      setActiveTab('overview');
+    },
+    [onUpdateSettings, room.settings.durationSeconds]
+  );
+
   const handleAssignGameToClassroom = useCallback((game: (typeof CLASSROOM_GAMES)[number]) => {
     onUpdateSettings({
       activityType: 'game',
@@ -210,7 +233,8 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
 
   const tabs: { key: TeacherTab; label: string; icon: React.FC<{ className?: string }> }[] = [
     { key: 'overview', label: 'Overview', icon: Target },
-    { key: 'lessons', label: 'Lessons (6)', icon: GraduationCap },
+    { key: 'learn', label: 'Learn Curriculum (685)', icon: BookOpen },
+    { key: 'lessons', label: 'Lab Lessons (6)', icon: GraduationCap },
     { key: 'games', label: 'Games (2)', icon: Gamepad2 },
     { key: 'activities', label: 'Activities', icon: Sparkles },
     { key: 'passages', label: 'Passages', icon: FileText },
@@ -347,13 +371,23 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
                 <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Current Session Target
                 </span>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('lessons')}
-                  className="text-xs font-black text-primary hover:underline cursor-pointer"
-                >
-                  Change Target
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('learn')}
+                    className="text-xs font-black text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+                  >
+                    Browse Learn (685)
+                  </button>
+                  <span className="text-slate-300 dark:text-slate-700">•</span>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('lessons')}
+                    className="text-xs font-black text-primary hover:underline cursor-pointer"
+                  >
+                    Change Target
+                  </button>
+                </div>
               </div>
 
               <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 mb-4">
@@ -362,6 +396,11 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
                     <span className="px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-mono text-[10px] font-black uppercase flex items-center gap-1">
                       <Gamepad2 className="w-3 h-3" />
                       <span>Classroom Arcade Game</span>
+                    </span>
+                  ) : room.settings.assignmentCategory === 'learn-curriculum' ? (
+                    <span className="px-2 py-0.5 rounded-md bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-mono text-[10px] font-black uppercase flex items-center gap-1">
+                      <BookOpen className="w-3 h-3" />
+                      <span>Learn Section • Step-by-Step Curriculum</span>
                     </span>
                   ) : room.settings.assignmentCategory === 'homerow' || room.settings.passageTitle?.toLowerCase().includes('homerow') || room.settings.passageTitle?.toLowerCase().includes('home row') ? (
                     <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-mono text-[10px] font-black uppercase flex items-center gap-1">
@@ -384,6 +423,21 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
                 <div className="text-sm font-black text-slate-900 dark:text-white mb-1">
                   {room.settings.passageTitle}
                 </div>
+
+                {room.settings.targetKeys && room.settings.targetKeys.length > 0 && (
+                  <div className="flex items-center gap-1.5 my-2 flex-wrap">
+                    <span className="text-[10px] font-bold text-slate-400">Target Focus Keys:</span>
+                    {room.settings.targetKeys.map((k) => (
+                      <span
+                        key={k}
+                        className="px-1.5 py-0.2 rounded bg-sky-100 dark:bg-sky-900/60 font-mono text-xs font-black text-sky-700 dark:text-sky-300 border border-sky-300 dark:border-sky-700"
+                      >
+                        {k === ' ' ? 'Space' : k.toUpperCase()}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
                 <div className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 italic">
                   {room.settings.activityType === 'game'
                     ? 'All connected students will play this live arcade typing game synchronously in the classroom.'
@@ -521,6 +575,188 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
               </motion.button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ─── TAB: LEARN STEP-BY-STEP CURRICULUM (685 LESSONS) ─── */}
+      {activeTab === 'learn' && (
+        <div className="space-y-6">
+          {/* Header Banner */}
+          <div className="p-6 rounded-3xl bg-gradient-to-r from-sky-900/40 via-blue-900/30 to-indigo-900/40 dark:bg-slate-900 border-2 border-sky-200 dark:border-sky-900/50 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <BookOpen className="w-6 h-6 text-sky-500" />
+                <h3 className="text-xl font-black text-slate-900 dark:text-white">
+                  The Great Typing Railway — Step-by-Step Curriculum
+                </h3>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium max-w-2xl">
+                Assign any progressive lesson step from the Learn section directly to your classroom. Organized into 25 chapters covering home row foundations, upper row reaches, shift key synchronization, and speed drills.
+              </p>
+            </div>
+
+            <div className="relative w-full md:w-64 shrink-0">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                value={curriculumSearchQuery}
+                onChange={(e) => setCurriculumSearchQuery(e.target.value)}
+                placeholder="Search lessons or keys..."
+                className="w-full pl-9 pr-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              />
+            </div>
+          </div>
+
+          {/* Chapter Selector Carousel */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin">
+            {CHAPTERS.map((ch) => {
+              const isSelected = selectedCurriculumChapterId === ch.id;
+              return (
+                <button
+                  key={ch.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedCurriculumChapterId(ch.id);
+                    setCurriculumSearchQuery('');
+                  }}
+                  className={`py-2 px-3.5 rounded-2xl text-xs font-black transition cursor-pointer whitespace-nowrap flex items-center gap-2 border ${
+                    isSelected
+                      ? 'bg-sky-600 text-white border-sky-600 shadow-md shadow-sky-600/20'
+                      : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-sky-400'
+                  }`}
+                >
+                  <span className="text-base">{ch.icon}</span>
+                  <span>{ch.title}</span>
+                  <span
+                    className={`text-[10px] font-mono px-1.5 py-0.2 rounded-md ${
+                      isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
+                    }`}
+                  >
+                    {ch.lessonRange[0]}–{ch.lessonRange[1]}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Active Chapter Details & Lessons Grid */}
+          {(() => {
+            const currentChapter =
+              CHAPTERS.find((c) => c.id === selectedCurriculumChapterId) || CHAPTERS[0];
+            const chapterLessons = getLessonsForChapter(currentChapter.id);
+            const filteredLessons = curriculumSearchQuery.trim()
+              ? chapterLessons.filter(
+                  (l) =>
+                    l.title.toLowerCase().includes(curriculumSearchQuery.toLowerCase()) ||
+                    l.description.toLowerCase().includes(curriculumSearchQuery.toLowerCase()) ||
+                    l.targetKeys.some((k) =>
+                      k.toLowerCase().includes(curriculumSearchQuery.toLowerCase())
+                    ) ||
+                    String(l.id) === curriculumSearchQuery.trim()
+                )
+              : chapterLessons;
+
+            return (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between px-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">{currentChapter.icon}</span>
+                    <div>
+                      <h4 className="text-base font-black text-slate-900 dark:text-white">
+                        {currentChapter.title} — Lessons {currentChapter.lessonRange[0]} to {currentChapter.lessonRange[1]}
+                      </h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                        {currentChapter.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <span className="text-xs font-bold text-slate-400">
+                    {filteredLessons.length} {filteredLessons.length === 1 ? 'Step' : 'Steps'} available
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {filteredLessons.map((lesson) => {
+                    const isLessonActive =
+                      room.settings.lessonId === `learn-${lesson.id}` ||
+                      room.settings.passageId === `learn-lesson-${lesson.id}`;
+
+                    return (
+                      <div
+                        key={lesson.id}
+                        className={`p-5 rounded-3xl bg-white dark:bg-slate-900 border-2 transition shadow-md flex flex-col justify-between ${
+                          isLessonActive
+                            ? 'border-sky-500 bg-sky-50/20 dark:bg-sky-950/20 ring-2 ring-sky-500/20'
+                            : 'border-slate-200 dark:border-slate-800 hover:border-sky-400/60'
+                        }`}
+                      >
+                        <div>
+                          <div className="flex items-center justify-between mb-2.5">
+                            <span className="px-2.5 py-0.5 rounded-lg bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-mono text-xs font-black">
+                              Step {lesson.id}
+                            </span>
+                            <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[10px] font-black uppercase text-slate-500 dark:text-slate-400">
+                              {lesson.type}
+                            </span>
+                          </div>
+
+                          <h5 className="text-sm sm:text-base font-black text-slate-900 dark:text-white mb-1 line-clamp-1">
+                            {lesson.title}
+                          </h5>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium line-clamp-2 mb-3 leading-relaxed">
+                            {lesson.description}
+                          </p>
+
+                          {/* Target Keys */}
+                          {lesson.targetKeys.length > 0 && (
+                            <div className="flex items-center gap-1.5 flex-wrap mb-3">
+                              <span className="text-[10px] font-bold text-slate-400">Focus Keys:</span>
+                              {lesson.targetKeys.map((k) => (
+                                <span
+                                  key={k}
+                                  className="px-1.5 py-0.2 rounded bg-sky-50 dark:bg-sky-950/60 font-mono text-[10px] font-black text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800"
+                                >
+                                  {k === ' ' ? 'Space' : k.toUpperCase()}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Content Snippet Preview */}
+                          {lesson.content && (
+                            <div className="p-2 rounded-xl bg-slate-950 text-white font-mono text-xs text-center truncate mb-4 border border-slate-800">
+                              {lesson.content}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                          <span className="text-[11px] font-bold text-slate-400">
+                            Passing: {lesson.passingAccuracy || 90}%
+                          </span>
+
+                          <button
+                            type="button"
+                            id={`assign-learn-step-${lesson.id}`}
+                            onClick={() => handleAssignLearnLesson(lesson, currentChapter.title)}
+                            className={`py-2 px-3 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                              isLessonActive
+                                ? 'bg-emerald-600 text-white shadow-xs'
+                                : 'bg-sky-600 hover:bg-sky-700 text-white shadow-md shadow-sky-600/20'
+                            }`}
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                            <span>{isLessonActive ? 'Assigned' : 'Assign Step'}</span>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       )}
 

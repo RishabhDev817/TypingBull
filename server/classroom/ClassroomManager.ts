@@ -252,6 +252,10 @@ export class ClassroomManager {
       room.settings.assignmentCategory = newSettings.assignmentCategory;
     }
 
+    if (newSettings.targetKeys && Array.isArray(newSettings.targetKeys)) {
+      room.settings.targetKeys = newSettings.targetKeys.slice(0, 20);
+    }
+
     if (newSettings.targetText && typeof newSettings.targetText === 'string') {
       room.settings.targetText = newSettings.targetText.slice(0, 5000);
     }

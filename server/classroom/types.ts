@@ -20,6 +20,7 @@ export interface ClassroomSettings {
   lessonId?: string;
   gameId?: 'lilypad-leap' | 'neon-velocity';
   assignmentCategory?: string;
+  targetKeys?: string[];
 }
 
 export interface ClassroomStudent {
