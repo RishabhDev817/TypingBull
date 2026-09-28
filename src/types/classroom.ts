@@ -8,9 +8,12 @@ export type SocketStatus = 'CONNECTING' | 'CONNECTED' | 'DISCONNECTED' | 'RECONN
 export type ClassroomRole = 'teacher' | 'student';
 
 export type ClassroomActivityType = 'practice' | 'lesson' | 'game';
+export type ClassroomSessionType = 'passage' | 'curriculum' | 'game';
 
 export interface ClassroomSettings {
   activityType: ClassroomActivityType;
+  session_type?: ClassroomSessionType;
+  lesson_id?: number | string;
   passageId: string;
   passageTitle: string;
   targetText: string;

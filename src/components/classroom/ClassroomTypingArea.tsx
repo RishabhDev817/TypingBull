@@ -2,13 +2,15 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Clock, Zap, Target, CheckCircle2 } from 'lucide-react';
 import { soundEngine } from '../../utils/audio';
-import type { StudentProgressUpdate, StudentFinishPayload } from '../../types/classroom';
+import { KeyboardDiagram } from '../keyboard/KeyboardDiagram';
+import type { StudentProgressUpdate, StudentFinishPayload, ClassroomSessionType } from '../../types/classroom';
 
 interface Props {
   targetText: string;
   passageTitle: string;
   sessionStartAt: number;
   sessionEndAt: number;
+  session_type?: ClassroomSessionType;
   targetKeys?: string[];
   assignmentCategory?: string;
   onProgressUpdate: (update: StudentProgressUpdate) => void;
@@ -20,6 +22,7 @@ export const ClassroomTypingArea: React.FC<Props> = ({
   passageTitle,
   sessionStartAt,
   sessionEndAt,
+  session_type,
   targetKeys,
   assignmentCategory,
   onProgressUpdate,
@@ -38,6 +41,7 @@ export const ClassroomTypingArea: React.FC<Props> = ({
   const activeCharRef = useRef<HTMLSpanElement>(null);
   const isFinishedRef = useRef<boolean>(false);
 
+  const isCurriculum = session_type === 'curriculum' || assignmentCategory === 'learn-curriculum';
   const safeTargetText = targetText || 'The morning sun rose gently over the emerald hills.';
   const totalChars = safeTargetText.length;
 
@@ -209,15 +213,15 @@ export const ClassroomTypingArea: React.FC<Props> = ({
         <div>
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
-              {assignmentCategory === 'learn-curriculum'
-                ? 'Step-by-Step Curriculum'
+              {isCurriculum
+                ? 'Skill Drill • Learn Curriculum'
                 : assignmentCategory === 'homerow'
                 ? 'Home Row Drill'
                 : 'Classroom Exercise'}
             </span>
-            {assignmentCategory === 'learn-curriculum' && (
-              <span className="px-2 py-0.5 rounded-md bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-mono text-[9px] font-black uppercase border border-sky-200 dark:border-sky-800">
-                Learn Section
+            {isCurriculum && (
+              <span className="px-2.5 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono text-[9px] font-black uppercase border border-blue-200 dark:border-blue-800 flex items-center gap-1">
+                <span>Learn Module</span>
               </span>
             )}
           </div>
@@ -226,11 +230,11 @@ export const ClassroomTypingArea: React.FC<Props> = ({
           </h2>
           {targetKeys && targetKeys.length > 0 && (
             <div className="flex items-center gap-1.5 flex-wrap mt-2">
-              <span className="text-[10px] font-bold text-slate-400">Target Keys:</span>
+              <span className="text-[10px] font-bold text-slate-400">Target Focus Keys:</span>
               {targetKeys.map((k) => (
                 <span
                   key={k}
-                  className="px-2 py-0.5 rounded-md bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-mono text-xs font-black border border-sky-300 dark:border-sky-800 shadow-xs"
+                  className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono text-xs font-black border border-blue-300 dark:border-blue-800 shadow-xs"
                 >
                   {k === ' ' ? 'Space' : k.toUpperCase()}
                 </span>
@@ -334,6 +338,38 @@ export const ClassroomTypingArea: React.FC<Props> = ({
           );
         })}
       </div>
+
+      {/* 1:1 Interactive Virtual Keyboard (When Curriculum Session is Active) */}
+      {isCurriculum && (
+        <div className="mt-4 p-4 rounded-3xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
+          <div className="flex items-center justify-between mb-2 px-2">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-ping" />
+              <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                1:1 Interactive Key Guide
+              </span>
+            </div>
+            <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
+              <span>Next Key:</span>
+              <kbd className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 font-mono font-black text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-800 shadow-xs">
+                {safeTargetText[userInput.length] === ' '
+                  ? 'SPACE'
+                  : (safeTargetText[userInput.length] || '').toUpperCase()}
+              </kbd>
+            </div>
+          </div>
+
+          <div className="w-full flex justify-center overflow-x-auto py-2">
+            <KeyboardDiagram
+              highlightKeys={targetKeys && targetKeys.length > 0 ? targetKeys : []}
+              activeKey={safeTargetText[userInput.length] || ''}
+              compact={false}
+              showHandShadows={true}
+              showHandsOverlay={false}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Early Finished Overlay / Notice */}
       {isFinished && (

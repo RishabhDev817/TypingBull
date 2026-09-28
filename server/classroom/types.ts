@@ -8,9 +8,12 @@ export type ClassroomStatus = 'WAITING' | 'STARTING' | 'ACTIVE' | 'FINISHED' | '
 export type StudentStatus = 'NOT_READY' | 'READY' | 'TYPING' | 'FINISHED' | 'DISCONNECTED';
 
 export type ClassroomActivityType = 'practice' | 'lesson' | 'game';
+export type ClassroomSessionType = 'passage' | 'curriculum' | 'game';
 
 export interface ClassroomSettings {
   activityType: ClassroomActivityType;
+  session_type?: ClassroomSessionType;
+  lesson_id?: number | string;
   passageId: string;
   passageTitle: string;
   targetText: string;

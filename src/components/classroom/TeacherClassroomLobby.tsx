@@ -23,6 +23,7 @@ import {
 import type { ClassroomRoomView, ClassroomSettings } from '../../types/classroom';
 import { Mascot } from '../Mascot';
 import { ClassroomEndModal } from './ClassroomEndModal';
+import { ClassroomTargetSelectorModal } from './ClassroomTargetSelectorModal';
 import { CLASSROOM_LESSONS, type ClassroomLesson } from '../../data/classroom/classroomLessons';
 import { CHAPTERS } from '../../data/curriculum';
 import { getLessonsForChapter, type LessonDef } from '../../data/lessonData';
@@ -150,6 +151,7 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
   const [copiedLink, setCopiedLink] = useState(false);
   const [showEndModal, setShowEndModal] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
+  const [showTargetSelectorModal, setShowTargetSelectorModal] = useState(false);
 
   const joinUrl = `${window.location.origin}/classroom?code=${room.code}`;
 
@@ -172,6 +174,7 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
     lessonId?: string
   ) => {
     onUpdateSettings({
+      session_type: 'curriculum',
       activityType: 'lesson',
       passageId: lessonId || `lesson-custom-${Date.now()}`,
       passageTitle: title,
@@ -186,13 +189,15 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
   const handleAssignLearnLesson = useCallback(
     (lesson: LessonDef, chapterTitle: string) => {
       onUpdateSettings({
+        session_type: 'curriculum',
         activityType: 'lesson',
+        lesson_id: lesson.id,
         lessonId: `learn-${lesson.id}`,
         passageId: `learn-lesson-${lesson.id}`,
-        passageTitle: `Learn Step ${lesson.id}: ${lesson.title} (${chapterTitle})`,
+        passageTitle: `Step ${lesson.id}: ${lesson.title} (${chapterTitle})`,
         targetText: lesson.content || 'Practice typing drill',
         assignmentCategory: 'learn-curriculum',
-        targetKeys: lesson.targetKeys,
+        targetKeys: lesson.targetKeys || [],
         durationSeconds: room.settings.durationSeconds || 180,
       });
       setActiveTab('overview');
@@ -200,8 +205,27 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
     [onUpdateSettings, room.settings.durationSeconds]
   );
 
+  const handleAssignPassage = useCallback(
+    (passage: (typeof PASSAGE_OPTIONS)[number]) => {
+      onUpdateSettings({
+        session_type: 'passage',
+        activityType: 'practice',
+        lesson_id: undefined,
+        lessonId: undefined,
+        passageId: passage.id,
+        passageTitle: passage.title,
+        targetText: passage.text,
+        assignmentCategory: 'passage',
+        targetKeys: [],
+      });
+      setActiveTab('overview');
+    },
+    [onUpdateSettings]
+  );
+
   const handleAssignGameToClassroom = useCallback((game: (typeof CLASSROOM_GAMES)[number]) => {
     onUpdateSettings({
+      session_type: 'game',
       activityType: 'game',
       gameId: game.gameId,
       passageId: game.id,
@@ -209,6 +233,7 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
       targetText: `Classroom Arcade Challenge: ${game.title}`,
       assignmentCategory: 'game',
       durationSeconds: game.duration,
+      targetKeys: [],
     });
     setActiveTab('overview');
   }, [onUpdateSettings]);
@@ -374,47 +399,31 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => setActiveTab('learn')}
-                    className="text-xs font-black text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+                    id="teacher-open-target-modal-btn"
+                    onClick={() => setShowTargetSelectorModal(true)}
+                    className="px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 text-xs font-black flex items-center gap-1.5 transition cursor-pointer shadow-xs"
                   >
-                    Browse Learn (685)
-                  </button>
-                  <span className="text-slate-300 dark:text-slate-700">•</span>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('lessons')}
-                    className="text-xs font-black text-primary hover:underline cursor-pointer"
-                  >
-                    Change Target
+                    <BookOpen className="w-3.5 h-3.5" />
+                    <span>Change Target</span>
                   </button>
                 </div>
               </div>
 
               <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 mb-4">
                 <div className="flex items-center gap-2 mb-2 flex-wrap">
-                  {room.settings.activityType === 'game' ? (
-                    <span className="px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-mono text-[10px] font-black uppercase flex items-center gap-1">
-                      <Gamepad2 className="w-3 h-3" />
+                  {room.settings.session_type === 'curriculum' || room.settings.assignmentCategory === 'learn-curriculum' ? (
+                    <span className="px-2.5 py-1 rounded-lg bg-blue-600 text-white font-mono text-[10px] font-black uppercase flex items-center gap-1.5 shadow-sm shadow-blue-500/20">
+                      <BookOpen className="w-3.5 h-3.5" />
+                      <span>Skill Drill • Learn Module</span>
+                    </span>
+                  ) : room.settings.session_type === 'game' || room.settings.activityType === 'game' ? (
+                    <span className="px-2.5 py-1 rounded-lg bg-purple-600 text-white font-mono text-[10px] font-black uppercase flex items-center gap-1.5 shadow-sm shadow-purple-500/20">
+                      <Gamepad2 className="w-3.5 h-3.5" />
                       <span>Classroom Arcade Game</span>
                     </span>
-                  ) : room.settings.assignmentCategory === 'learn-curriculum' ? (
-                    <span className="px-2 py-0.5 rounded-md bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-mono text-[10px] font-black uppercase flex items-center gap-1">
-                      <BookOpen className="w-3 h-3" />
-                      <span>Learn Section • Step-by-Step Curriculum</span>
-                    </span>
-                  ) : room.settings.assignmentCategory === 'homerow' || room.settings.passageTitle?.toLowerCase().includes('homerow') || room.settings.passageTitle?.toLowerCase().includes('home row') ? (
-                    <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-mono text-[10px] font-black uppercase flex items-center gap-1">
-                      <Keyboard className="w-3 h-3" />
-                      <span>Home Row Practice Drill</span>
-                    </span>
-                  ) : room.settings.activityType === 'lesson' ? (
-                    <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono text-[10px] font-black uppercase flex items-center gap-1">
-                      <GraduationCap className="w-3 h-3" />
-                      <span>Classroom Curriculum Lesson</span>
-                    </span>
                   ) : (
-                    <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 font-mono text-[10px] font-black uppercase flex items-center gap-1">
-                      <FileText className="w-3 h-3" />
+                    <span className="px-2.5 py-1 rounded-lg bg-amber-500 text-white font-mono text-[10px] font-black uppercase flex items-center gap-1.5 shadow-sm shadow-amber-500/20">
+                      <FileText className="w-3.5 h-3.5" />
                       <span>Synchronized Passage</span>
                     </span>
                   )}
@@ -424,25 +433,45 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
                   {room.settings.passageTitle}
                 </div>
 
-                {room.settings.targetKeys && room.settings.targetKeys.length > 0 && (
-                  <div className="flex items-center gap-1.5 my-2 flex-wrap">
-                    <span className="text-[10px] font-bold text-slate-400">Target Focus Keys:</span>
-                    {room.settings.targetKeys.map((k) => (
-                      <span
-                        key={k}
-                        className="px-1.5 py-0.2 rounded bg-sky-100 dark:bg-sky-900/60 font-mono text-xs font-black text-sky-700 dark:text-sky-300 border border-sky-300 dark:border-sky-700"
-                      >
-                        {k === ' ' ? 'Space' : k.toUpperCase()}
+                {/* Dynamic Preview Area */}
+                {room.settings.session_type === 'curriculum' || room.settings.assignmentCategory === 'learn-curriculum' ? (
+                  <div className="p-3.5 rounded-2xl bg-blue-50/80 dark:bg-blue-950/40 border-2 border-blue-200 dark:border-blue-800/80 space-y-2.5 mt-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-black uppercase tracking-wider text-blue-800 dark:text-blue-300">
+                        Target Keys Being Taught:
                       </span>
-                    ))}
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200">
+                        {room.settings.lesson_id ? `Step ${room.settings.lesson_id}` : 'Interactive Drill'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {(room.settings.targetKeys && room.settings.targetKeys.length > 0
+                        ? room.settings.targetKeys
+                        : ['f', 'j']
+                      ).map((k) => (
+                        <span
+                          key={k}
+                          className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border-2 border-blue-400 dark:border-blue-600 font-mono font-black text-sm text-blue-700 dark:text-blue-300 shadow-sm"
+                        >
+                          {k === ' ' ? 'SPACE' : k.toUpperCase()}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 truncate">
+                      Drill Prompt: {room.settings.targetText}
+                    </div>
+                  </div>
+                ) : room.settings.session_type === 'game' || room.settings.activityType === 'game' ? (
+                  <div className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 italic mt-2">
+                    All connected students will play this live arcade typing game synchronously in the classroom.
+                  </div>
+                ) : (
+                  <div className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 italic mt-2">
+                    "{room.settings.targetText}"
                   </div>
                 )}
-
-                <div className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 italic">
-                  {room.settings.activityType === 'game'
-                    ? 'All connected students will play this live arcade typing game synchronously in the classroom.'
-                    : `"${room.settings.targetText}"`}
-                </div>
               </div>
 
               {/* Duration Selector */}
@@ -1268,6 +1297,18 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
           setShowEndModal(false);
           onEndClassroom();
         }}
+      />
+
+      {/* Target Assignment Selector Modal */}
+      <ClassroomTargetSelectorModal
+        isOpen={showTargetSelectorModal}
+        onClose={() => setShowTargetSelectorModal(false)}
+        currentSettings={room.settings}
+        passages={PASSAGE_OPTIONS}
+        games={CLASSROOM_GAMES}
+        onAssignCurriculumLesson={handleAssignLearnLesson}
+        onAssignPassage={handleAssignPassage}
+        onAssignGame={handleAssignGameToClassroom}
       />
     </div>
   );

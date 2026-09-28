@@ -104,6 +104,7 @@ export class ClassroomManager {
 
     const defaultSettings: ClassroomSettings = {
       activityType: 'practice',
+      session_type: 'passage',
       passageId: defaultPassage.id,
       passageTitle: defaultPassage.title,
       targetText: defaultPassage.text,
@@ -238,6 +239,14 @@ export class ClassroomManager {
 
     if (newSettings.activityType && ['practice', 'lesson', 'game'].includes(newSettings.activityType)) {
       room.settings.activityType = newSettings.activityType;
+    }
+
+    if (newSettings.session_type && ['passage', 'curriculum', 'game'].includes(newSettings.session_type)) {
+      room.settings.session_type = newSettings.session_type;
+    }
+
+    if (newSettings.lesson_id !== undefined) {
+      room.settings.lesson_id = newSettings.lesson_id;
     }
 
     if (newSettings.gameId !== undefined) {
