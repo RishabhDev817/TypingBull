@@ -127,7 +127,7 @@ export const ContactPage: React.FC = () => {
 
                 <div className="space-y-3 text-xs sm:text-sm">
                   <div className="p-3.5 rounded-2xl bg-slate-100/80 dark:bg-slate-700/50 border border-slate-200/80 dark:border-slate-600/60">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-400 block mb-0.5">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-400 block mb-0.5">
                       {t.supportLabel}
                     </span>
                     <a
@@ -139,7 +139,7 @@ export const ContactPage: React.FC = () => {
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-slate-100/80 dark:bg-slate-700/50 border border-slate-200/80 dark:border-slate-600/60">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-pink-600 dark:text-pink-400 block mb-0.5">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-pink-600 dark:text-pink-400 block mb-0.5">
                       {t.feedbackLabel}
                     </span>
                     <a
@@ -151,7 +151,7 @@ export const ContactPage: React.FC = () => {
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-slate-100/80 dark:bg-slate-700/50 border border-slate-200/80 dark:border-slate-600/60">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block mb-0.5">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block mb-0.5">
                       {t.privacyLabel}
                     </span>
                     <a

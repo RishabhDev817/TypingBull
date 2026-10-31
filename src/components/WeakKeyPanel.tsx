@@ -75,7 +75,7 @@ export const WeakKeyPanel: React.FC<WeakKeyPanelProps> = ({
                       }}
                     />
                   </div>
-                  <span className="text-[10px] font-extrabold w-8 text-right shrink-0" style={{ color: errorRate > 0.3 ? '#E53935' : '#FF9800' }}>
+                  <span className="text-[11px] font-extrabold w-8 text-right shrink-0" style={{ color: errorRate > 0.3 ? '#E53935' : '#FF9800' }}>
                     {Math.round(errorRate * 100)}%
                   </span>
                 </div>
@@ -88,7 +88,7 @@ export const WeakKeyPanel: React.FC<WeakKeyPanelProps> = ({
           <div className="mb-2 shrink-0">
             <div className="flex items-center gap-1.5 mb-1">
               <AlertTriangle className="w-3 h-3 text-orange" />
-              <span className="text-[10px] font-extrabold text-orange uppercase tracking-wider">{weakKeyUi.trickyCombos}</span>
+              <span className="text-[11px] font-extrabold text-orange uppercase tracking-wider">{weakKeyUi.trickyCombos}</span>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {recommendation.weakBigrams
@@ -97,7 +97,7 @@ export const WeakKeyPanel: React.FC<WeakKeyPanelProps> = ({
                 .map(({ bigram, errorRate }) => (
                   <span
                     key={bigram}
-                    className="px-2 py-0.5 text-[10px] font-bold rounded-lg"
+                    className="px-2 py-0.5 text-[11px] font-bold rounded-lg"
                     style={{
                       background: 'var(--color-badge-bg-orange)',
                       color: 'var(--color-ink)',

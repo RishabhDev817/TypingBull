@@ -1,3 +1,4 @@
+import { TOTAL_LESSONS } from '../../data/lessons/index';
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -262,7 +263,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
           <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0 bg-slate-50/70 dark:bg-slate-900/70">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 font-mono text-[10px] font-black uppercase tracking-wider">
+                <span className="px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 font-mono text-[11px] font-black uppercase tracking-wider">
                   Lesson & Target Selector
                 </span>
                 <span className="text-xs text-slate-500 dark:text-slate-400">• Multi-Lesson Queue Enabled</span>
@@ -304,13 +305,13 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                 <BookOpen className="w-4 h-4" />
                 <span>Learn Curriculum</span>
                 <span
-                  className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-black ${
+                  className={`text-[11px] font-mono px-2 py-0.5 rounded-full font-black ${
                     activeCategory === 'curriculum'
                       ? 'bg-white/20 text-white'
                       : 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300'
                   }`}
                 >
-                  685 Steps
+                  {TOTAL_LESSONS} Steps
                 </span>
               </button>
 
@@ -332,7 +333,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                 <FileText className="w-4 h-4" />
                 <span>Practice Passages</span>
                 <span
-                  className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-black ${
+                  className={`text-[11px] font-mono px-2 py-0.5 rounded-full font-black ${
                     activeCategory === 'passages'
                       ? 'bg-white/20 text-white'
                       : 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'
@@ -360,7 +361,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                 <Gamepad2 className="w-4 h-4" />
                 <span>Arcade Games</span>
                 <span
-                  className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-black ${
+                  className={`text-[11px] font-mono px-2 py-0.5 rounded-full font-black ${
                     activeCategory === 'games'
                       ? 'bg-white/20 text-white'
                       : 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
@@ -385,7 +386,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                     </div>
                     <div>
                       <h4 className="text-sm font-black text-slate-900 dark:text-white">
-                        Learn Curriculum (685 Steps)
+                        Learn Curriculum ({TOTAL_LESSONS} Steps)
                       </h4>
                       <p className="text-xs text-slate-600 dark:text-slate-300 font-medium">
                         Click &ldquo;+ Add to Queue&rdquo; on any lesson to build a multi-lesson sequence for your class.
@@ -411,7 +412,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                   <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-blue-500/10 border-2 border-emerald-400/60 dark:border-emerald-500/40 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="space-y-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="px-2.5 py-0.5 rounded-md bg-emerald-600 text-white font-mono text-[10px] font-black uppercase tracking-wider shadow-xs flex items-center gap-1">
+                        <span className="px-2.5 py-0.5 rounded-md bg-emerald-600 text-white font-mono text-[11px] font-black uppercase tracking-wider shadow-xs flex items-center gap-1">
                           <Sparkles className="w-3 h-3" />
                           <span>Recommended Next Lesson</span>
                         </span>
@@ -481,7 +482,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                           <span>{ch.icon}</span>
                           <span>{ch.title}</span>
                           <span
-                            className={`text-[10px] font-mono px-1.5 py-0.2 rounded-md ${
+                            className={`text-[11px] font-mono px-1.5 py-0.2 rounded-md ${
                               isSelected
                                 ? 'bg-white/20 text-white'
                                 : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
@@ -537,15 +538,15 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                               {/* Status Tag */}
                               <div>
                                 {isQueued ? (
-                                  <span className="px-2 py-0.5 rounded-md bg-emerald-600 text-white text-[10px] font-black uppercase">
+                                  <span className="px-2 py-0.5 rounded-md bg-emerald-600 text-white text-[11px] font-black uppercase">
                                     ✓ Queued (#{queueIndex + 1})
                                   </span>
                                 ) : isCurrentlyActive ? (
-                                  <span className="px-2 py-0.5 rounded-md bg-blue-600 text-white text-[10px] font-black uppercase">
+                                  <span className="px-2 py-0.5 rounded-md bg-blue-600 text-white text-[11px] font-black uppercase">
                                     → Active
                                   </span>
                                 ) : (
-                                  <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase">
+                                  <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase">
                                     {lesson.type}
                                   </span>
                                 )}
@@ -562,11 +563,11 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                             {/* Target Keys */}
                             {lesson.targetKeys && lesson.targetKeys.length > 0 && (
                               <div className="flex items-center gap-1 flex-wrap mb-2.5">
-                                <span className="text-[10px] font-bold text-slate-400">Keys:</span>
+                                <span className="text-[11px] font-bold text-slate-400">Keys:</span>
                                 {lesson.targetKeys.map((k) => (
                                   <span
                                     key={k}
-                                    className="px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/60 font-mono text-[10px] font-black text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
+                                    className="px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/60 font-mono text-[11px] font-black text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
                                   >
                                     {k === ' ' ? 'Space' : k.toUpperCase()}
                                   </span>
@@ -675,7 +676,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                       >
                         <div>
                           <div className="flex items-center justify-between mb-2">
-                            <span className="px-2.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-[10px] font-black uppercase">
+                            <span className="px-2.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-[11px] font-black uppercase">
                               {passage.category}
                             </span>
                             <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
@@ -953,7 +954,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                   </h4>
                   <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 text-left text-xs font-semibold space-y-2 border border-slate-200 dark:border-slate-700">
                     <div>
-                      <span className="text-slate-500 text-[10px] uppercase font-bold block">
+                      <span className="text-slate-500 text-[11px] uppercase font-bold block">
                         Current assignment:
                       </span>
                       <span className="text-slate-700 dark:text-slate-200 font-bold block truncate">
@@ -961,7 +962,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                       </span>
                     </div>
                     <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
-                      <span className="text-slate-500 text-[10px] uppercase font-bold block">
+                      <span className="text-slate-500 text-[11px] uppercase font-bold block">
                         Replace with:
                       </span>
                       <span className="text-blue-600 dark:text-blue-400 font-black block">

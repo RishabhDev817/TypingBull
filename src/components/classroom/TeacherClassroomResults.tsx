@@ -48,7 +48,7 @@ export const TeacherClassroomResults: React.FC<Props> = ({
               <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
                 Lesson Complete 🎉
               </h2>
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-[10px] font-black uppercase">
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-[11px] font-black uppercase">
                 {results.completedCount}/{results.totalStudents} Completed
               </span>
             </div>
@@ -94,7 +94,7 @@ export const TeacherClassroomResults: React.FC<Props> = ({
       {/* Teacher Next Lesson Control Banner (Prominent Action) */}
       <div className="p-6 rounded-3xl bg-gradient-to-r from-blue-500/15 via-indigo-500/10 to-teal-500/10 border-2 border-blue-400/50 dark:border-blue-500/40 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <span className="text-[10px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400 block mb-1">
+          <span className="text-[11px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400 block mb-1">
             Next Lesson Recommendation
           </span>
           <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
@@ -144,7 +144,7 @@ export const TeacherClassroomResults: React.FC<Props> = ({
       {/* Class Overview Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 shadow-md text-center">
-          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
+          <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
             Class Average Speed
           </span>
           <div className="flex items-center justify-center gap-2">
@@ -156,7 +156,7 @@ export const TeacherClassroomResults: React.FC<Props> = ({
         </div>
 
         <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 shadow-md text-center">
-          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
+          <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
             Class Average Accuracy
           </span>
           <div className="flex items-center justify-center gap-2">
@@ -168,7 +168,7 @@ export const TeacherClassroomResults: React.FC<Props> = ({
         </div>
 
         <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 shadow-md text-center">
-          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
+          <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
             Classroom Completion
           </span>
           <div className="flex items-center justify-center gap-2">
@@ -307,7 +307,7 @@ export const TeacherClassroomResults: React.FC<Props> = ({
 
                 <div className="flex items-center gap-6 text-right">
                   <div>
-                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                       Speed
                     </span>
                     <span className="font-mono text-base font-black text-blue-600 dark:text-blue-400">
@@ -316,7 +316,7 @@ export const TeacherClassroomResults: React.FC<Props> = ({
                   </div>
 
                   <div>
-                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                       Accuracy
                     </span>
                     <span className="font-mono text-base font-black text-emerald-600 dark:text-emerald-400">

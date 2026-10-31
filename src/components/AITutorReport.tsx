@@ -410,7 +410,7 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <span
-              className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider"
+              className="px-2 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider"
               style={{ background: sevInfo.bg, color: sevInfo.color, border: `1px solid ${sevInfo.border}` }}
             >
               {sevInfo.label}
@@ -621,7 +621,7 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
                 className="p-4 rounded-2xl mb-5 bg-white/75 dark:bg-slate-800/60 border border-slate-200/90 dark:border-slate-700/60 shadow-xs"
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                     <TrendingUp className="w-3.5 h-3.5 text-sky-500" />
                     {ui.wpmVsTarget}
                   </span>
@@ -647,7 +647,7 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
                 {report.averageWpm >= report.targetWpm && (
                   <div className="flex items-center gap-1.5 mt-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">{ui.targetReached}</span>
+                    <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">{ui.targetReached}</span>
                   </div>
                 )}
               </div>
@@ -695,7 +695,7 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
                   ].map(l => (
                     <div key={l.label} className="flex items-center gap-1.5">
                       <div className="w-3 h-3 rounded shadow-2xs" style={{ background: l.color, border: l.border }} />
-                      <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400">{l.label}</span>
+                      <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">{l.label}</span>
                     </div>
                   ))}
                 </div>
@@ -708,7 +708,7 @@ export const AITutorReport: React.FC<AITutorReportProps> = ({
                     <BarChart3 className="w-3.5 h-3.5 text-sky-500" />
                     {ui.typingStamina}
                     <span
-                      className="ml-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase"
+                      className="ml-1 px-2 py-0.5 rounded-full text-[10.5px] font-black uppercase"
                       style={{
                         color: STAMINA_COLORS[report.stamina.verdict],
                         background: `${STAMINA_COLORS[report.stamina.verdict]}20`,

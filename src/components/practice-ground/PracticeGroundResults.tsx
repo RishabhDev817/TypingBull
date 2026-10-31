@@ -123,19 +123,19 @@ export const PracticeGroundResults: React.FC<Props> = ({
 
           <div className="grid grid-cols-3 gap-3 w-full text-center">
             <div className="p-3 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 shadow-sm">
-              <span className="text-[10px] font-black uppercase text-slate-400 block">{t('multiplayer.rank')}</span>
+              <span className="text-[11px] font-black uppercase text-slate-400 block">{t('multiplayer.rank')}</span>
               <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400">
                 #{myResult.rank}
               </span>
             </div>
             <div className="p-3 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 shadow-sm">
-              <span className="text-[10px] font-black uppercase text-slate-400 block">{t('multiplayer.speed')}</span>
+              <span className="text-[11px] font-black uppercase text-slate-400 block">{t('multiplayer.speed')}</span>
               <span className="text-2xl font-black text-amber-500">
                 {myResult.wpm} <span className="text-xs font-bold">WPM</span>
               </span>
             </div>
             <div className="p-3 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 shadow-sm">
-              <span className="text-[10px] font-black uppercase text-slate-400 block">{t('multiplayer.accuracy')}</span>
+              <span className="text-[11px] font-black uppercase text-slate-400 block">{t('multiplayer.accuracy')}</span>
               <span className="text-2xl font-black text-emerald-500">
                 {myResult.accuracy}%
               </span>
@@ -184,12 +184,12 @@ export const PracticeGroundResults: React.FC<Props> = ({
                       {item.name}
                     </span>
                     {isMe && (
-                      <span className="px-1.5 py-0.2 rounded bg-emerald-500 text-white text-[9px] font-black uppercase">
+                      <span className="px-1.5 py-0.2 rounded bg-emerald-500 text-white text-[10.5px] font-black uppercase">
                         {t('multiplayer.you')}
                       </span>
                     )}
                   </div>
-                  <span className="text-[10px] font-bold text-slate-400">
+                  <span className="text-[11px] font-bold text-slate-400">
                     {item.finished ? formatDuration(item.durationSeconds) : t('multiplayer.didNotFinish')}
                   </span>
                 </div>
@@ -199,11 +199,11 @@ export const PracticeGroundResults: React.FC<Props> = ({
               <div className="flex items-center gap-3 sm:gap-5 font-mono font-black text-sm sm:text-base">
                 <div className="text-right">
                   <span className="text-amber-500 block leading-tight">{item.wpm} WPM</span>
-                  <span className="text-[10px] text-slate-400">{t('multiplayer.speed')}</span>
+                  <span className="text-[11px] text-slate-400">{t('multiplayer.speed')}</span>
                 </div>
                 <div className="text-right">
                   <span className="text-emerald-500 block leading-tight">{item.accuracy}%</span>
-                  <span className="text-[10px] text-slate-400">{t('multiplayer.accuracy')}</span>
+                  <span className="text-[11px] text-slate-400">{t('multiplayer.accuracy')}</span>
                 </div>
               </div>
             </motion.div>

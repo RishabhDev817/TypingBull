@@ -64,12 +64,12 @@ export const PracticeGroundRaceTrack: React.FC<Props> = ({
                     {player.name || 'Racer'}
                   </span>
                   {isMe && (
-                    <span className="px-1.5 py-0.2 rounded-md bg-emerald-500 text-white text-[9px] font-black uppercase">
+                    <span className="px-1.5 py-0.2 rounded-md bg-emerald-500 text-white text-[10.5px] font-black uppercase">
                       {t('multiplayer.you')}
                     </span>
                   )}
                   {isFinished && (
-                    <span className="px-2 py-0.2 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-400 text-[10px] font-black flex items-center gap-1">
+                    <span className="px-2 py-0.2 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-400 text-[11px] font-black flex items-center gap-1">
                       {t('multiplayer.finishedStatus')}
                     </span>
                   )}

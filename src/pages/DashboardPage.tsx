@@ -27,6 +27,18 @@ import { useI18n } from '../context/I18nContext';
 import { HomeSEOContent } from '../components/HomeSEOContent';
 import { usePageSEO } from '../hooks/usePageSEO';
 
+const FIRST_TEST_CTA: Record<string, string> = {
+  en: 'Take a 60-second test',
+  es: 'Haz una prueba de 60 s',
+  ja: '60秒テストに挑戦',
+  fr: 'Faire un test de 60 s',
+  de: '60-Sekunden-Test starten',
+  pt: 'Fazer um teste de 60 s',
+  ko: '60초 테스트 시작',
+  it: 'Fai un test di 60 s',
+  hi: '60 सेकंड का टेस्ट दें',
+};
+
 export const DashboardPage: React.FC = () => {
   const { currentLang, t } = useI18n();
   usePageSEO(currentLang);
@@ -61,15 +73,15 @@ export const DashboardPage: React.FC = () => {
       {/* Glassmorphism wrapper for dashboard content */}
       <div className="glass-panel rounded-2xl md:rounded-3xl p-5 sm:p-6 lg:p-8 flex-1 flex flex-col min-h-[calc(100vh-8rem)] min-h-[calc(100dvh-8rem)]">
         {/* Dashboard Main 2-Column Layout */}
-        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-stretch flex-1">
+        <div className="flex flex-col xl:flex-row gap-6 xl:gap-8 items-stretch flex-1">
           {/* Left Primary Content Area (Hero + Quick Actions + Analytics Row) */}
           <div className="flex-1 min-w-0 w-full flex flex-col justify-between">
             {/* 1. Hero / Welcome Banner */}
             <motion.div
               variants={itemVariants}
-              className="card-game card-halo-orange relative p-4 sm:p-5 flex items-center justify-between gap-4 mb-3.5"
+              className="card-game card-halo-orange relative p-4 sm:p-5 flex items-center justify-between gap-4 mb-3.5 min-w-0"
             >
-              <div className="flex items-center gap-4 z-10">
+              <div className="flex items-center gap-4 z-10 min-w-0">
                 <Mascot mood={streak.currentStreak > 0 ? 'happy' : 'idle'} size="md" />
                 <div>
                   <h1 className="text-xl sm:text-2xl font-extrabold text-ink leading-tight">
@@ -85,13 +97,13 @@ export const DashboardPage: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <WelcomeBannerIllustration className="hidden sm:flex" />
+              <WelcomeBannerIllustration className="hidden 2xl:flex" />
             </motion.div>
 
             {/* 2. Quick Actions (4 Cards) */}
             <motion.div
               variants={itemVariants}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3.5 items-stretch"
+              className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-3 mb-3.5 items-stretch"
             >
               {/* Continue Learning Card */}
               <motion.button
@@ -104,8 +116,8 @@ export const DashboardPage: React.FC = () => {
                   style={{ background: 'var(--color-badge-bg-emerald)', border: '1px solid var(--color-badge-border-emerald)' }}
                 >📚</div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-xs font-extrabold text-ink leading-tight">{t('dash.continueLearning')}</h3>
-                  <p className="text-[10.5px] text-body font-semibold leading-tight mt-0.5">
+                  <h3 className="text-sm font-extrabold text-ink leading-tight">{t('dash.continueLearning')}</h3>
+                  <p className="text-xs text-body font-semibold leading-snug mt-0.5">
                     {nextLesson ? `${t('dash.station')} ${nextLesson.id}: ${nextLesson.title}` : t('dash.allDone')}
                   </p>
                 </div>
@@ -118,20 +130,6 @@ export const DashboardPage: React.FC = () => {
 
               {/* Play Multiplayer Card with Floating Cloud Notification */}
               <div className="relative h-full flex flex-col">
-                {/* Floating "Cloud" Notification (Speech Bubble Callout) */}
-                <div
-                  className="absolute -top-10 sm:-top-11 left-1/2 -translate-x-1/2 z-30 pointer-events-none select-none flex flex-col items-center whitespace-nowrap"
-                  aria-hidden="true"
-                >
-                  <div className="animate-cloud-float flex flex-col items-center">
-                    <div className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 text-white text-[11px] sm:text-xs font-black tracking-wide shadow-xl shadow-rose-500/30 flex items-center gap-1.5 border border-white/40 backdrop-blur-md">
-                      <span>New! Come and play multiplayer! 🎮</span>
-                    </div>
-                    {/* Speech bubble pointer arrow */}
-                    <div className="w-0 h-0 border-x-[5px] border-x-transparent border-t-[6px] border-t-rose-500 -mt-[0.5px] drop-shadow-sm" />
-                  </div>
-                </div>
-
                 <motion.button
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.96 }}
@@ -143,12 +141,15 @@ export const DashboardPage: React.FC = () => {
                   >🏎️</div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <h3 className="text-xs font-extrabold text-ink leading-tight">{t('dash.playGame')}</h3>
-                      <span className="px-1.5 py-0.5 text-[8.5px] font-black uppercase tracking-wider rounded-full bg-emerald-500 text-slate-950 dark:text-slate-950 leading-none">
+                      <h3 className="text-sm font-extrabold text-ink leading-tight">{t('dash.playGame')}</h3>
+                      <span className="px-1.5 py-0.5 text-[11px] font-black uppercase tracking-wider rounded-full bg-emerald-500 text-slate-950 dark:text-slate-950 leading-none">
                         LIVE
                       </span>
+                      <span className="px-1.5 py-0.5 text-[11px] font-black uppercase tracking-wider rounded-full bg-gradient-to-r from-amber-500 to-rose-500 text-white leading-none">
+                        NEW
+                      </span>
                     </div>
-                    <p className="text-[10.5px] text-body font-semibold leading-tight mt-0.5">Multiplayer Speedway</p>
+                    <p className="text-xs text-body font-semibold leading-snug mt-0.5">Race real typists live</p>
                   </div>
                   <ArrowRight className="w-3.5 h-3.5 text-highlight-pink shrink-0" />
                   {/* Watermark illustration */}
@@ -169,8 +170,8 @@ export const DashboardPage: React.FC = () => {
                   style={{ background: 'var(--color-badge-bg-orange)', border: '1px solid var(--color-badge-border-orange)' }}
                 >⌨️</div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-xs font-extrabold text-ink leading-tight">{t('dash.quickPractice')}</h3>
-                  <p className="text-[10.5px] text-body font-semibold leading-tight mt-0.5">{t('dash.freeTypingTest')}</p>
+                  <h3 className="text-sm font-extrabold text-ink leading-tight">{t('dash.quickPractice')}</h3>
+                  <p className="text-xs text-body font-semibold leading-snug mt-0.5">{t('dash.freeTypingTest')}</p>
                 </div>
                 <ArrowRight className="w-3.5 h-3.5 text-orange shrink-0" />
                 {/* Watermark illustration */}
@@ -190,8 +191,8 @@ export const DashboardPage: React.FC = () => {
                   style={{ background: 'var(--color-badge-bg-purple)', border: '1px solid var(--color-badge-border-purple)' }}
                 >🤖</div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-xs font-extrabold text-ink leading-tight">{t('dash.aiTutor')}</h3>
-                  <p className="text-[10.5px] text-body font-semibold leading-tight mt-0.5">{t('dash.diagnoseWeak')}</p>
+                  <h3 className="text-sm font-extrabold text-ink leading-tight">{t('dash.aiTutor')}</h3>
+                  <p className="text-xs text-body font-semibold leading-snug mt-0.5">{t('dash.diagnoseWeak')}</p>
                 </div>
                 <Brain className="w-3.5 h-3.5 text-violet shrink-0" />
               </motion.button>
@@ -217,23 +218,31 @@ export const DashboardPage: React.FC = () => {
                             </span>
                             <div className="min-w-0">
                               <span className="text-xs font-bold text-ink block truncate">{session.modeDetail}</span>
-                              <span className="text-[10px] text-mute font-semibold block leading-none">
+                              <span className="text-[11px] text-body font-semibold block leading-none">
                                 {new Date(session.startTime).toLocaleDateString()}
                               </span>
                             </div>
                           </div>
                           <div className="text-right shrink-0 pl-2">
                             <span className="text-xs font-extrabold text-primary block leading-none">{session.wpm} WPM</span>
-                            <span className="text-[10px] text-body font-bold block leading-tight mt-0.5">{session.accuracy.toFixed(1)}%</span>
+                            <span className="text-[11px] text-body font-bold block leading-tight mt-0.5">{session.accuracy.toFixed(1)}%</span>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="flex-1 flex items-center justify-center py-4">
-                      <p className="text-xs text-body font-semibold">
+                    <div className="flex-1 flex flex-col items-center justify-center gap-3 py-4 text-center">
+                      <p className="text-sm text-body font-semibold">
                         {t('dash.noSessions')}
                       </p>
+                      <button
+                        type="button"
+                        onClick={() => { soundEngine.playPop(); navigate('/practice'); }}
+                        className="inline-flex items-center gap-2 min-h-11 px-5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 text-sm font-black shadow-lg cursor-pointer hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300"
+                      >
+                        <ArrowRight className="w-4 h-4" />
+                        {FIRST_TEST_CTA[currentLang] || FIRST_TEST_CTA.en}
+                      </button>
                     </div>
                   )}
                 </div>
@@ -251,7 +260,7 @@ export const DashboardPage: React.FC = () => {
           </div>
 
           {/* Right Sidebar: Clean Stat Overview Rail */}
-          <motion.div variants={itemVariants} className="w-full lg:w-48 shrink-0 flex flex-col items-center pt-0 pb-1 self-stretch justify-between relative z-30">
+          <motion.div variants={itemVariants} className="w-full xl:w-48 shrink-0 flex flex-col items-center pt-0 pb-1 self-stretch justify-between relative z-30">
             {/* Glassmorphic Utility Pill in column header flow */}
             <div className="mb-4 flex justify-center relative z-[100]">
               <FloatingControls showLabel={false} showLanguageSwitcher={true} />
@@ -262,25 +271,25 @@ export const DashboardPage: React.FC = () => {
               {t('dash.statOverview')}
             </div>
 
-            <div className="flex flex-col items-center justify-around w-full gap-2.5 flex-1 relative z-10">
+            <div className="flex flex-row flex-wrap xl:flex-col items-center justify-around w-full gap-3 flex-1 relative z-10">
               {/* 1. Streak Circle Card */}
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 style={{ borderRadius: '50%' }}
-                className="w-22 h-22 card-game card-halo-orange flex flex-col items-center justify-center p-1.5 text-center overflow-hidden shrink-0 shadow-md"
+                className="w-24 h-24 card-game card-halo-orange flex flex-col items-center justify-center p-1.5 text-center overflow-hidden shrink-0 shadow-md"
               >
                 <div className="w-6.5 h-6.5 rounded-full shrink-0 flex items-center justify-center overflow-hidden mb-0.5"
                   style={{ background: 'var(--color-badge-bg-orange)', border: '1px solid var(--color-badge-border-orange)' }}
                 >
                   <StreakIllustration />
                 </div>
-                <span className="text-[8.5px] font-extrabold text-orange uppercase tracking-wider flex items-center gap-0.5 leading-none mb-0.5">
+                <span className="text-[10.5px] font-extrabold text-orange uppercase tracking-wider flex items-center gap-0.5 leading-none mb-0.5">
                   <Flame className="w-2.5 h-2.5 text-orange" /> {t('dash.streak')}
                 </span>
                 <div className="flex items-baseline gap-0.5">
                   <span className="text-lg font-extrabold text-ink leading-none">{streak.currentStreak}</span>
-                  <span className="text-[8.5px] text-body font-bold">day{streak.currentStreak !== 1 ? 's' : ''}</span>
+                  <span className="text-[11px] text-body font-bold">day{streak.currentStreak !== 1 ? 's' : ''}</span>
                 </div>
               </motion.div>
 
@@ -289,19 +298,19 @@ export const DashboardPage: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 style={{ borderRadius: '50%' }}
-                className="w-22 h-22 card-game card-halo-gold flex flex-col items-center justify-center p-1.5 text-center overflow-hidden shrink-0 shadow-md"
+                className="w-24 h-24 card-game card-halo-gold flex flex-col items-center justify-center p-1.5 text-center overflow-hidden shrink-0 shadow-md"
               >
                 <div className="w-6.5 h-6.5 rounded-full shrink-0 flex items-center justify-center overflow-hidden mb-0.5"
                   style={{ background: 'var(--color-badge-bg-yellow)', border: '1px solid var(--color-badge-border-yellow)' }}
                 >
                   <StarsIllustration />
                 </div>
-                <span className="text-[8.5px] font-extrabold text-warning-deep uppercase tracking-wider flex items-center gap-0.5 leading-none mb-0.5">
+                <span className="text-[10.5px] font-extrabold text-warning-deep uppercase tracking-wider flex items-center gap-0.5 leading-none mb-0.5">
                   <Star className="w-2.5 h-2.5 text-warning fill-warning" /> {t('dash.stars')}
                 </span>
                 <div className="flex items-baseline gap-0.5">
                   <span className="text-lg font-extrabold text-ink leading-none">{totalStars}</span>
-                  <span className="text-[8.5px] text-body font-bold">/ {LESSONS.length * 3}</span>
+                  <span className="text-[11px] text-body font-bold">/ {LESSONS.length * 3}</span>
                 </div>
               </motion.div>
 
@@ -310,19 +319,19 @@ export const DashboardPage: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 style={{ borderRadius: '50%' }}
-                className="w-22 h-22 card-game card-halo-purple flex flex-col items-center justify-center p-1.5 text-center overflow-hidden shrink-0 shadow-md"
+                className="w-24 h-24 card-game card-halo-purple flex flex-col items-center justify-center p-1.5 text-center overflow-hidden shrink-0 shadow-md"
               >
                 <div className="w-6.5 h-6.5 rounded-full shrink-0 flex items-center justify-center overflow-hidden mb-0.5"
                   style={{ background: 'var(--color-badge-bg-purple)', border: '1px solid var(--color-badge-border-purple)' }}
                 >
                   <LessonsIllustration />
                 </div>
-                <span className="text-[8.5px] font-extrabold text-violet uppercase tracking-wider flex items-center gap-0.5 leading-none mb-0.5">
+                <span className="text-[10.5px] font-extrabold text-violet uppercase tracking-wider flex items-center gap-0.5 leading-none mb-0.5">
                   <BookOpen className="w-2.5 h-2.5 text-violet" /> {t('dash.lessons')}
                 </span>
                 <div className="flex items-baseline gap-0.5">
                   <span className="text-lg font-extrabold text-ink leading-none">{completedLessons}</span>
-                  <span className="text-[8.5px] text-body font-bold">/ {LESSONS.length}</span>
+                  <span className="text-[11px] text-body font-bold">/ {LESSONS.length}</span>
                 </div>
               </motion.div>
 
@@ -331,19 +340,19 @@ export const DashboardPage: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 style={{ borderRadius: '50%' }}
-                className="w-22 h-22 card-game card-halo-blue flex flex-col items-center justify-center p-1.5 text-center overflow-hidden shrink-0 shadow-md"
+                className="w-24 h-24 card-game card-halo-blue flex flex-col items-center justify-center p-1.5 text-center overflow-hidden shrink-0 shadow-md"
               >
                 <div className="w-6.5 h-6.5 rounded-full shrink-0 flex items-center justify-center overflow-hidden mb-0.5"
                   style={{ background: 'var(--color-badge-bg-blue)', border: '1px solid var(--color-badge-border-blue)' }}
                 >
                   <SessionsIllustration />
                 </div>
-                <span className="text-[8.5px] font-extrabold text-sky-blue uppercase tracking-wider flex items-center gap-0.5 leading-none mb-0.5">
+                <span className="text-[10.5px] font-extrabold text-sky-blue uppercase tracking-wider flex items-center gap-0.5 leading-none mb-0.5">
                   <TrendingUp className="w-2.5 h-2.5 text-sky-blue" /> {t('dash.sessions')}
                 </span>
                 <div className="flex items-baseline gap-0.5">
                   <span className="text-lg font-extrabold text-ink leading-none">{streak.totalSessions}</span>
-                  <span className="text-[8.5px] text-body font-bold">total</span>
+                  <span className="text-[11px] text-body font-bold">total</span>
                 </div>
               </motion.div>
             </div>

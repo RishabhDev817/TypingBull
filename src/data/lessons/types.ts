@@ -1,7 +1,7 @@
 /**
  * Lesson Type & Curriculum Type Definitions
  * ─────────────────────────────────────────
- * Supports 685 lessons organized into Sections → Chapters → Lessons.
+ * Supports 528 lessons organized into Sections → Chapters → Lessons.
  */
 
 /** Distinct lesson interaction types — each renders differently in the UI. */

@@ -1,3 +1,4 @@
+import { TOTAL_LESSONS } from '../data/lessons/index';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -296,18 +297,18 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                   {/* Floating Micro-Badge Toast Pill */}
                   <div className="absolute -top-3.5 right-6 z-20 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-[11px] shadow-lg shadow-orange-500/25 border border-white/20">
                     <Flame className="w-3.5 h-3.5 text-amber-100 animate-bounce" />
-                    <span>Over 12,000+ classroom races completed this week</span>
+                    <span>Free for teachers and students</span>
                   </div>
 
                   {/* Video Player Interface Mockup */}
                   <div className="relative rounded-2xl overflow-hidden border-2 border-slate-200/80 dark:border-slate-700/80 bg-slate-950 shadow-xl group mb-5">
                     {/* Top Bar Badges on Player */}
                     <div className="absolute top-3 left-3 right-3 z-20 flex items-center justify-between pointer-events-none">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900/85 backdrop-blur-md border border-slate-700/60 text-white text-[10px] font-black uppercase tracking-wider shadow-sm">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900/85 backdrop-blur-md border border-slate-700/60 text-white text-[11px] font-black uppercase tracking-wider shadow-sm">
                         <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
                         <span>TUTORIAL PREVIEW</span>
                       </span>
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-900/85 backdrop-blur-md border border-slate-700/60 text-slate-200 text-[10px] font-mono font-bold shadow-sm">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-900/85 backdrop-blur-md border border-slate-700/60 text-slate-200 text-[11px] font-mono font-bold shadow-sm">
                         <span>⏱️ 1:15 Mins</span>
                       </span>
                     </div>
@@ -333,11 +334,11 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                               <span className="text-xl">🏫</span>
                               <div>
                                 <div className="text-[11px] font-black text-white">Lab Room 102</div>
-                                <div className="text-[9px] text-slate-400">Teacher: Mrs. Harper</div>
+                                <div className="text-[10.5px] text-slate-400">Teacher: Mrs. Harper</div>
                               </div>
                             </div>
                             <div className="text-right">
-                              <div className="text-[9px] font-black text-emerald-400 uppercase">1-Click Room</div>
+                              <div className="text-[10.5px] font-black text-emerald-400 uppercase">1-Click Room</div>
                               <div className="font-mono text-sm font-black text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800/80">
                                 TB-4821
                               </div>
@@ -347,22 +348,22 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                           <div className="grid grid-cols-3 gap-2 text-center my-auto">
                             <div className="p-2 rounded-xl bg-slate-800/60 border border-slate-700 text-xs">
                               <span className="text-base block mb-0.5">🐂</span>
-                              <span className="text-[10px] font-extrabold text-white block truncate">Alex M.</span>
-                              <span className="text-[8px] font-bold text-emerald-400">Connected ✓</span>
+                              <span className="text-[11px] font-extrabold text-white block truncate">Alex M.</span>
+                              <span className="text-[10.5px] font-bold text-emerald-400">Connected ✓</span>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-800/60 border border-slate-700 text-xs">
                               <span className="text-base block mb-0.5">🐼</span>
-                              <span className="text-[10px] font-extrabold text-white block truncate">Maya S.</span>
-                              <span className="text-[8px] font-bold text-emerald-400">Connected ✓</span>
+                              <span className="text-[11px] font-extrabold text-white block truncate">Maya S.</span>
+                              <span className="text-[10.5px] font-bold text-emerald-400">Connected ✓</span>
                             </div>
                             <div className="p-2 rounded-xl bg-slate-800/60 border border-slate-700 text-xs">
                               <span className="text-base block mb-0.5">🦊</span>
-                              <span className="text-[10px] font-extrabold text-white block truncate">Liam T.</span>
-                              <span className="text-[8px] font-bold text-emerald-400">Connected ✓</span>
+                              <span className="text-[11px] font-extrabold text-white block truncate">Liam T.</span>
+                              <span className="text-[10.5px] font-bold text-emerald-400">Connected ✓</span>
                             </div>
                           </div>
 
-                          <div className="text-center text-[10px] text-slate-400 font-semibold bg-slate-900/60 py-1 rounded-lg">
+                          <div className="text-center text-[11px] text-slate-400 font-semibold bg-slate-900/60 py-1 rounded-lg">
                             Teachers launch room • Students join with 6-letter code
                           </div>
                         </motion.div>
@@ -382,10 +383,10 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                               <span className="text-lg">📚</span>
                               <div>
                                 <div className="text-[11px] font-black text-white">Morning in the Valley</div>
-                                <div className="text-[9px] text-teal-300">Curriculum Grade 6 • 120 Words</div>
+                                <div className="text-[10.5px] text-teal-300">Curriculum Grade 6 • 120 Words</div>
                               </div>
                             </div>
-                            <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded bg-teal-900/60 text-teal-300 border border-teal-700">
+                            <span className="text-[10.5px] font-black uppercase px-2 py-0.5 rounded bg-teal-900/60 text-teal-300 border border-teal-700">
                               Selected Drill
                             </span>
                           </div>
@@ -395,7 +396,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                             {' '}over the golden hills as students tuned their fingers...
                           </div>
 
-                          <div className="flex items-center justify-between text-[10px] text-slate-300 bg-slate-800/60 px-3 py-1.5 rounded-lg border border-slate-700">
+                          <div className="flex items-center justify-between text-[11px] text-slate-300 bg-slate-800/60 px-3 py-1.5 rounded-lg border border-slate-700">
                             <span>🎯 Target: 35+ WPM</span>
                             <span className="text-amber-400 font-bold">⚡ Zero-Error Challenge</span>
                           </div>
@@ -416,7 +417,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                             <div className="p-2 rounded-xl bg-slate-800/80 border border-slate-700/80 flex items-center gap-2">
                               <span className="text-sm">🐂</span>
                               <div className="flex-1">
-                                <div className="flex justify-between text-[10px] font-black text-white mb-1">
+                                <div className="flex justify-between text-[11px] font-black text-white mb-1">
                                   <span>Alex M. (Lead)</span>
                                   <span className="text-emerald-400 font-mono">52 WPM • 99%</span>
                                 </div>
@@ -430,7 +431,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                             <div className="p-2 rounded-xl bg-slate-800/80 border border-slate-700/80 flex items-center gap-2">
                               <span className="text-sm">🐼</span>
                               <div className="flex-1">
-                                <div className="flex justify-between text-[10px] font-black text-white mb-1">
+                                <div className="flex justify-between text-[11px] font-black text-white mb-1">
                                   <span>Maya S.</span>
                                   <span className="text-sky-400 font-mono">46 WPM • 98%</span>
                                 </div>
@@ -444,7 +445,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                             <div className="p-2 rounded-xl bg-slate-800/80 border border-slate-700/80 flex items-center gap-2">
                               <span className="text-sm">🦊</span>
                               <div className="flex-1">
-                                <div className="flex justify-between text-[10px] font-black text-white mb-1">
+                                <div className="flex justify-between text-[11px] font-black text-white mb-1">
                                   <span>Liam T.</span>
                                   <span className="text-amber-400 font-mono">44 WPM • 100%</span>
                                 </div>
@@ -455,7 +456,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-between text-[10px] text-emerald-400 font-bold bg-slate-900/80 px-3 py-1 rounded-lg">
+                          <div className="flex items-center justify-between text-[11px] text-emerald-400 font-bold bg-slate-900/80 px-3 py-1 rounded-lg">
                             <span>● Live Race Telemetry</span>
                             <span className="text-amber-300">🏆 Real-time Podium Sync</span>
                           </div>
@@ -483,7 +484,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                       </div>
 
                       {/* Bottom Player Bar Mockup */}
-                      <div className="absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-slate-950/90 to-transparent flex items-center px-4 justify-between text-slate-400 text-[10px] font-mono">
+                      <div className="absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-slate-950/90 to-transparent flex items-center px-4 justify-between text-slate-400 text-[11px] font-mono">
                         <div className="flex items-center gap-2">
                           <Play className="w-3 h-3 text-emerald-400 fill-emerald-400" />
                           <span>0:42 / 1:15</span>
@@ -524,7 +525,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                         <div className="text-xs font-black text-slate-900 dark:text-white mb-0.5 flex items-center justify-between">
                           <span>Launch or Enter Code</span>
                           {activeStepTab === 1 && (
-                            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">Active Preview</span>
+                            <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">Active Preview</span>
                           )}
                         </div>
                         <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-snug font-medium">
@@ -559,7 +560,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                         <div className="text-xs font-black text-slate-900 dark:text-white mb-0.5 flex items-center justify-between">
                           <span>Choose Text or Custom Drill</span>
                           {activeStepTab === 2 && (
-                            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">Active Preview</span>
+                            <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">Active Preview</span>
                           )}
                         </div>
                         <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-snug font-medium">
@@ -594,7 +595,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                         <div className="text-xs font-black text-slate-900 dark:text-white mb-0.5 flex items-center justify-between">
                           <span>Real-Time Race & Leaderboard</span>
                           {activeStepTab === 3 && (
-                            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">Active Preview</span>
+                            <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">Active Preview</span>
                           )}
                         </div>
                         <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-snug font-medium">
@@ -746,7 +747,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                     <div className="p-5 rounded-2xl bg-slate-900/90 border border-slate-700 shadow-xl max-w-md w-full text-left">
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-xs font-black text-white">Morning in the Valley</span>
-                        <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 text-[10px] font-bold">
+                        <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 text-[11px] font-bold">
                           Ready
                         </span>
                       </div>
@@ -804,15 +805,15 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                     <h4 className="text-lg font-black text-white">Race Complete!</h4>
                     <div className="grid grid-cols-3 gap-3 w-full max-w-md">
                       <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800">
-                        <div className="text-[10px] text-slate-400 font-bold">1st Place</div>
+                        <div className="text-[11px] text-slate-400 font-bold">1st Place</div>
                         <div className="text-xs font-black text-amber-400">Alex M. (54 WPM)</div>
                       </div>
                       <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800">
-                        <div className="text-[10px] text-slate-400 font-bold">Class Average</div>
+                        <div className="text-[11px] text-slate-400 font-bold">Class Average</div>
                         <div className="text-xs font-black text-emerald-400">47 WPM</div>
                       </div>
                       <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800">
-                        <div className="text-[10px] text-slate-400 font-bold">Accuracy</div>
+                        <div className="text-[11px] text-slate-400 font-bold">Accuracy</div>
                         <div className="text-xs font-black text-teal-400">98.6%</div>
                       </div>
                     </div>
@@ -1108,7 +1109,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                   <div className="w-full bg-orange-100 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden flex">
                     <div className="bg-gradient-to-r from-orange-500 to-amber-400 h-full w-[85%] rounded-full shadow-xs" />
                   </div>
-                  <div className="flex justify-between text-[10px] font-black text-slate-500 dark:text-slate-400">
+                  <div className="flex justify-between text-[11px] font-black text-slate-500 dark:text-slate-400">
                     <span>Target: 22+ WPM</span>
                     <span className="text-orange-600 dark:text-orange-400">99.4% Accuracy Goal</span>
                   </div>
@@ -1161,7 +1162,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-lg font-extrabold text-slate-900 dark:text-white">Teacher Track</h3>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-sky-200/80 dark:bg-sky-900/80 text-sky-900 dark:text-sky-200">
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase bg-sky-200/80 dark:bg-sky-900/80 text-sky-900 dark:text-sky-200">
                     Steps 1–3
                   </span>
                 </div>
@@ -1187,7 +1188,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                   <div className="w-9 h-9 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center shadow-xs">
                     01
                   </div>
-                  <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                  <span className="px-2 py-0.5 rounded-md text-[11px] font-black uppercase bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
                     Teacher Action
                   </span>
                 </div>
@@ -1199,7 +1200,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                   Select <strong className="text-slate-900 dark:text-white">Create Classroom</strong> on your desktop or classroom projector.
                 </p>
               </div>
-              <div className="mt-4 pt-2.5 border-t border-slate-100 dark:border-slate-700/60 text-[10px] font-bold text-slate-400 dark:text-slate-500">
+              <div className="mt-4 pt-2.5 border-t border-slate-100 dark:border-slate-700/60 text-[11px] font-bold text-slate-400 dark:text-slate-500">
                 Instant setup • No login required
               </div>
             </div>
@@ -1211,7 +1212,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                   <div className="w-9 h-9 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center shadow-xs">
                     02
                   </div>
-                  <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase bg-sky-50 dark:bg-sky-950/70 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
+                  <span className="px-2 py-0.5 rounded-md text-[11px] font-black uppercase bg-sky-50 dark:bg-sky-950/70 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
                     Instant Code
                   </span>
                 </div>
@@ -1225,7 +1226,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                   TypingBull automatically generates an easy-to-read 6-character room code.
                 </p>
               </div>
-              <div className="mt-4 pt-2.5 border-t border-slate-100 dark:border-slate-700/60 text-[10px] font-bold text-slate-400 dark:text-slate-500">
+              <div className="mt-4 pt-2.5 border-t border-slate-100 dark:border-slate-700/60 text-[11px] font-bold text-slate-400 dark:text-slate-500">
                 Identifies your in-memory room
               </div>
             </div>
@@ -1237,7 +1238,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                   <div className="w-9 h-9 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center shadow-xs">
                     03
                   </div>
-                  <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                  <span className="px-2 py-0.5 rounded-md text-[11px] font-black uppercase bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
                     Zero Friction
                   </span>
                 </div>
@@ -1249,7 +1250,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                   Project or write the code on the board. Students join directly without email invites.
                 </p>
               </div>
-              <div className="mt-4 pt-2.5 border-t border-slate-100 dark:border-slate-700/60 text-[10px] font-bold text-slate-400 dark:text-slate-500">
+              <div className="mt-4 pt-2.5 border-t border-slate-100 dark:border-slate-700/60 text-[11px] font-bold text-slate-400 dark:text-slate-500">
                 No email distribution or paper needed
               </div>
             </div>
@@ -1266,7 +1267,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-lg font-extrabold text-slate-900 dark:text-white">Student Track</h3>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-200/80 dark:bg-emerald-900/80 text-emerald-900 dark:text-emerald-200">
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase bg-emerald-200/80 dark:bg-emerald-900/80 text-emerald-900 dark:text-emerald-200">
                     Steps 4–6
                   </span>
                 </div>
@@ -1292,7 +1293,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                   <div className="w-9 h-9 rounded-full bg-emerald-600 text-white font-black text-sm flex items-center justify-center shadow-xs">
                     04
                   </div>
-                  <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                  <span className="px-2 py-0.5 rounded-md text-[11px] font-black uppercase bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                     Student Action
                   </span>
                 </div>
@@ -1304,7 +1305,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                   Students select <strong className="text-slate-900 dark:text-white">Join Classroom</strong>, type the code, pick an emoji avatar, and enter their name.
                 </p>
               </div>
-              <div className="mt-4 pt-2.5 border-t border-slate-100 dark:border-slate-700/60 text-[10px] font-bold text-slate-400 dark:text-slate-500">
+              <div className="mt-4 pt-2.5 border-t border-slate-100 dark:border-slate-700/60 text-[11px] font-bold text-slate-400 dark:text-slate-500">
                 Connected directly to teacher lobby
               </div>
             </div>
@@ -1316,7 +1317,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                   <div className="w-9 h-9 rounded-full bg-emerald-600 text-white font-black text-sm flex items-center justify-center shadow-xs">
                     05
                   </div>
-                  <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                  <span className="px-2 py-0.5 rounded-md text-[11px] font-black uppercase bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                     Instant Sync
                   </span>
                 </div>
@@ -1328,7 +1329,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                   Teacher selects the lesson or passage and clicks Start. An animated countdown plays across all student monitors.
                 </p>
               </div>
-              <div className="mt-4 pt-2.5 border-t border-slate-100 dark:border-slate-700/60 text-[10px] font-bold text-slate-400 dark:text-slate-500">
+              <div className="mt-4 pt-2.5 border-t border-slate-100 dark:border-slate-700/60 text-[11px] font-bold text-slate-400 dark:text-slate-500">
                 Everyone begins at the exact same second
               </div>
             </div>
@@ -1340,7 +1341,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                   <div className="w-9 h-9 rounded-full bg-emerald-600 text-white font-black text-sm flex items-center justify-center shadow-xs">
                     06
                   </div>
-                  <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                  <span className="px-2 py-0.5 rounded-md text-[11px] font-black uppercase bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                     Real-Time
                   </span>
                 </div>
@@ -1352,7 +1353,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                   Students type together with real-time telemetry. Class averages, ranks, and passing stars appear instantly.
                 </p>
               </div>
-              <div className="mt-4 pt-2.5 border-t border-slate-100 dark:border-slate-700/60 text-[10px] font-bold text-slate-400 dark:text-slate-500">
+              <div className="mt-4 pt-2.5 border-t border-slate-100 dark:border-slate-700/60 text-[11px] font-bold text-slate-400 dark:text-slate-500">
                 Shared celebrations & personal achievements
               </div>
             </div>
@@ -1385,10 +1386,10 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                 Teacher chooses a lesson
               </h3>
               <p className="text-xs text-mute font-medium leading-relaxed">
-                Browse the 685 progressive Learn steps (starting with tactile home keys FF, FJ, JF) and assign with one click.
+                Browse the {TOTAL_LESSONS} progressive Learn steps (starting with tactile home keys FF, FJ, JF) and assign with one click.
               </p>
             </div>
-            <div className="mt-3 text-[10px] font-bold text-blue-600 dark:text-blue-400">
+            <div className="mt-3 text-[11px] font-bold text-blue-600 dark:text-blue-400">
               One source of truth curriculum
             </div>
           </div>
@@ -1405,7 +1406,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                 Students enter the room code on desktop, tablet, or Chromebook. Zero accounts, logins, or tracking cookies required.
               </p>
             </div>
-            <div className="mt-3 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+            <div className="mt-3 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
               Zero login friction
             </div>
           </div>
@@ -1422,7 +1423,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                 Students practice the exact same repetitive keystrokes with interactive virtual keyboards, while the teacher tracks live completion.
               </p>
             </div>
-            <div className="mt-3 text-[10px] font-bold text-purple-600 dark:text-purple-400">
+            <div className="mt-3 text-[11px] font-bold text-purple-600 dark:text-purple-400">
               Live progress telemetry
             </div>
           </div>
@@ -1437,10 +1438,10 @@ export const ClassroomLandingPage: React.FC<Props> = ({
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono">
+                  <span className="px-2 py-0.5 rounded-md text-[11px] font-black uppercase bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono">
                     Step {lesson.id}
                   </span>
-                  <span className="text-[10px] font-bold text-mute uppercase">{lesson.type}</span>
+                  <span className="text-[11px] font-bold text-mute uppercase">{lesson.type}</span>
                 </div>
                 <h4 className="text-sm font-extrabold text-ink mb-1 flex items-center gap-1.5">
                   <span>{lesson.icon}</span>
@@ -1454,7 +1455,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                     {lesson.targetKeys.map((k) => (
                       <span
                         key={k}
-                        className="px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-700 font-mono text-[10px] font-bold text-slate-700 dark:text-slate-300"
+                        className="px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-700 font-mono text-[11px] font-bold text-slate-700 dark:text-slate-300"
                       >
                         {k === ' ' ? 'Space' : k.toUpperCase()}
                       </span>
@@ -1463,7 +1464,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                 )}
               </div>
 
-              <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-primary flex items-center justify-between">
+              <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] font-bold text-primary flex items-center justify-between">
                 <span>Pass: {lesson.passingAccuracy}% Acc</span>
                 <span className="text-slate-400 font-mono">Home Row</span>
               </div>
@@ -1480,32 +1481,32 @@ export const ClassroomLandingPage: React.FC<Props> = ({
             <div className="p-2.5 rounded-xl bg-white/90 dark:bg-slate-800/90 border border-purple-200 dark:border-purple-800">
               <span className="text-base block mb-1">📖</span>
               <span className="text-xs font-extrabold text-ink block">Concept</span>
-              <span className="text-[10px] text-mute font-semibold">Clear tactile rule</span>
+              <span className="text-[11px] text-mute font-semibold">Clear tactile rule</span>
             </div>
             <div className="p-2.5 rounded-xl bg-white/90 dark:bg-slate-800/90 border border-purple-200 dark:border-purple-800">
               <span className="text-base block mb-1">🖐️</span>
               <span className="text-xs font-extrabold text-ink block">Finger Guide</span>
-              <span className="text-[10px] text-mute font-semibold">Exact finger map</span>
+              <span className="text-[11px] text-mute font-semibold">Exact finger map</span>
             </div>
             <div className="p-2.5 rounded-xl bg-white/90 dark:bg-slate-800/90 border border-purple-200 dark:border-purple-800">
               <span className="text-base block mb-1">🎯</span>
               <span className="text-xs font-extrabold text-ink block">Example</span>
-              <span className="text-[10px] text-mute font-semibold">Demonstration tip</span>
+              <span className="text-[11px] text-mute font-semibold">Demonstration tip</span>
             </div>
             <div className="p-2.5 rounded-xl bg-white/90 dark:bg-slate-800/90 border border-purple-200 dark:border-purple-800">
               <span className="text-base block mb-1">⚡</span>
               <span className="text-xs font-extrabold text-ink block">Guided Drills</span>
-              <span className="text-[10px] text-mute font-semibold">Target pattern practice</span>
+              <span className="text-[11px] text-mute font-semibold">Target pattern practice</span>
             </div>
             <div className="p-2.5 rounded-xl bg-white/90 dark:bg-slate-800/90 border border-purple-200 dark:border-purple-800">
               <span className="text-base block mb-1">⌨️</span>
               <span className="text-xs font-extrabold text-ink block">Repetition</span>
-              <span className="text-[10px] text-mute font-semibold">Muscle memory drills</span>
+              <span className="text-[11px] text-mute font-semibold">Muscle memory drills</span>
             </div>
             <div className="p-2.5 rounded-xl bg-white/90 dark:bg-slate-800/90 border border-purple-200 dark:border-purple-800">
               <span className="text-base block mb-1">📊</span>
               <span className="text-xs font-extrabold text-ink block">Live Mastery</span>
-              <span className="text-[10px] text-mute font-semibold">Accuracy gate to pass</span>
+              <span className="text-[11px] text-mute font-semibold">Accuracy gate to pass</span>
             </div>
           </div>
         </div>
@@ -1530,7 +1531,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
           <div className="card-game p-5 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
             <div>
               <div className="text-2xl mb-2">📚</div>
-              <div className="inline-block px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 text-[10px] font-black uppercase mb-1.5">
+              <div className="inline-block px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 text-[11px] font-black uppercase mb-1.5">
                 Learn
               </div>
               <h3 className="text-base font-extrabold text-ink mb-1">Lessons</h3>
@@ -1538,7 +1539,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                 Structured instruction on home-row tactile bumps, finger assignments, and muscle memory.
               </p>
             </div>
-            <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-mute">
+            <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] font-bold text-mute">
               Foundational technique
             </div>
           </div>
@@ -1547,7 +1548,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
           <div className="card-game p-5 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
             <div>
               <div className="text-2xl mb-2">🎯</div>
-              <div className="inline-block px-2 py-0.5 rounded-md bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300 text-[10px] font-black uppercase mb-1.5">
+              <div className="inline-block px-2 py-0.5 rounded-md bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300 text-[11px] font-black uppercase mb-1.5">
                 Practice
               </div>
               <h3 className="text-base font-extrabold text-ink mb-1">Activities</h3>
@@ -1555,7 +1556,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                 Targeted drills such as zero-error accuracy sprints and metronomic cadence marathons.
               </p>
             </div>
-            <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-mute">
+            <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] font-bold text-mute">
               Rhythm & accuracy focus
             </div>
           </div>
@@ -1564,7 +1565,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
           <div className="card-game p-5 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
             <div>
               <div className="text-2xl mb-2">⌨️</div>
-              <div className="inline-block px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 text-[10px] font-black uppercase mb-1.5">
+              <div className="inline-block px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 text-[11px] font-black uppercase mb-1.5">
                 Type
               </div>
               <h3 className="text-base font-extrabold text-ink mb-1">Passages</h3>
@@ -1572,7 +1573,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                 Curated literary excerpts calibrated for natural typing endurance and punctuation flow.
               </p>
             </div>
-            <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-mute">
+            <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] font-bold text-mute">
               Literature & essays
             </div>
           </div>
@@ -1581,7 +1582,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
           <div className="card-game p-5 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
             <div>
               <div className="text-2xl mb-2">⚡</div>
-              <div className="inline-block px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-[10px] font-black uppercase mb-1.5">
+              <div className="inline-block px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-[11px] font-black uppercase mb-1.5">
                 Together
               </div>
               <h3 className="text-base font-extrabold text-ink mb-1">Live Sessions</h3>
@@ -1589,7 +1590,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                 Synchronized classroom rounds with unified start countdowns and live class benchmarks.
               </p>
             </div>
-            <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-mute">
+            <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] font-bold text-mute">
               Group motivation
             </div>
           </div>
@@ -1625,7 +1626,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
               Lesson: <span className="font-extrabold text-ink">Home Row Basics</span>
             </div>
 
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
               Session Ready
             </span>
           </div>
@@ -1687,7 +1688,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
               🖥️
             </div>
             <div className="text-xs font-extrabold text-ink">Teacher Host</div>
-            <div className="text-[10px] text-mute font-semibold mt-0.5">Creates classroom session</div>
+            <div className="text-[11px] text-mute font-semibold mt-0.5">Creates classroom session</div>
           </div>
 
           <div className="text-primary font-black text-lg rotate-90 md:rotate-0">
@@ -1696,9 +1697,9 @@ export const ClassroomLandingPage: React.FC<Props> = ({
 
           {/* Classroom Code */}
           <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border-2 border-dashed border-emerald-400 dark:border-emerald-700 text-center flex-1 w-full">
-            <div className="text-[10px] font-black uppercase text-emerald-800 dark:text-emerald-300">Room Code</div>
+            <div className="text-[11px] font-black uppercase text-emerald-800 dark:text-emerald-300">Room Code</div>
             <div className="font-mono text-xl font-black text-primary my-0.5">TB-4821</div>
-            <div className="text-[9px] text-mute font-semibold">Shared on board / screen</div>
+            <div className="text-[10.5px] text-mute font-semibold">Shared on board / screen</div>
           </div>
 
           <div className="text-primary font-black text-lg rotate-90 md:rotate-0">
@@ -1711,7 +1712,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
               💻
             </div>
             <div className="text-xs font-extrabold text-ink">Student Computers</div>
-            <div className="text-[10px] text-mute font-semibold mt-0.5">Enter code & start typing</div>
+            <div className="text-[11px] text-mute font-semibold mt-0.5">Enter code & start typing</div>
           </div>
         </div>
 

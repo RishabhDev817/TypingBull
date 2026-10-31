@@ -44,7 +44,7 @@ export const Header: React.FC<HeaderProps> = ({
           <h1 className="font-sans text-sm font-semibold tracking-tight leading-none m-0 text-ink">
             Typing<span className="text-success">Bull</span>
           </h1>
-          <span className="font-mono text-[10px] text-mute uppercase tracking-widest leading-none">
+          <span className="font-mono text-[11px] text-mute uppercase tracking-widest leading-none">
             v1.0.0
           </span>
         </div>

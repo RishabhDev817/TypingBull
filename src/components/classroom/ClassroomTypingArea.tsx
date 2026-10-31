@@ -233,7 +233,7 @@ export const ClassroomTypingArea: React.FC<Props> = ({
       <div className="rounded-3xl p-4 sm:p-5 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 shadow-xl mb-4 flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
+            <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
               {isCurriculum
                 ? 'Skill Drill • Learn Curriculum'
                 : assignmentCategory === 'homerow'
@@ -241,7 +241,7 @@ export const ClassroomTypingArea: React.FC<Props> = ({
                 : 'Classroom Exercise'}
             </span>
             {isCurriculum && (
-              <span className="px-2.5 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono text-[9px] font-black uppercase border border-blue-200 dark:border-blue-800 flex items-center gap-1">
+              <span className="px-2.5 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono text-[10.5px] font-black uppercase border border-blue-200 dark:border-blue-800 flex items-center gap-1">
                 <span>Learn Module</span>
               </span>
             )}
@@ -251,7 +251,7 @@ export const ClassroomTypingArea: React.FC<Props> = ({
           </h2>
           {effectiveTargetKeys && effectiveTargetKeys.length > 0 && (
             <div className="flex items-center gap-1.5 flex-wrap mt-2">
-              <span className="text-[10px] font-bold text-slate-400">Target Focus Keys:</span>
+              <span className="text-[11px] font-bold text-slate-400">Target Focus Keys:</span>
               {effectiveTargetKeys.map((k) => (
                 <span
                   key={k}
@@ -271,7 +271,7 @@ export const ClassroomTypingArea: React.FC<Props> = ({
               <Zap className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
+              <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 block">
                 WPM
               </span>
               <span className="font-mono text-lg font-black text-slate-900 dark:text-white">
@@ -286,7 +286,7 @@ export const ClassroomTypingArea: React.FC<Props> = ({
               <Target className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
+              <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 block">
                 Accuracy
               </span>
               <span className="font-mono text-lg font-black text-slate-900 dark:text-white">
@@ -305,7 +305,7 @@ export const ClassroomTypingArea: React.FC<Props> = ({
               <Clock className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
+              <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 block">
                 Time Left
               </span>
               <span className="font-mono text-lg font-black text-slate-900 dark:text-white">

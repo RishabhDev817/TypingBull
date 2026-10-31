@@ -57,7 +57,7 @@ function buildAllLessons(): LessonDef[] {
   return all.sort((a, b) => a.id - b.id);
 }
 
-/** The complete curriculum: all 685 lessons sorted by ID. */
+/** The complete curriculum: all 528 lessons sorted by ID. */
 export const LESSONS: LessonDef[] = buildAllLessons();
 
 /** Look up a single lesson by its numeric ID. */

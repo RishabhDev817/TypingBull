@@ -275,10 +275,10 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
                 }`}
               >
                 {!isUser && (
-                  <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-400 mb-1">
+                  <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-400 mb-1">
                     <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                     <span>BullBot</span>
-                    <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 px-1 py-0.2 rounded bg-purple-100/60 dark:bg-purple-950/40">
+                    <span className="text-[10.5px] font-bold text-slate-400 dark:text-slate-500 px-1 py-0.2 rounded bg-purple-100/60 dark:bg-purple-950/40">
                       Gemini Flash AI
                     </span>
                   </div>

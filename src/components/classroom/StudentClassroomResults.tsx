@@ -69,7 +69,7 @@ export const StudentClassroomResults: React.FC<Props> = ({
       >
         {/* Big Rank Pill */}
         <div className="text-center p-4 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800/80 dark:to-indigo-950/40 border border-blue-200 dark:border-indigo-900">
-          <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 block">
+          <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 block">
             Classroom Standing
           </span>
           <div className="font-mono text-3xl sm:text-4xl font-black text-primary mt-1">

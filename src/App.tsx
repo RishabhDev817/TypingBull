@@ -73,6 +73,37 @@ function AnimatedRoutes() {
   );
 }
 
+/**
+ * Mounts the 3D sky only after the page has painted, never on phones, with reduced-motion or in data-saver mode,
+ * so the dashboard is usable immediately instead of waiting on the Three.js bundle.
+ */
+function DeferredBackground() {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const nav = navigator as Navigator & { connection?: { saveData?: boolean } };
+    const skip =
+      window.matchMedia('(max-width: 767px)').matches ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      nav.connection?.saveData === true;
+    if (skip) return;
+
+    const w = window as Window & { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void };
+    if (w.requestIdleCallback) {
+      const id = w.requestIdleCallback(() => setReady(true), { timeout: 1500 });
+      return () => w.cancelIdleCallback?.(id);
+    }
+    const id = window.setTimeout(() => setReady(true), 600);
+    return () => window.clearTimeout(id);
+  }, []);
+
+  return ready ? (
+    <Suspense fallback={null}>
+      <LivingBackground />
+    </Suspense>
+  ) : null;
+}
+
 function MainLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const location = useLocation();
@@ -99,7 +130,7 @@ function MainLayout() {
       }`}
     >
       {/* 3D Living Background Canvas (omitted on /learn to guarantee pure night theme) */}
-      {!isLearn && <LivingBackground />}
+      {!isLearn && <DeferredBackground />}
 
       {/* Desktop Sidebar with Slide Toggle */}
       <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} />

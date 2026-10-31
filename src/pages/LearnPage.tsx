@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Train, BookOpen, Layers, ChevronLeft, ChevronRight } from 'lucide-react';
 import { LESSONS } from '../data/lessonData';
 import { CHAPTERS, getChapterById, getChapterByLessonId } from '../data/curriculum';
-import { getTotalStars, getCompletedLessonCount, getLessonProgress } from '../engine/sessionStore';
+import { getTotalStars, getCompletedLessonCount, getLessonProgress, isSkipAheadEnabled, enableSkipAhead } from '../engine/sessionStore';
 import { TrainMap } from '../components/TrainMap';
 import { ChapterSelector } from '../components/ChapterSelector';
 import { Mascot } from '../components/Mascot';
@@ -12,6 +12,18 @@ import { useI18n } from '../context/I18nContext';
 import { usePageSEO } from '../hooks/usePageSEO';
 import { LearnGuideSection } from '../components/educational/LearnGuideSection';
 import { SiteFooter } from '../components/navigation/SiteFooter';
+
+const SKIP_AHEAD_LABEL: Record<string, string> = {
+  en: 'Already know the basics? Unlock all chapters',
+  es: '¿Ya sabes lo básico? Desbloquea todos los capítulos',
+  ja: '基礎は習得済み？すべての章を解放',
+  fr: 'Vous maîtrisez les bases ? Débloquer tous les chapitres',
+  de: 'Grundlagen schon drauf? Alle Kapitel freischalten',
+  pt: 'Já sabe o básico? Desbloquear todos os capítulos',
+  ko: '기본을 아시나요? 모든 챕터 열기',
+  it: 'Conosci già le basi? Sblocca tutti i capitoli',
+  hi: 'बेसिक्स आते हैं? सभी चैप्टर अनलॉक करें',
+};
 
 export const LearnPage: React.FC = () => {
   const { t, currentLang } = useI18n();
@@ -42,6 +54,7 @@ export const LearnPage: React.FC = () => {
   const [selectedChapterId, setSelectedChapterId] = useState<string>(initialChapterId);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [isCurriculumOpen, setIsCurriculumOpen] = useState(true);
+  const [skipAhead, setSkipAhead] = useState(isSkipAheadEnabled);
 
   const selectedChapter = useMemo(() => getChapterById(selectedChapterId) || CHAPTERS[0], [selectedChapterId]);
 
@@ -82,7 +95,7 @@ export const LearnPage: React.FC = () => {
           {/* Mobile Chapters Drawer Toggle */}
           <button
             onClick={() => setMobileDrawerOpen(!mobileDrawerOpen)}
-            className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-2xl border border-sky-400/40 bg-sky-500/20 text-sky-300 text-xs font-extrabold hover:bg-sky-500/30 transition-all cursor-pointer"
+            className="lg:hidden flex items-center gap-1.5 min-h-11 px-3.5 rounded-2xl border border-sky-400/40 bg-sky-500/20 text-sky-300 text-xs font-extrabold hover:bg-sky-500/30 transition-all cursor-pointer"
           >
             <Layers className="w-3.5 h-3.5" />
             <span>{t('learn.chapters')}</span>
@@ -125,6 +138,19 @@ export const LearnPage: React.FC = () => {
           </div>
         </div>
       </motion.div>
+
+      {/* Skip-ahead for experienced typists (own row so the header never gets cramped) */}
+      {!skipAhead && (
+        <div className="w-full flex justify-end -mt-1 mb-3">
+          <button
+            type="button"
+            onClick={() => { enableSkipAhead(); setSkipAhead(true); }}
+            className="flex items-center min-h-11 px-4 rounded-2xl border border-white/30 bg-white/10 text-slate-100 text-xs font-extrabold hover:bg-white/20 transition-all cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+          >
+            {SKIP_AHEAD_LABEL[currentLang] || SKIP_AHEAD_LABEL.en}
+          </button>
+        </div>
+      )}
 
       {/* Main Two-Panel Layout (Left Collapsible Chapter Selector + Right Train Map) */}
       <div className="w-full flex-1 flex min-h-0 relative">

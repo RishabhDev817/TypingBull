@@ -55,7 +55,7 @@ export const WordImagePop: React.FC<WordImagePopProps> = ({ word }) => {
               <Check className="w-3 h-3 stroke-[3]" />
             </div>
           </div>
-          <span className="text-[10px] font-black text-emerald-800 tracking-widest uppercase">
+          <span className="text-[11px] font-black text-emerald-800 tracking-widest uppercase">
             PERFECT!
           </span>
         </div>

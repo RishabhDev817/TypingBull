@@ -89,7 +89,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
         aria-label="Select language"
         className={
           variant === 'transparent'
-            ? 'h-8.5 px-2.5 rounded-full flex items-center gap-1.5 bg-transparent hover:bg-white/25 dark:hover:bg-white/10 active:scale-95 text-slate-800 dark:text-slate-100 text-xs font-bold transition-all outline-none cursor-pointer shrink-0'
+            ? 'h-9 pointer-coarse:h-11 px-2.5 rounded-full flex items-center gap-1.5 bg-transparent hover:bg-white/25 dark:hover:bg-white/10 active:scale-95 text-slate-800 dark:text-slate-100 text-xs font-bold transition-all outline-none cursor-pointer shrink-0'
             : `h-10 px-3.5 rounded-full flex items-center gap-2
                bg-white/80 dark:bg-slate-900/80
                hover:bg-white dark:hover:bg-slate-800
@@ -136,7 +136,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
                      p-2 z-[9999] animate-in fade-in zoom-in-95 duration-150`}
         >
           <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-slate-100 dark:border-slate-800 mb-1.5">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
+            <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
               <Globe className="w-3 h-3 text-blue-500" />
               Language ({LOCALES.length})
             </span>
@@ -168,7 +168,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
                       <span className="text-xs font-bold leading-tight">
                         {langMeta.nativeName}
                       </span>
-                      <span className="text-[10px] text-slate-400 dark:text-slate-500 leading-tight">
+                      <span className="text-[11px] text-slate-400 dark:text-slate-500 leading-tight">
                         {langMeta.name}
                       </span>
                     </div>

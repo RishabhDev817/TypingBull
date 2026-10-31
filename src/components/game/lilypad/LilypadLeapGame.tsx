@@ -389,7 +389,7 @@ export const LilypadLeapGame: React.FC<LilypadLeapGameProps> = ({
           <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-200">
             {currentConfig.title}
           </span>
-          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 font-extrabold text-[10px] border border-emerald-300 dark:border-emerald-700 flex items-center gap-1">
+          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 font-extrabold text-[11px] border border-emerald-300 dark:border-emerald-700 flex items-center gap-1">
             <Sparkles className="w-3 h-3" />
             {currentConfig.badge}
           </span>
@@ -398,7 +398,7 @@ export const LilypadLeapGame: React.FC<LilypadLeapGameProps> = ({
         {/* Right: Progress & Sound Controls */}
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="text-right mr-1">
-            <span className="text-[9px] font-black uppercase text-slate-400 block leading-tight">
+            <span className="text-[10.5px] font-black uppercase text-slate-400 block leading-tight">
               {t('stats.progress')}
             </span>
             <span className="text-xs sm:text-sm font-black text-emerald-600 dark:text-emerald-400">

@@ -121,7 +121,7 @@ export const LilypadTrack: React.FC<LilypadTrackProps> = ({
             {/* Start Line Badge */}
             {isStart && currentPadIndex === 0 && (
               <div className="absolute -top-8 z-20">
-                <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-2 border-emerald-400 shadow-md">
+                <span className="text-[10.5px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-2 border-emerald-400 shadow-md">
                   START
                 </span>
               </div>
@@ -232,7 +232,7 @@ export const LilypadTrack: React.FC<LilypadTrackProps> = ({
                 {/* Leaf Step Index Badge */}
                 <div className="absolute -bottom-2 flex items-center justify-center">
                   <span
-                    className={`text-[8px] font-black px-1.2 py-0.2 rounded-full shadow-sm ${
+                    className={`text-[10.5px] font-black px-1.2 py-0.2 rounded-full shadow-sm ${
                       isVisited
                         ? 'bg-emerald-500 text-white'
                         : isCurrent

@@ -258,19 +258,19 @@ export const GuidelinesPage: React.FC = () => {
                       <div className="flex items-center justify-between mb-1.5">
                         <div className="flex items-center gap-1.5">
                           <span
-                            className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-white shadow-sm"
+                            className="w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-black text-white shadow-sm"
                             style={{ backgroundColor: color }}
                           >
                             {sym.symbol}
                           </span>
                           <span className="text-xs font-extrabold text-ink">{t(f.fingerKey)}</span>
                         </div>
-                        <span className="text-[10px] font-extrabold bg-canvas px-1.5 py-0.5 rounded-md border border-hairline text-ink">
+                        <span className="text-[11px] font-extrabold bg-canvas px-1.5 py-0.5 rounded-md border border-hairline text-ink">
                           {t('guide.home')}: <strong>{f.homeKey}</strong>
                         </span>
                       </div>
 
-                      <div className="text-[10px] font-semibold text-mute mb-2">
+                      <div className="text-[11px] font-semibold text-mute mb-2">
                         {t('guide.pattern')}: {sym.patternLabel}
                       </div>
                     </div>
@@ -280,7 +280,7 @@ export const GuidelinesPage: React.FC = () => {
                       {f.keys.map((k) => (
                         <span
                           key={k}
-                          className="px-1.5 py-0.5 text-[10px] font-mono font-bold rounded bg-canvas text-ink border border-hairline shadow-xs"
+                          className="px-1.5 py-0.5 text-[11px] font-mono font-bold rounded bg-canvas text-ink border border-hairline shadow-xs"
                           style={k === f.homeKey ? { borderColor: color, fontWeight: 900 } : undefined}
                         >
                           {k}
@@ -325,19 +325,19 @@ export const GuidelinesPage: React.FC = () => {
                       <div className="flex items-center justify-between mb-1.5">
                         <div className="flex items-center gap-1.5">
                           <span
-                            className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-white shadow-sm"
+                            className="w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-black text-white shadow-sm"
                             style={{ backgroundColor: color }}
                           >
                             {sym.symbol}
                           </span>
                           <span className="text-xs font-extrabold text-ink">{t(f.fingerKey)}</span>
                         </div>
-                        <span className="text-[10px] font-extrabold bg-canvas px-1.5 py-0.5 rounded-md border border-hairline text-ink">
+                        <span className="text-[11px] font-extrabold bg-canvas px-1.5 py-0.5 rounded-md border border-hairline text-ink">
                           {t('guide.home')}: <strong>{f.homeKey}</strong>
                         </span>
                       </div>
 
-                      <div className="text-[10px] font-semibold text-mute mb-2">
+                      <div className="text-[11px] font-semibold text-mute mb-2">
                         {t('guide.pattern')}: {sym.patternLabel}
                       </div>
                     </div>
@@ -347,7 +347,7 @@ export const GuidelinesPage: React.FC = () => {
                       {f.keys.map((k) => (
                         <span
                           key={k}
-                          className="px-1.5 py-0.5 text-[10px] font-mono font-bold rounded bg-canvas text-ink border border-hairline shadow-xs"
+                          className="px-1.5 py-0.5 text-[11px] font-mono font-bold rounded bg-canvas text-ink border border-hairline shadow-xs"
                           style={k === f.homeKey ? { borderColor: color, fontWeight: 900 } : undefined}
                         >
                           {k}
@@ -364,7 +364,7 @@ export const GuidelinesPage: React.FC = () => {
         {/* Space Bar / Thumbs note */}
         <div className="mt-3 p-2.5 rounded-xl bg-canvas border border-hairline flex items-center justify-between text-xs text-body font-semibold">
           <span className="flex items-center gap-2">
-            <span className="w-4 h-4 rounded-full bg-slate-400 flex items-center justify-center text-[9px] font-black text-white">—</span>
+            <span className="w-4 h-4 rounded-full bg-slate-400 flex items-center justify-center text-[10.5px] font-black text-white">—</span>
             <span><strong>{t('guide.thumbs')}:</strong> {t('guide.thumbsNote')}</span>
           </span>
           <span className="font-mono text-[11px] bg-canvas-soft-2 px-2 py-0.5 rounded border border-hairline">[SPACE]</span>

@@ -17,6 +17,7 @@ import { AITutorReport } from '../components/AITutorReport';
 import { ShareScoreModal } from '../components/social/ShareScoreModal';
 import type { SessionResult } from '../engine/typingEngine';
 import { useI18n } from '../context/I18nContext';
+import { KeyboardNotice } from '../components/KeyboardNotice';
 import { getLocalizedLesson, getLocalizedChapter } from '../data/curriculumI18n';
 
 type LessonState = 'ready' | 'typing' | 'completed';
@@ -222,6 +223,7 @@ export const LessonView: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-4 md:py-8 flex flex-col gap-5 text-slate-100">
+      <KeyboardNotice />
       {/* Top bar */}
       <div className="flex items-center justify-between">
         <motion.button
@@ -240,7 +242,7 @@ export const LessonView: React.FC = () => {
               {t('lesson.lessonNum', { n: lesson.id })} <span className="text-slate-400 font-normal">/ {LESSONS.length}</span>
             </span>
             {chapter && (
-              <span className="text-[10px] font-bold text-sky-300 block">
+              <span className="text-[11px] font-bold text-sky-300 block">
                 {chapter.icon} {chapter.title}
               </span>
             )}
@@ -361,7 +363,7 @@ export const LessonView: React.FC = () => {
               },
             ].map(({ label, value, color }) => (
               <div key={label} className="text-center bg-slate-900/60 px-4 py-2 rounded-2xl border border-white/10 backdrop-blur-md min-w-[90px]">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider block" style={{ color }}>{label}</span>
+                <span className="text-[11px] font-extrabold uppercase tracking-wider block" style={{ color }}>{label}</span>
                 <span className="text-xl font-black text-white">{value}</span>
               </div>
             ))}
@@ -513,7 +515,7 @@ export const LessonView: React.FC = () => {
                   { label: t('lesson.streak'), value: engine.maxStreak, color: '#FBBF24' },
                 ].map(({ label, value, color }) => (
                   <div key={label} className="p-3 rounded-2xl bg-slate-800/80 border border-white/10">
-                    <span className="text-[10px] font-extrabold uppercase block" style={{ color }}>{label}</span>
+                    <span className="text-[11px] font-extrabold uppercase block" style={{ color }}>{label}</span>
                     <span className="text-lg font-black text-white">{value}</span>
                   </div>
                 ))}

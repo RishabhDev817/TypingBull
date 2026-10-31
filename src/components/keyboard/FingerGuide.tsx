@@ -359,7 +359,7 @@ export const FingerGuide: React.FC<FingerGuideProps> = ({
               }}
             >
               <div
-                className="w-5 h-5 rounded-full shrink-0 flex items-center justify-center text-[10px] font-black text-white"
+                className="w-5 h-5 rounded-full shrink-0 flex items-center justify-center text-[11px] font-black text-white"
                 style={{
                   backgroundColor: color,
                   boxShadow: `0 0 8px ${color}`,
@@ -370,9 +370,9 @@ export const FingerGuide: React.FC<FingerGuideProps> = ({
               <div className="min-w-0">
                 <div className="text-xs font-bold text-ink truncate leading-tight flex items-center gap-1">
                   <span>{FINGER_LABELS[finger.idx]}</span>
-                  <span className="text-[10px] opacity-75 font-mono">({FINGER_SYMBOLS[finger.idx]?.symbol})</span>
+                  <span className="text-[11px] opacity-75 font-mono">({FINGER_SYMBOLS[finger.idx]?.symbol})</span>
                 </div>
-                <div className="text-[10px] font-mono text-body font-semibold truncate mt-0.5">
+                <div className="text-[11px] font-mono text-body font-semibold truncate mt-0.5">
                   {finger.keys}
                 </div>
               </div>

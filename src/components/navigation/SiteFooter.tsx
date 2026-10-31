@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Shield, BookOpen, Gamepad2 } from 'lucide-react';
-import { Mascot } from '../Mascot';
 import { soundEngine } from '../../utils/audio';
 
 export const SiteFooter: React.FC = () => {
@@ -22,14 +21,12 @@ export const SiteFooter: React.FC = () => {
               onClick={onLinkClick}
               className="inline-flex items-center gap-3 cursor-pointer group"
             >
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 p-1 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-                <Mascot mood="happy" size="xs" />
-              </div>
+              <img src="/typingbull-logo.png" alt="TypingBull logo" width="44" height="44" className="w-11 h-11 object-contain shrink-0 drop-shadow-md group-hover:scale-105 transition-transform" draggable={false} />
               <div>
                 <span className="font-black text-xl text-slate-900 dark:text-white tracking-tight leading-none block">
                   Typing<span className="text-purple-600 dark:text-purple-400">Bull</span>
                 </span>
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 leading-none">
+                <span className="text-[11px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 leading-none">
                   Smart Typing Coach
                 </span>
               </div>
@@ -104,7 +101,7 @@ export const SiteFooter: React.FC = () => {
                   className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors flex items-center gap-1.5"
                 >
                   <span>Classroom Lab Mode</span>
-                  <span className="px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider rounded bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">Free</span>
+                  <span className="px-1.5 py-0.5 text-[10.5px] font-black uppercase tracking-wider rounded bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">Free</span>
                 </Link>
               </li>
             </ul>

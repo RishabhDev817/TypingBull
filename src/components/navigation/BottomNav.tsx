@@ -53,7 +53,7 @@ export const BottomNav: React.FC = () => {
                   <Icon className="w-5 h-5" style={{ color: isItemActive ? color : 'var(--color-mute)' }} />
                 </div>
                 <span
-                  className="text-[10px] font-bold mt-0.5"
+                  className="text-[11px] font-bold mt-0.5"
                   style={{ color: isItemActive ? color : 'var(--color-mute)' }}
                 >
                   {label}

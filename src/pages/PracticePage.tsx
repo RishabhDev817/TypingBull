@@ -15,6 +15,7 @@ import { ProductRoadmap } from '../components/ProductRoadmap';
 import { SiteFooter } from '../components/navigation/SiteFooter';
 import { usePageSEO } from '../hooks/usePageSEO';
 import { PracticeGuideSection } from '../components/educational/PracticeGuideSection';
+import { KeyboardNotice } from '../components/KeyboardNotice';
 
 type PracticeStatus = 'idle' | 'typing' | 'completed' | 'failed';
 
@@ -359,6 +360,8 @@ export const PracticePage: React.FC = () => {
       {/* Confetti on Completion */}
       <ConfettiFireworks active={gameStatus === 'completed'} />
 
+      <KeyboardNotice />
+
       {/* ─── Top Navigation Header ─── */}
       <div className="w-full flex items-center justify-between gap-4 mb-4 max-w-full">
         {/* Left: Practice Section Badge */}
@@ -448,7 +451,7 @@ export const PracticePage: React.FC = () => {
                   <span>{lvl.icon}</span>
                   <span>Lvl {lvl.level}</span>
                   {lvl.type === 'stamina-essay' && (
-                    <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-black uppercase ${
+                    <span className={`px-1.5 py-0.2 rounded-full text-[10.5px] font-black uppercase ${
                       isActive ? 'bg-white/20 text-white' : 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
                     }`}>
                       Stamina
@@ -560,15 +563,15 @@ export const PracticePage: React.FC = () => {
                 {/* Score Pills */}
                 <div className="grid grid-cols-3 gap-3 my-3 w-full max-w-md">
                   <div className="bg-white/10 p-3 rounded-2xl border border-white/20 text-center">
-                    <span className="text-[10px] uppercase font-black text-slate-300 block">Speed</span>
+                    <span className="text-[11px] uppercase font-black text-slate-300 block">Speed</span>
                     <span className="text-xl font-black text-amber-400">{currentWpm} WPM</span>
                   </div>
                   <div className="bg-white/10 p-3 rounded-2xl border border-white/20 text-center">
-                    <span className="text-[10px] uppercase font-black text-slate-300 block">Accuracy</span>
+                    <span className="text-[11px] uppercase font-black text-slate-300 block">Accuracy</span>
                     <span className="text-xl font-black text-emerald-400">{accuracy}%</span>
                   </div>
                   <div className="bg-white/10 p-3 rounded-2xl border border-white/20 text-center">
-                    <span className="text-[10px] uppercase font-black text-slate-300 block">Time Left</span>
+                    <span className="text-[11px] uppercase font-black text-slate-300 block">Time Left</span>
                     <span className="text-xl font-black text-sky-400">{formatTime(timeRemaining)}</span>
                   </div>
                 </div>
@@ -718,7 +721,7 @@ export const PracticePage: React.FC = () => {
                 style={{ width: `${Math.max(0, timeProgressPercent)}%` }}
               />
             </div>
-            <span className="text-[10px] font-bold text-slate-400 mt-1">
+            <span className="text-[11px] font-bold text-slate-400 mt-1">
               Allocated: {formatTime(initialTimeLimit)} ({initialTimeLimit}s)
             </span>
           </motion.div>

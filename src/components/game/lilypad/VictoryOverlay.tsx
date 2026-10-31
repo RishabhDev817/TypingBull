@@ -137,25 +137,25 @@ export const VictoryOverlay: React.FC<VictoryOverlayProps> = ({
         {/* Performance Statistics Grid */}
         <div className="grid grid-cols-4 gap-2 my-4 bg-white/85 dark:bg-slate-800/85 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-inner">
           <div className="text-center">
-            <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block">Words</span>
+            <span className="text-[11px] font-black uppercase text-slate-400 tracking-wider block">Words</span>
             <span className="text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400">
               {wordsCount}
             </span>
           </div>
           <div className="text-center border-l border-slate-200 dark:border-slate-700">
-            <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block">Accuracy</span>
+            <span className="text-[11px] font-black uppercase text-slate-400 tracking-wider block">Accuracy</span>
             <span className="text-base sm:text-lg font-black text-indigo-600 dark:text-indigo-400">
               {accuracy.toFixed(0)}%
             </span>
           </div>
           <div className="text-center border-l border-slate-200 dark:border-slate-700">
-            <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block">Speed</span>
+            <span className="text-[11px] font-black uppercase text-slate-400 tracking-wider block">Speed</span>
             <span className="text-base sm:text-lg font-black text-amber-600 dark:text-amber-400">
-              {wpm} <span className="text-[10px] font-bold text-slate-400">WPM</span>
+              {wpm} <span className="text-[11px] font-bold text-slate-400">WPM</span>
             </span>
           </div>
           <div className="text-center border-l border-slate-200 dark:border-slate-700">
-            <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block">Time</span>
+            <span className="text-[11px] font-black uppercase text-slate-400 tracking-wider block">Time</span>
             <span className="text-base sm:text-lg font-black text-pink-600 dark:text-pink-400">
               {timeSeconds.toFixed(1)}s
             </span>

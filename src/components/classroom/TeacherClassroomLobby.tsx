@@ -1,3 +1,4 @@
+import { TOTAL_LESSONS } from '../../data/lessons/index';
 import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -429,7 +430,7 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
 
   const tabs: { key: TeacherTab; label: string; icon: React.FC<{ className?: string }> }[] = [
     { key: 'overview', label: 'Overview', icon: Target },
-    { key: 'learn', label: 'Learn Curriculum (685)', icon: BookOpen },
+    { key: 'learn', label: `Learn Curriculum (${TOTAL_LESSONS})`, icon: BookOpen },
     { key: 'lessons', label: 'Lab Lessons (6)', icon: GraduationCap },
     { key: 'games', label: 'Games (2)', icon: Gamepad2 },
     { key: 'activities', label: 'Activities', icon: Sparkles },
@@ -584,7 +585,7 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
                 {room.settings.teacherNote ? (
                   <div className="p-3.5 mb-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <span className="text-[10px] font-black uppercase text-amber-700 dark:text-amber-400 block mb-0.5 tracking-wider">
+                      <span className="text-[11px] font-black uppercase text-amber-700 dark:text-amber-400 block mb-0.5 tracking-wider">
                         📢 Teacher's Daily Tip / Focus Note
                       </span>
                       <p className="text-xs text-slate-800 dark:text-slate-200 font-medium italic break-words">
@@ -655,11 +656,11 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
                 {/* Active Target Banner */}
                 <div className="p-3.5 mb-4 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40 border border-blue-200 dark:border-blue-800">
                   <div className="flex items-center justify-between gap-2 mb-1">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400">
                       Active Exercise
                     </span>
                     {room.settings.durationSeconds && (
-                      <span className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">
+                      <span className="text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400">
                         {Math.round(room.settings.durationSeconds / 60)} min limit
                       </span>
                     )}
@@ -752,7 +753,7 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
                                     #{idx + 1}
                                   </span>
                                   {isCurrentlyActive ? (
-                                    <span className="px-2 py-0.5 rounded-md bg-blue-600 text-white text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+                                    <span className="px-2 py-0.5 rounded-md bg-blue-600 text-white text-[11px] font-black uppercase tracking-wider flex items-center gap-1">
                                       <Play className="w-2.5 h-2.5 fill-current" /> Active
                                     </span>
                                   ) : (
@@ -762,14 +763,14 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
                                         e.stopPropagation();
                                         handleActivateAssignment(assignment);
                                       }}
-                                      className="px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-700 hover:bg-blue-600 hover:text-white text-slate-700 dark:text-slate-300 text-[10px] font-black uppercase transition cursor-pointer"
+                                      className="px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-700 hover:bg-blue-600 hover:text-white text-slate-700 dark:text-slate-300 text-[11px] font-black uppercase transition cursor-pointer"
                                       title="Make this the active assignment for the next round"
                                     >
                                       Activate
                                     </button>
                                   )}
                                   {assignment.durationSeconds && (
-                                    <span className="text-[10px] font-mono text-slate-400">
+                                    <span className="text-[11px] font-mono text-slate-400">
                                       ⏱ {Math.round(assignment.durationSeconds / 60)}m
                                     </span>
                                   )}
@@ -780,11 +781,11 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
 
                                 {assignment.targetKeys && assignment.targetKeys.length > 0 && (
                                   <div className="flex items-center gap-1 mb-1.5">
-                                    <span className="text-[10px] font-bold text-slate-400">Keys:</span>
+                                    <span className="text-[11px] font-bold text-slate-400">Keys:</span>
                                     {assignment.targetKeys.map((k) => (
                                       <span
                                         key={k}
-                                        className="px-1.5 py-0.2 rounded bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-300 font-mono text-[10px] font-bold border border-slate-200 dark:border-slate-700"
+                                        className="px-1.5 py-0.2 rounded bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-300 font-mono text-[11px] font-bold border border-slate-200 dark:border-slate-700"
                                       >
                                         {k === ' ' ? 'Space' : k.toUpperCase()}
                                       </span>
@@ -1009,7 +1010,7 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
                       </div>
 
                       <span
-                        className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full shrink-0 flex items-center gap-1 ${
+                        className={`text-[11px] font-black uppercase px-2.5 py-0.5 rounded-full shrink-0 flex items-center gap-1 ${
                           student.isReady
                             ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
                             : 'bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
@@ -1062,7 +1063,7 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
         </div>
       )}
 
-      {/* ─── TAB: LEARN STEP-BY-STEP CURRICULUM (685 LESSONS) ─── */}
+      {/* ─── TAB: LEARN STEP-BY-STEP CURRICULUM ─── */}
       {activeTab === 'learn' && (
         <div className="space-y-6">
           {/* Header Banner */}
@@ -1112,7 +1113,7 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
                   <span className="text-base">{ch.icon}</span>
                   <span>{ch.title}</span>
                   <span
-                    className={`text-[10px] font-mono px-1.5 py-0.2 rounded-md ${
+                    className={`text-[11px] font-mono px-1.5 py-0.2 rounded-md ${
                       isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
                     }`}
                   >
@@ -1180,7 +1181,7 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
                             <span className="px-2.5 py-0.5 rounded-lg bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-mono text-xs font-black">
                               Step {lesson.id}
                             </span>
-                            <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[10px] font-black uppercase text-slate-500 dark:text-slate-400">
+                            <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[11px] font-black uppercase text-slate-500 dark:text-slate-400">
                               {lesson.type}
                             </span>
                           </div>
@@ -1195,11 +1196,11 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
                           {/* Target Keys */}
                           {lesson.targetKeys.length > 0 && (
                             <div className="flex items-center gap-1.5 flex-wrap mb-3">
-                              <span className="text-[10px] font-bold text-slate-400">Focus Keys:</span>
+                              <span className="text-[11px] font-bold text-slate-400">Focus Keys:</span>
                               {lesson.targetKeys.map((k) => (
                                 <span
                                   key={k}
-                                  className="px-1.5 py-0.2 rounded bg-sky-50 dark:bg-sky-950/60 font-mono text-[10px] font-black text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800"
+                                  className="px-1.5 py-0.2 rounded bg-sky-50 dark:bg-sky-950/60 font-mono text-[11px] font-black text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800"
                                 >
                                   {k === ' ' ? 'Space' : k.toUpperCase()}
                                 </span>
@@ -1284,7 +1285,7 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
                       <span className="px-2.5 py-0.5 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono text-xs font-black">
                         Lesson {lesson.lessonNumber}
                       </span>
-                      <span className="text-[10px] font-black uppercase text-slate-400">
+                      <span className="text-[11px] font-black uppercase text-slate-400">
                         {lesson.badge}
                       </span>
                     </div>
@@ -1298,11 +1299,11 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
 
                     {/* Key Highlights Pill */}
                     <div className="flex items-center gap-1.5 flex-wrap mb-4">
-                      <span className="text-[10px] font-bold text-slate-400">Keys:</span>
+                      <span className="text-[11px] font-bold text-slate-400">Keys:</span>
                       {lesson.typingConcept.keyHighlights.slice(0, 6).map((k) => (
                         <span
                           key={k}
-                          className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono text-[10px] font-black text-slate-700 dark:text-slate-300"
+                          className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono text-[11px] font-black text-slate-700 dark:text-slate-300"
                         >
                           {k}
                         </span>
@@ -1314,7 +1315,7 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
                       <div className="mb-4 p-3 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/80 space-y-2.5 animate-fadeIn">
                         <div className="text-[11px] font-black uppercase tracking-wider text-indigo-700 dark:text-indigo-300 flex items-center justify-between">
                           <span>Guided Homerow Drills</span>
-                          <span className="text-[10px] font-bold text-indigo-500">Pick any drill</span>
+                          <span className="text-[11px] font-bold text-indigo-500">Pick any drill</span>
                         </div>
 
                         {lesson.guidedPractice.map((drill, idx) => (
@@ -1333,7 +1334,7 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
                                 {drill.focusKeys.map((fk) => (
                                   <span
                                     key={fk}
-                                    className="px-1 py-0.2 rounded bg-indigo-50 dark:bg-indigo-950 font-mono text-[9px] font-black text-indigo-600 dark:text-indigo-400"
+                                    className="px-1 py-0.2 rounded bg-indigo-50 dark:bg-indigo-950 font-mono text-[10.5px] font-black text-indigo-600 dark:text-indigo-400"
                                   >
                                     {fk}
                                   </span>
@@ -1688,14 +1689,14 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
                       <div className="font-black text-sm text-slate-900 dark:text-white">
                         {student.name}
                       </div>
-                      <div className="text-[10px] font-bold text-slate-400">
+                      <div className="text-[11px] font-bold text-slate-400">
                         ID: {student.id.slice(0, 8)}
                       </div>
                     </div>
                   </div>
 
                   <span
-                    className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${
+                    className={`text-[11px] font-black uppercase px-2.5 py-1 rounded-full ${
                       student.isReady
                         ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
                         : 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'

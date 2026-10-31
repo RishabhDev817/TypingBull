@@ -576,7 +576,7 @@ export const ClassroomEntry: React.FC<Props> = ({
                             </span>
                           </div>
                           {lesson.targetKeys && lesson.targetKeys.length > 0 && (
-                            <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                            <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
                               {lesson.targetKeys.join(', ').toUpperCase()}
                             </span>
                           )}

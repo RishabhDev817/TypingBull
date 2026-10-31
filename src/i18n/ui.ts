@@ -332,7 +332,7 @@ const rawUi = {
     'dash.faqSubtitle': 'TypingBullでのタッチタイピング習得に関するすべて',
 
     'learn.title': '🚂 タイピング大鉄道アドベンチャー',
-    'learn.allMastered': '🎉 全685レッスン完全制覇！真のタイピングチャンピオン！',
+    'learn.allMastered': '🎉 全528レッスン完全制覇！真のタイピングチャンピオン！',
     'learn.exploring': '現在の探検区間:',
     'learn.chapters': 'チャプター一覧',
     'learn.lessonsCount': 'レッスン',
@@ -804,7 +804,7 @@ const rawUi = {
     'dash.faqSubtitle': 'TypingBull을 통한 정밀 타자 학습의 모든 것',
 
     'learn.title': '🚂 그레이트 타이핑 철도 대장정',
-    'learn.allMastered': '🎉 모든 685개 레슨 완전 정복! 진정한 타자 챔피언입니다!',
+    'learn.allMastered': '🎉 모든 528개 레슨 완전 정복! 진정한 타자 챔피언입니다!',
     'learn.exploring': '현재 탐험 중:',
     'learn.chapters': '챕터 목록',
     'learn.lessonsCount': '레슨',

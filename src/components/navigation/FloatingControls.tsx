@@ -39,7 +39,7 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
       <button
         type="button"
         onClick={toggleMute}
-        className="h-8.5 w-8.5 rounded-full bg-transparent hover:bg-white/25 dark:hover:bg-white/10 active:scale-95 transition-all cursor-pointer flex items-center justify-center shrink-0"
+        className="h-9 w-9 pointer-coarse:h-11 pointer-coarse:w-11 rounded-full bg-transparent hover:bg-white/25 dark:hover:bg-white/10 active:scale-95 transition-all cursor-pointer flex items-center justify-center shrink-0"
         title={muted ? 'Unmute sounds' : 'Mute sounds'}
         aria-label={muted ? 'Unmute sounds' : 'Mute sounds'}
       >
@@ -54,7 +54,7 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
       <button
         type="button"
         onClick={cycleTheme}
-        className="h-8.5 w-8.5 rounded-full bg-transparent hover:bg-white/25 dark:hover:bg-white/10 active:scale-95 transition-all cursor-pointer flex items-center justify-center shrink-0"
+        className="h-9 w-9 pointer-coarse:h-11 pointer-coarse:w-11 rounded-full bg-transparent hover:bg-white/25 dark:hover:bg-white/10 active:scale-95 transition-all cursor-pointer flex items-center justify-center shrink-0"
         title={`Theme / Zen: ${mode.toUpperCase()} mode (Click to switch Day/Night/Auto)`}
         aria-label={`Toggle Theme Mode (Current: ${mode})`}
       >

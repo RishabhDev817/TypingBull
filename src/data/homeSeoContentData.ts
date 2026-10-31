@@ -22,7 +22,7 @@ export const HOME_SEO_DATA: Record<SupportedLocale, HomeSEOData> = {
     quickStats: [
       { label: 'Platform Tier', value: '100% Free', desc: 'Unlimited lessons & arcade modes' },
       { label: 'Telemetry Precision', value: '1 ms', desc: 'Per-key latency & error tracking' },
-      { label: 'Speed Benchmark', value: '80+ WPM', desc: 'Average user target achievement' },
+      { label: 'Speed Goal', value: '80+ WPM', desc: 'A common target for fast typists' },
       { label: 'Global Layouts', value: '9 Standards', desc: 'QWERTY, AZERTY, QWERTZ, JIS & more' },
     ],
     sections: [
@@ -47,7 +47,7 @@ export const HOME_SEO_DATA: Record<SupportedLocale, HomeSEOData> = {
         heading: 'High-Precision Online Typing Test WPM & Fast Keyboard Speed Drills',
         paragraphs: [
           'Speed without accuracy is counterproductive, but accuracy without velocity hampers modern digital throughput. TypingBull bridges this gap through high-velocity online typing test wpm evaluations and targeted fast keyboard speed drills. Our engine measures both Gross WPM (raw typing speed) and Net WPM (penalizing uncorrected mistakes), providing an uncompromising benchmark of genuine productivity.',
-          'Practice arenas challenge typists with adaptive countdown timers tailored to passage complexity. If the clock runs out before the passage is cleanly completed, the system enforces a tactical restart penalty. This gentle time pressure trains psychological composure, simulating the rigorous conditions of timed academic examinations, real-time closed captioning, medical transcription, and fast-paced workplace collaboration. By systematically training rhythm, cadence, and consistent burst velocity, users routinely break through stubborn 40 WPM, 60 WPM, and 80+ WPM plateaus within weeks of guided training.',
+          'Practice arenas challenge typists with adaptive countdown timers tailored to passage complexity. If the clock runs out before the passage is cleanly completed, the system enforces a tactical restart penalty. This gentle time pressure trains psychological composure, simulating the rigorous conditions of timed academic examinations, real-time closed captioning, medical transcription, and fast-paced workplace collaboration. By systematically training rhythm, cadence, and consistent burst velocity, regular practice can help you break through stubborn 40 WPM, 60 WPM, and 80+ WPM plateaus.',
         ],
       },
       {

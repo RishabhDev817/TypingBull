@@ -110,7 +110,7 @@ export const AboutPage: React.FC = () => {
             </div>
 
             <div className="space-y-2 text-center sm:text-left">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-700 dark:bg-purple-900/60 dark:text-purple-300">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-purple-100 text-purple-700 dark:bg-purple-900/60 dark:text-purple-300">
                 {t.mascotBadge}
               </div>
               <h2 className="card-title text-xl sm:text-2xl font-black text-[#0F172A] dark:text-[#F8FAFC]">

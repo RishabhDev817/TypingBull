@@ -129,7 +129,7 @@ export const PracticeGroundMenu: React.FC<Props> = ({
           >
             <span className="text-base">{playerEmoji}</span>
             <span className="max-w-[120px] truncate">{playerName}</span>
-            <span className="px-1.5 py-0.2 rounded-md bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 text-[10px] font-black uppercase flex items-center gap-1">
+            <span className="px-1.5 py-0.2 rounded-md bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 text-[11px] font-black uppercase flex items-center gap-1">
               <Edit3 className="w-2.5 h-2.5" />
               {t('multiplayer.editProfile')}
             </span>
@@ -223,7 +223,7 @@ export const PracticeGroundMenu: React.FC<Props> = ({
                 <span className="text-white font-black text-xs tracking-wider uppercase drop-shadow">
                   {t('multiplayer.speedway')}
                 </span>
-                <span className="text-[10px] font-bold text-emerald-100/90 mt-0.5">
+                <span className="text-[11px] font-bold text-emerald-100/90 mt-0.5">
                   {t('multiplayer.instantMatchmaking')}
                 </span>
               </div>
@@ -299,7 +299,7 @@ export const PracticeGroundMenu: React.FC<Props> = ({
                 <span className="text-cyan-300 font-black text-xs tracking-wider uppercase drop-shadow-[0_0_10px_rgba(6,182,212,0.8)]">
                   {t('multiplayer.privateArena')}
                 </span>
-                <span className="text-[10px] font-bold text-cyan-400/90 mt-0.5">
+                <span className="text-[11px] font-bold text-cyan-400/90 mt-0.5">
                   {t('multiplayer.customCodeInvite')}
                 </span>
               </div>
@@ -375,7 +375,7 @@ export const PracticeGroundMenu: React.FC<Props> = ({
                 <span className="text-purple-300 font-black text-xs tracking-wider uppercase drop-shadow-[0_0_10px_rgba(168,85,247,0.8)]">
                   {t('multiplayer.enterRoomCode')}
                 </span>
-                <span className="text-[10px] font-bold text-purple-400/80 mt-0.5">
+                <span className="text-[11px] font-bold text-purple-400/80 mt-0.5">
                   {t('multiplayer.joinFriendArena')}
                 </span>
               </div>

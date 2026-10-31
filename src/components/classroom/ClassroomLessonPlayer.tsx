@@ -298,7 +298,7 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
 
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-[10px] font-black uppercase tracking-wider border border-blue-200 dark:border-blue-800">
+              <span className="px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-[11px] font-black uppercase tracking-wider border border-blue-200 dark:border-blue-800">
                 Classroom Assignment
               </span>
               <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
@@ -314,7 +314,7 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
         <div className="flex items-center gap-2 self-end sm:self-center">
           {currentLesson.targetKeys && currentLesson.targetKeys.length > 0 && (
             <div className="flex items-center gap-1">
-              <span className="text-[10px] font-bold text-slate-400">Target Keys:</span>
+              <span className="text-[11px] font-bold text-slate-400">Target Keys:</span>
               {currentLesson.targetKeys.map((k) => (
                 <span
                   key={k}
@@ -343,7 +343,7 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
       <div className="text-center mb-5">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-black mb-2 text-slate-700 dark:text-slate-300">
           <span>{currentLesson.icon}</span>
-          <span className="uppercase tracking-wider text-[10px] text-primary">{currentLesson.type}</span>
+          <span className="uppercase tracking-wider text-[11px] text-primary">{currentLesson.type}</span>
           <span>•</span>
           <span>Passing Accuracy: {currentLesson.passingAccuracy}%</span>
         </div>
@@ -424,7 +424,7 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
                 <Zap className="w-4 h-4" />
               </div>
               <div>
-                <span className="text-[9px] font-black uppercase text-slate-400 block">WPM</span>
+                <span className="text-[10.5px] font-black uppercase text-slate-400 block">WPM</span>
                 <span className="font-mono text-base font-black text-slate-900 dark:text-white">
                   {engine.metrics.wpm}
                 </span>
@@ -436,7 +436,7 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
                 <Target className="w-4 h-4" />
               </div>
               <div>
-                <span className="text-[9px] font-black uppercase text-slate-400 block">Accuracy</span>
+                <span className="text-[10.5px] font-black uppercase text-slate-400 block">Accuracy</span>
                 <span
                   className={`font-mono text-base font-black ${
                     engine.metrics.accuracy >= currentLesson.passingAccuracy
@@ -454,7 +454,7 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
                 <Clock className="w-4 h-4" />
               </div>
               <div>
-                <span className="text-[9px] font-black uppercase text-slate-400 block">Progress</span>
+                <span className="text-[10.5px] font-black uppercase text-slate-400 block">Progress</span>
                 <span className="font-mono text-base font-black text-slate-900 dark:text-white">
                   {progressPercent}%
                 </span>
@@ -602,13 +602,13 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
               {/* Stats Summary */}
               <div className="grid grid-cols-2 gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
                 <div>
-                  <span className="text-[10px] font-black uppercase text-slate-400 block">WPM</span>
+                  <span className="text-[11px] font-black uppercase text-slate-400 block">WPM</span>
                   <span className="font-mono text-xl font-black text-blue-600 dark:text-blue-400">
                     {engine.metrics.wpm}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[10px] font-black uppercase text-slate-400 block">Accuracy</span>
+                  <span className="text-[11px] font-black uppercase text-slate-400 block">Accuracy</span>
                   <span className="font-mono text-xl font-black text-emerald-600 dark:text-emerald-400">
                     {engine.metrics.accuracy.toFixed(1)}%
                   </span>

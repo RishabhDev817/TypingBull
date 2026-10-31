@@ -329,7 +329,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                         {t('feedback.question')} <span className="text-rose-500">*</span>
                       </label>
                       <span
-                        className={`text-[10px] font-bold ${
+                        className={`text-[11px] font-bold ${
                           message.length > 900 ? 'text-amber-500' : 'text-slate-400'
                         }`}
                       >
@@ -352,7 +352,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                   <div className="space-y-2">
                     <label className="block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
                       {t('feedback.useCaseLabel')}{' '}
-                      <span className="text-[10px] lowercase text-slate-400 font-medium">{t('feedback.useCaseOptional')}</span>
+                      <span className="text-[11px] lowercase text-slate-400 font-medium">{t('feedback.useCaseOptional')}</span>
                     </label>
                     <div className="flex flex-wrap gap-1.5">
                       {useCases.map(({ id, label }) => {

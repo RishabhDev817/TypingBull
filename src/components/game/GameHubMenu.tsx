@@ -88,7 +88,7 @@ export const GameHubMenu: React.FC<GameHubMenuProps> = ({
                   <Sparkles className="w-3.5 h-3.5 fill-current" />
                   {t('game.hub.mpTag')}
                 </span>
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-400 text-[10px] font-black uppercase flex items-center gap-1">
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-400 text-[11px] font-black uppercase flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-sm" />
                   {t('game.hub.mpArena')}
                 </span>
@@ -226,7 +226,7 @@ export const GameHubMenu: React.FC<GameHubMenuProps> = ({
                 <Zap className="w-3.5 h-3.5 fill-current" />
                 {t('game.hub.teensBadge')}
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/50 text-amber-500 dark:text-amber-300 text-[10px] font-black uppercase flex items-center gap-1">
+              <span className="px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/50 text-amber-500 dark:text-amber-300 text-[11px] font-black uppercase flex items-center gap-1">
                 <Sparkles className="w-3 h-3" />
                 {t('game.hub.mpArena')}
               </span>
@@ -240,7 +240,7 @@ export const GameHubMenu: React.FC<GameHubMenuProps> = ({
                 <span className="text-cyan-300 font-black text-xs tracking-wider uppercase drop-shadow-[0_0_10px_rgba(6,182,212,0.8)]">
                   {t('game.neon.title')}
                 </span>
-                <span className="text-[10px] font-bold text-cyan-400/90 mt-1">
+                <span className="text-[11px] font-bold text-cyan-400/90 mt-1">
                   {t('game.neon.banner')}
                 </span>
               </div>
@@ -303,7 +303,7 @@ export const GameHubMenu: React.FC<GameHubMenuProps> = ({
                 <Code2 className="w-3.5 h-3.5" />
                 {t('game.hub.adultsBadge')}
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-black uppercase flex items-center gap-1">
+              <span className="px-2.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[11px] font-black uppercase flex items-center gap-1">
                 <Lock className="w-3 h-3" />
                 {t('game.hub.locked')}
               </span>
@@ -316,7 +316,7 @@ export const GameHubMenu: React.FC<GameHubMenuProps> = ({
                 <span className="text-purple-300 font-black text-xs tracking-wider uppercase">
                   {t('game.hub.terminalTitle')}
                 </span>
-                <span className="text-[10px] font-bold text-purple-400/80 mt-1">
+                <span className="text-[11px] font-bold text-purple-400/80 mt-1">
                   {t('game.hub.terminalBanner')}
                 </span>
               </div>

@@ -10,6 +10,7 @@ const KEYS = {
   streak: 'typingbull_streak',
   weakKeys: 'typingbull_weakkeys',
   highScore: 'typing_bull_high_score',
+  skipAhead: 'typingbull_skip_ahead',
 } as const;
 
 const MAX_SESSIONS = 20;
@@ -109,8 +110,26 @@ export function saveLessonProgress(progress: LessonProgress): void {
   writeJSON(KEYS.lessons, all);
 }
 
+/** Lets experienced typists open every chapter without clearing the earlier ones first. */
+export function isSkipAheadEnabled(): boolean {
+  try {
+    return localStorage.getItem(KEYS.skipAhead) === '1';
+  } catch {
+    return false;
+  }
+}
+
+export function enableSkipAhead(): void {
+  try {
+    localStorage.setItem(KEYS.skipAhead, '1');
+  } catch {
+    /* storage unavailable: skip-ahead just won't persist */
+  }
+}
+
 export function isLessonUnlocked(lessonId: number): boolean {
   if (lessonId === 1) return true; // First lesson always unlocked
+  if (isSkipAheadEnabled()) return true;
 
   // Check if the previous lesson (by ID) is completed
   // This works across chapter boundaries: the last lesson of chapter N

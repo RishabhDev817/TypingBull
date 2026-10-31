@@ -457,7 +457,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                 {/* Live Performance HUD */}
                 <div className="flex items-center gap-3">
                   <div className="px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-center">
-                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block uppercase">
+                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 block uppercase">
                       Speed
                     </span>
                     <span className="text-sm font-black text-blue-600 dark:text-blue-400">
@@ -466,7 +466,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                   </div>
 
                   <div className="px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-center">
-                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block uppercase">
+                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 block uppercase">
                       Accuracy
                     </span>
                     <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">

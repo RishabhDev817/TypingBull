@@ -375,7 +375,7 @@ canvas, .cloud, .confetti-piece {
   position: relative;
   overflow: hidden;
   background: var(--color-card-bg);
-  border: 3px solid var(--color-card-border);
+  border: 2px solid var(--color-card-border);
   border-radius: var(--radius-xl);
   box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.04);
   backdrop-filter: blur(24px);
@@ -502,65 +502,65 @@ canvas, .cloud, .confetti-piece {
 
 .card-halo-orange {
   border-color: #FED7AA;
-  box-shadow: 0 14px 36px -4px rgba(249, 115, 22, 0.32), 0 4px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 14px 36px -4px rgba(249, 115, 22, 0.2), 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 [data-theme="dark"] .card-halo-orange {
-  border-color: #C2410C;
-  box-shadow: 0 14px 36px -4px rgba(249, 115, 22, 0.25), 0 4px 12px rgba(0, 0, 0, 0.4);
+  border-color: rgba(148, 163, 184, 0.28);
+  box-shadow: 0 14px 36px -4px rgba(249, 115, 22, 0.14), 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .card-halo-gold {
   border-color: #FEF08A;
-  box-shadow: 0 14px 36px -4px rgba(234, 179, 8, 0.35), 0 4px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 14px 36px -4px rgba(234, 179, 8, 0.2), 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 [data-theme="dark"] .card-halo-gold {
-  border-color: #A16207;
-  box-shadow: 0 14px 36px -4px rgba(234, 179, 8, 0.25), 0 4px 12px rgba(0, 0, 0, 0.4);
+  border-color: rgba(148, 163, 184, 0.28);
+  box-shadow: 0 14px 36px -4px rgba(234, 179, 8, 0.14), 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .card-halo-purple {
   border-color: #E9D5FF;
-  box-shadow: 0 14px 36px -4px rgba(168, 85, 247, 0.32), 0 4px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 14px 36px -4px rgba(168, 85, 247, 0.2), 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 [data-theme="dark"] .card-halo-purple {
-  border-color: #7E22CE;
-  box-shadow: 0 14px 36px -4px rgba(168, 85, 247, 0.25), 0 4px 12px rgba(0, 0, 0, 0.4);
+  border-color: rgba(148, 163, 184, 0.28);
+  box-shadow: 0 14px 36px -4px rgba(168, 85, 247, 0.14), 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .card-halo-blue {
   border-color: #BFDBFE;
-  box-shadow: 0 14px 36px -4px rgba(59, 130, 246, 0.32), 0 4px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 14px 36px -4px rgba(59, 130, 246, 0.2), 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 [data-theme="dark"] .card-halo-blue {
-  border-color: #1D4ED8;
-  box-shadow: 0 14px 36px -4px rgba(59, 130, 246, 0.25), 0 4px 12px rgba(0, 0, 0, 0.4);
+  border-color: rgba(148, 163, 184, 0.28);
+  box-shadow: 0 14px 36px -4px rgba(59, 130, 246, 0.14), 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .card-halo-green {
   border-color: #BBF7D0;
-  box-shadow: 0 14px 36px -4px rgba(34, 197, 94, 0.32), 0 4px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 14px 36px -4px rgba(34, 197, 94, 0.2), 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 [data-theme="dark"] .card-halo-green {
-  border-color: #15803D;
-  box-shadow: 0 14px 36px -4px rgba(34, 197, 94, 0.25), 0 4px 12px rgba(0, 0, 0, 0.4);
+  border-color: rgba(148, 163, 184, 0.28);
+  box-shadow: 0 14px 36px -4px rgba(34, 197, 94, 0.14), 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .card-halo-pink {
   border-color: #FBCFE8;
-  box-shadow: 0 14px 36px -4px rgba(236, 72, 153, 0.32), 0 4px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 14px 36px -4px rgba(236, 72, 153, 0.2), 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 [data-theme="dark"] .card-halo-pink {
-  border-color: #BE185D;
-  box-shadow: 0 14px 36px -4px rgba(236, 72, 153, 0.25), 0 4px 12px rgba(0, 0, 0, 0.4);
+  border-color: rgba(148, 163, 184, 0.28);
+  box-shadow: 0 14px 36px -4px rgba(236, 72, 153, 0.14), 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .card-halo-red {
   border-color: #FECACA;
-  box-shadow: 0 14px 36px -4px rgba(239, 68, 68, 0.32), 0 4px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 14px 36px -4px rgba(239, 68, 68, 0.2), 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 [data-theme="dark"] .card-halo-red {
-  border-color: #B91C1C;
-  box-shadow: 0 14px 36px -4px rgba(239, 68, 68, 0.25), 0 4px 12px rgba(0, 0, 0, 0.4);
+  border-color: rgba(148, 163, 184, 0.28);
+  box-shadow: 0 14px 36px -4px rgba(239, 68, 68, 0.14), 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 /* ─── Sky Background with Clouds ───────────────────────────────── */

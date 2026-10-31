@@ -149,7 +149,7 @@ export const TypingFAQ: React.FC<TypingFAQProps> = ({ className = '' }) => {
                   soundEngine.playPop();
                   setActiveCategory(key);
                 }}
-                className={`relative px-4 py-2 rounded-2xl text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer border ${
+                className={`relative min-h-11 px-4 py-2 rounded-2xl text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer border ${
                   isActive
                     ? 'text-white border-transparent shadow-md'
                     : 'bg-white/60 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 border-slate-200/80 dark:border-slate-700/70 hover:bg-white dark:hover:bg-slate-800'
@@ -167,7 +167,7 @@ export const TypingFAQ: React.FC<TypingFAQProps> = ({ className = '' }) => {
                 <Icon className="w-3.5 h-3.5" />
                 <span>{categoryLabels[key]}</span>
                 <span
-                  className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                  className={`text-[11px] font-bold px-1.5 py-0.5 rounded-full ${
                     isActive
                       ? 'bg-white/25 text-white'
                       : 'bg-slate-200/70 dark:bg-slate-700/70 text-slate-500 dark:text-slate-400'
@@ -226,7 +226,7 @@ export const TypingFAQ: React.FC<TypingFAQProps> = ({ className = '' }) => {
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <span
-                      className={`shrink-0 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${catColors.bg} ${catColors.text} ${catColors.border}`}
+                      className={`shrink-0 px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider border ${catColors.bg} ${catColors.text} ${catColors.border}`}
                     >
                       {categoryLabels[item.category]}
                     </span>

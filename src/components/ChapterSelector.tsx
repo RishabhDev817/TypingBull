@@ -37,7 +37,7 @@ export const ChapterSelector: React.FC<ChapterSelectorProps> = ({
           {/* Section Header */}
           <div className="flex items-center gap-2 px-3 py-2 mb-1.5">
             <span className="text-base">{section.icon}</span>
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
               {section.title}
             </span>
           </div>
@@ -116,7 +116,7 @@ const ChapterCard: React.FC<ChapterCardProps> = ({ chapter, isSelected, onSelect
             {chapter.title}
           </span>
           {chapter.wpmGoal && unlocked && (
-            <span className="text-[9px] font-bold text-sky-400/70 shrink-0">
+            <span className="text-[10.5px] font-bold text-sky-400/70 shrink-0">
               {chapter.wpmGoal} WPM
             </span>
           )}
@@ -136,7 +136,7 @@ const ChapterCard: React.FC<ChapterCardProps> = ({ chapter, isSelected, onSelect
             </div>
             <div className="flex items-center gap-0.5 shrink-0">
               <Star className="w-2.5 h-2.5 text-amber-400/60 fill-amber-400/60" />
-              <span className="text-[9px] font-bold text-slate-400">
+              <span className="text-[10.5px] font-bold text-slate-400">
                 {progress.stars}
               </span>
             </div>
@@ -144,7 +144,7 @@ const ChapterCard: React.FC<ChapterCardProps> = ({ chapter, isSelected, onSelect
         )}
 
         {/* Lesson count */}
-        <span className="text-[9px] text-slate-500 mt-0.5 block">
+        <span className="text-[10.5px] text-slate-500 mt-0.5 block">
           {progress.completed}/{progress.total} {t('learn.lessonsCount').toLowerCase()}
         </span>
       </div>

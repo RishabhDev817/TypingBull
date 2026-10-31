@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { LayoutDashboard, BookOpen, Gamepad2, Keyboard, Info, ChevronLeft, ChevronRight, Sparkles, MessageSquareHeart, School } from 'lucide-react';
-import { Mascot } from '../Mascot';
 import { soundEngine } from '../../utils/audio';
 import { useI18n } from '../../context/I18nContext';
 import { useFeedback } from '../../context/FeedbackContext';
@@ -56,7 +55,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, 
       {/* Toggle Button attached to right edge */}
       <button
         onClick={toggleSidebar}
-        className="absolute top-6 -right-4 z-50 w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 shadow-md flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-primary hover:scale-110 active:scale-95 transition-all cursor-pointer"
+        className="absolute top-6 -right-4 z-50 w-9 h-9 pointer-coarse:w-11 pointer-coarse:h-11 rounded-full bg-white/90 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 shadow-md flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-primary hover:scale-110 active:scale-95 transition-all cursor-pointer"
         title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
         aria-label="Toggle Sidebar"
       >
@@ -65,12 +64,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, 
 
       {/* Logo with mascot */}
       <div className="flex items-center gap-3 px-5 py-4 border-b border-hairline/50 shrink-0">
-        <Mascot mood="happy" size="xs" />
+        <img src="/typingbull-logo.png" alt="TypingBull logo" width="44" height="44" className="w-11 h-11 object-contain shrink-0 drop-shadow-md" draggable={false} />
         <div className="flex flex-col">
           <span className="font-extrabold text-base tracking-tight leading-none text-ink">
             Typing<span className="text-primary">Bull</span>
           </span>
-          <span className="text-[10px] text-body font-bold uppercase tracking-widest leading-none mt-0.5">
+          <span className="text-[11px] text-body font-bold uppercase tracking-widest leading-none mt-0.5">
             typing coach
           </span>
         </div>
@@ -111,7 +110,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, 
                 <span className={`truncate ${isItemActive ? 'text-white' : 'text-body font-bold'}`}>{label}</span>
                 {badge && (
                   <span
-                    className={`ml-auto shrink-0 w-10 max-w-[42px] px-1 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-full text-center flex items-center justify-center border shadow-xs transition-all ${
+                    className={`ml-auto shrink-0 w-10 max-w-[42px] px-1 py-0.5 text-[10.5px] font-black uppercase tracking-wider rounded-full text-center flex items-center justify-center border shadow-xs transition-all ${
                       badge === 'LIVE' || isLive
                         ? isItemActive
                           ? 'bg-white text-emerald-600 border-white/90 shadow-sm font-black'

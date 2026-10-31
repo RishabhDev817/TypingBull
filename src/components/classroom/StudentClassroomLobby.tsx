@@ -176,7 +176,7 @@ export const StudentClassroomLobby: React.FC<Props> = ({
           {/* Status Indicators Grid */}
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
+              <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
                 Teacher Status
               </span>
               <div className="flex items-center gap-1.5 mt-1">
@@ -188,7 +188,7 @@ export const StudentClassroomLobby: React.FC<Props> = ({
             </div>
 
             <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
+              <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
                 Classmates
               </span>
               <div className="flex items-center gap-1.5 mt-1">
@@ -205,7 +205,7 @@ export const StudentClassroomLobby: React.FC<Props> = ({
             <div className="p-3.5 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40 border border-blue-200 dark:border-blue-800 flex items-start gap-2.5 shadow-xs">
               <span className="text-lg leading-none shrink-0 mt-0.5">📌</span>
               <div>
-                <span className="text-[10px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400 block">
+                <span className="text-[11px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400 block">
                   Note from {room.teacherName}:
                 </span>
                 <p className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 mt-0.5 leading-relaxed">
@@ -220,7 +220,7 @@ export const StudentClassroomLobby: React.FC<Props> = ({
             <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-blue-500/10 via-indigo-500/5 to-purple-500/10 border-2 border-blue-400/50 dark:border-blue-500/40 shadow-xl space-y-4">
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 rounded-full bg-blue-600 text-white font-mono text-[10px] font-black uppercase tracking-wider shadow-sm shadow-blue-500/20">
+                  <span className="px-3 py-1 rounded-full bg-blue-600 text-white font-mono text-[11px] font-black uppercase tracking-wider shadow-sm shadow-blue-500/20">
                     Classroom Tasks ({(me?.completedLessonIds || []).filter((id) => room.settings.assignments?.some((a) => a.lessonId === id)).length}/{room.settings.assignments.length} Completed)
                   </span>
                 </div>
@@ -303,17 +303,17 @@ export const StudentClassroomLobby: React.FC<Props> = ({
                               {idx + 1}. {assignment.title}
                             </span>
                             {isCompleted && (
-                              <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold text-[10px] uppercase">
+                              <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold text-[11px] uppercase">
                                 ✅ Completed
                               </span>
                             )}
                             {isNext && (
-                              <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 font-bold text-[10px] uppercase animate-pulse">
+                              <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 font-bold text-[11px] uppercase animate-pulse">
                                 ▶ Available
                               </span>
                             )}
                             {isLocked && (
-                              <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-400 font-semibold text-[10px]">
+                              <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-400 font-semibold text-[11px]">
                                 🔒 Complete previous lesson first
                               </span>
                             )}
@@ -327,11 +327,11 @@ export const StudentClassroomLobby: React.FC<Props> = ({
 
                           {assignment.targetKeys && assignment.targetKeys.length > 0 && (
                             <div className="flex items-center gap-1 mt-1">
-                              <span className="text-[10px] font-bold text-slate-400">Keys:</span>
+                              <span className="text-[11px] font-bold text-slate-400">Keys:</span>
                               {assignment.targetKeys.map((k) => (
                                 <span
                                   key={k}
-                                  className="px-1.5 py-0.2 rounded bg-white dark:bg-slate-800 font-mono text-[10px] font-bold text-blue-600 dark:text-blue-300 border border-slate-200 dark:border-slate-700"
+                                  className="px-1.5 py-0.2 rounded bg-white dark:bg-slate-800 font-mono text-[11px] font-bold text-blue-600 dark:text-blue-300 border border-slate-200 dark:border-slate-700"
                                 >
                                   {k === ' ' ? 'Space' : k.toUpperCase()}
                                 </span>
@@ -386,7 +386,7 @@ export const StudentClassroomLobby: React.FC<Props> = ({
             <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-blue-500/10 via-indigo-500/5 to-purple-500/10 border-2 border-blue-400/50 dark:border-blue-500/40 shadow-xl space-y-4">
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 rounded-full bg-blue-600 text-white font-mono text-[10px] font-black uppercase tracking-wider shadow-sm shadow-blue-500/20">
+                  <span className="px-3 py-1 rounded-full bg-blue-600 text-white font-mono text-[11px] font-black uppercase tracking-wider shadow-sm shadow-blue-500/20">
                     Today&apos;s Classroom Lesson
                   </span>
                   <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
@@ -446,16 +446,16 @@ export const StudentClassroomLobby: React.FC<Props> = ({
             /* Fallback Activity Preview (Passages / Games) */
             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
               <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Assigned Activity
                 </span>
                 {room.settings.activityType === 'game' ? (
-                  <span className="px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-mono text-[9px] font-black uppercase flex items-center gap-1">
+                  <span className="px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-mono text-[10.5px] font-black uppercase flex items-center gap-1">
                     <Gamepad2 className="w-3 h-3" />
                     <span>Arcade Game Challenge</span>
                   </span>
                 ) : (
-                  <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 font-mono text-[9px] font-black uppercase flex items-center gap-1">
+                  <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 font-mono text-[10.5px] font-black uppercase flex items-center gap-1">
                     <Keyboard className="w-3 h-3" />
                     <span>Practice Passage</span>
                   </span>
@@ -595,15 +595,15 @@ export const StudentClassroomLobby: React.FC<Props> = ({
 
                     <div>
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono text-[10px] font-black">
+                        <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono text-[11px] font-black">
                           Step {lesson.id}
                         </span>
                         {isCurrentAssignment && (
-                          <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-[10px] font-black uppercase">
+                          <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-[11px] font-black uppercase">
                             Teacher Assignment
                           </span>
                         )}
-                        <span className="text-[10px] font-bold text-slate-400 uppercase">
+                        <span className="text-[11px] font-bold text-slate-400 uppercase">
                           {lesson.type}
                         </span>
                       </div>
@@ -665,12 +665,12 @@ export const StudentClassroomLobby: React.FC<Props> = ({
                       <div className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-1.5">
                         <span>{student.name}</span>
                         {isMe && (
-                          <span className="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-[10px] font-black">
+                          <span className="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-[11px] font-black">
                             You
                           </span>
                         )}
                       </div>
-                      <span className="text-[10px] font-bold text-slate-400">
+                      <span className="text-[11px] font-bold text-slate-400">
                         {student.isReady ? 'Ready for Session' : 'Warming Up'}
                       </span>
                     </div>
@@ -678,12 +678,12 @@ export const StudentClassroomLobby: React.FC<Props> = ({
 
                   <div>
                     {student.isReady ? (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-[10px] font-black uppercase">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-[11px] font-black uppercase">
                         <CheckCircle2 className="w-3 h-3" />
                         <span>Ready</span>
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 text-[10px] font-black uppercase">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 text-[11px] font-black uppercase">
                         <span>Waiting</span>
                       </span>
                     )}

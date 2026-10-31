@@ -2,7 +2,7 @@
  * Curriculum Registry — Sections & Chapters
  * ──────────────────────────────────────────
  * Defines the 5 sections and 25 chapters that make up
- * the TypingBull 685-lesson curriculum.
+ * the TypingBull 528-lesson curriculum.
  */
 
 import type { Chapter, Section } from './lessons/types';

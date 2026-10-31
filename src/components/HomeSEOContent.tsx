@@ -1,12 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Trophy, Zap, ShieldCheck, Keyboard, Brain, Gamepad2, Code2, Globe2 } from 'lucide-react';
+import { Sparkles, Trophy, Zap, ShieldCheck, Keyboard, Brain, Gamepad2, Code2, Globe2, ChevronDown } from 'lucide-react';
 import { useI18n } from '../context/I18nContext';
 import { HOME_SEO_DATA } from '../data/homeSeoContentData';
 import { SEO_DATA_BY_LANG } from '../hooks/usePageSEO';
 
+const READ_MORE: Record<string, [string, string]> = {
+  en: ['Read the full guide', 'Show less'],
+  es: ['Leer la guía completa', 'Mostrar menos'],
+  ja: ['ガイド全文を読む', '閉じる'],
+  fr: ['Lire le guide complet', 'Réduire'],
+  de: ['Ganzen Leitfaden lesen', 'Weniger anzeigen'],
+  pt: ['Ler o guia completo', 'Mostrar menos'],
+  ko: ['전체 가이드 보기', '접기'],
+  it: ['Leggi la guida completa', 'Mostra meno'],
+  hi: ['पूरा गाइड पढ़ें', 'कम दिखाएँ'],
+};
+
 export const HomeSEOContent: React.FC = () => {
   const { currentLang } = useI18n();
+  const [expanded, setExpanded] = useState(false);
+  const [readMore, showLess] = READ_MORE[currentLang] || READ_MORE.en;
   const data = HOME_SEO_DATA[currentLang] || HOME_SEO_DATA.en;
   const seoMeta = SEO_DATA_BY_LANG[currentLang] || SEO_DATA_BY_LANG.en;
 
@@ -51,19 +65,24 @@ export const HomeSEOContent: React.FC = () => {
             key={idx}
             className="p-3.5 rounded-2xl bg-slate-50/90 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/60 flex flex-col justify-between"
           >
-            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
               {stat.label}
             </span>
             <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white my-0.5">
               {stat.value}
             </span>
-            <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">
+            <span className="text-xs text-slate-600 dark:text-slate-300 font-semibold">
               {stat.desc}
             </span>
           </div>
         ))}
       </div>
 
+      {/* Collapsed by default so the long guide doesn't push the app down; the text stays in the DOM for crawlers. */}
+      <div
+        id="seo-guide-body"
+        className={`relative z-10 transition-[max-height] duration-500 ease-out overflow-hidden ${expanded ? 'max-h-[400rem]' : 'max-h-[22rem]'}`}
+      >
       {/* Semantic Educational Topic Cards (2 Columns) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
         {data.sections.map((section, index) => (
@@ -78,7 +97,7 @@ export const HomeSEOContent: React.FC = () => {
             <div>
               {/* Section Tag */}
               {section.badge && (
-                <div className="flex items-center gap-1.5 text-[10.5px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+                <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">
                   {sectionIcons[index % sectionIcons.length]}
                   <span>{section.badge}</span>
                 </div>
@@ -90,7 +109,7 @@ export const HomeSEOContent: React.FC = () => {
               </h3>
 
               {/* Body Paragraphs */}
-              <div className="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
+              <div className="space-y-3 text-sm text-slate-700 dark:text-slate-200 font-medium leading-relaxed">
                 {section.paragraphs.map((p, pIdx) => (
                   <p key={pIdx}>{p}</p>
                 ))}
@@ -103,14 +122,14 @@ export const HomeSEOContent: React.FC = () => {
       {/* Keyword Tags & Feature Pill Matrix Footer */}
       <footer className="mt-8 pt-6 border-t border-slate-200/80 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-4 relative z-10">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-bold text-slate-400 dark:text-slate-500 flex items-center gap-1">
+          <span className="text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
             Keywords:
           </span>
           {seoMeta.keywords.split(', ').slice(0, 6).map((kw, i) => (
             <span
               key={i}
-              className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 border border-slate-200/70 dark:border-slate-700/60"
+              className="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 border border-slate-200/70 dark:border-slate-700/60"
             >
               #{kw.toLowerCase()}
             </span>
@@ -122,6 +141,22 @@ export const HomeSEOContent: React.FC = () => {
           <span>TypingBull — 100% Free Browser-Based Engine</span>
         </div>
       </footer>
+      {!expanded && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white dark:from-slate-900 to-transparent" aria-hidden="true" />
+      )}
+      </div>
+      <div className="relative z-10 mt-5 flex justify-center">
+        <button
+          type="button"
+          onClick={() => setExpanded(v => !v)}
+          aria-expanded={expanded}
+          aria-controls="seo-guide-body"
+          className="inline-flex items-center gap-2 min-h-11 px-6 rounded-full text-sm font-black bg-purple-600 hover:bg-purple-500 text-white shadow-lg cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-300"
+        >
+          {expanded ? showLess : readMore}
+          <ChevronDown className={`w-4 h-4 transition-transform ${expanded ? 'rotate-180' : ''}`} />
+        </button>
+      </div>
     </article>
   );
 };

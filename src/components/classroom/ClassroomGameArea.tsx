@@ -87,7 +87,7 @@ export const ClassroomGameArea: React.FC<Props> = ({
               <span className="text-xs font-black uppercase tracking-wider text-indigo-400">
                 Classroom Arcade Challenge
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">
+              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-bold">
                 Live Session
               </span>
             </div>
