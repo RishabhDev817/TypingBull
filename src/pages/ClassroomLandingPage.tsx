@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import { Mascot } from '../components/Mascot';
 import { soundEngine } from '../utils/audio';
-import { CLASSROOM_LESSONS } from '../data/classroom/classroomLessons';
+import { LESSONS } from '../data/lessonData';
 
 interface Props {
   onCreateClassroom: () => void;
@@ -1360,44 +1360,112 @@ export const ClassroomLandingPage: React.FC<Props> = ({
         </div>
       </section>
 
-      {/* ─── 6. LESSONS MUST BE PROMINENT (Learn Step by Step) ─── */}
+      {/* ─── 6. LESSONS MUST BE PROMINENT (Learn Together Workflow) ─── */}
       <section className="card-game card-halo-purple p-6 sm:p-8 lg:p-10 rounded-3xl mb-8 sm:mb-12">
         <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
           <span className="text-xs font-black uppercase tracking-widest text-primary">
-            Core Curriculum
+            Learn Together
           </span>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-ink mt-1">
-            Learn Step by Step
+            Assign Structured Typing Lessons to Your Entire Classroom
           </h2>
-          <p className="text-xs sm:text-sm text-mute font-semibold mt-1">
-            Classroom includes structured lessons designed for tactile muscle memory.
+          <p className="text-xs sm:text-sm text-mute font-semibold mt-2 leading-relaxed">
+            Teachers can assign structured typing lessons from TypingBull Learn, and students can practice the same lesson together in real-time.
           </p>
         </div>
 
-        {/* Visual Learning Path */}
+        {/* 3-Step Simple Explanation */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div className="p-5 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg font-black mb-3">
+                1
+              </div>
+              <h3 className="text-base font-extrabold text-ink mb-1">
+                Teacher chooses a lesson
+              </h3>
+              <p className="text-xs text-mute font-medium leading-relaxed">
+                Browse the 685 progressive Learn steps (starting with tactile home keys FF, FJ, JF) and assign with one click.
+              </p>
+            </div>
+            <div className="mt-3 text-[10px] font-bold text-blue-600 dark:text-blue-400">
+              One source of truth curriculum
+            </div>
+          </div>
+
+          <div className="p-5 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-lg font-black mb-3">
+                2
+              </div>
+              <h3 className="text-base font-extrabold text-ink mb-1">
+                Students join the classroom
+              </h3>
+              <p className="text-xs text-mute font-medium leading-relaxed">
+                Students enter the room code on desktop, tablet, or Chromebook. Zero accounts, logins, or tracking cookies required.
+              </p>
+            </div>
+            <div className="mt-3 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+              Zero login friction
+            </div>
+          </div>
+
+          <div className="p-5 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400 flex items-center justify-center text-lg font-black mb-3">
+                3
+              </div>
+              <h3 className="text-base font-extrabold text-ink mb-1">
+                Everyone practices the assigned lesson
+              </h3>
+              <p className="text-xs text-mute font-medium leading-relaxed">
+                Students practice the exact same repetitive keystrokes with interactive virtual keyboards, while the teacher tracks live completion.
+              </p>
+            </div>
+            <div className="mt-3 text-[10px] font-bold text-purple-600 dark:text-purple-400">
+              Live progress telemetry
+            </div>
+          </div>
+        </div>
+
+        {/* Visual Learning Path Preview from Canonical Learn Lessons */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {CLASSROOM_LESSONS.slice(0, 4).map((lesson) => (
+          {LESSONS.slice(0, 4).map((lesson) => (
             <div
               key={lesson.id}
               className="p-4 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">
-                    Lesson {lesson.lessonNumber}
+                  <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono">
+                    Step {lesson.id}
                   </span>
-                  <span className="text-[10px] font-bold text-mute">{lesson.badge}</span>
+                  <span className="text-[10px] font-bold text-mute uppercase">{lesson.type}</span>
                 </div>
-                <h4 className="text-sm font-extrabold text-ink mb-1">{lesson.shortTitle}</h4>
-                <p className="text-[11px] text-body font-medium leading-relaxed">
+                <h4 className="text-sm font-extrabold text-ink mb-1 flex items-center gap-1.5">
+                  <span>{lesson.icon}</span>
+                  <span className="truncate">{lesson.title}</span>
+                </h4>
+                <p className="text-[11px] text-body font-medium leading-relaxed line-clamp-2">
                   {lesson.description}
                 </p>
+                {lesson.targetKeys.length > 0 && (
+                  <div className="flex items-center gap-1 mt-2">
+                    {lesson.targetKeys.map((k) => (
+                      <span
+                        key={k}
+                        className="px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-700 font-mono text-[10px] font-bold text-slate-700 dark:text-slate-300"
+                      >
+                        {k === ' ' ? 'Space' : k.toUpperCase()}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-primary flex items-center gap-1">
-                <span>Target: {lesson.typingExercise.targetWpm} WPM</span>
-                <span className="text-mute">•</span>
-                <span>{lesson.typingExercise.minimumAccuracy}% Acc</span>
+              <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-primary flex items-center justify-between">
+                <span>Pass: {lesson.passingAccuracy}% Acc</span>
+                <span className="text-slate-400 font-mono">Home Row</span>
               </div>
             </div>
           ))}
@@ -1431,13 +1499,13 @@ export const ClassroomLandingPage: React.FC<Props> = ({
             </div>
             <div className="p-2.5 rounded-xl bg-white/90 dark:bg-slate-800/90 border border-purple-200 dark:border-purple-800">
               <span className="text-base block mb-1">⌨️</span>
-              <span className="text-xs font-extrabold text-ink block">Exercise</span>
-              <span className="text-[10px] text-mute font-semibold">Passing benchmark</span>
+              <span className="text-xs font-extrabold text-ink block">Repetition</span>
+              <span className="text-[10px] text-mute font-semibold">Muscle memory drills</span>
             </div>
             <div className="p-2.5 rounded-xl bg-white/90 dark:bg-slate-800/90 border border-purple-200 dark:border-purple-800">
-              <span className="text-base block mb-1">🏆</span>
-              <span className="text-xs font-extrabold text-ink block">Completion</span>
-              <span className="text-[10px] text-mute font-semibold">Star & progress badge</span>
+              <span className="text-base block mb-1">📊</span>
+              <span className="text-xs font-extrabold text-ink block">Live Mastery</span>
+              <span className="text-[10px] text-mute font-semibold">Accuracy gate to pass</span>
             </div>
           </div>
         </div>

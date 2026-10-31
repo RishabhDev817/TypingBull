@@ -830,7 +830,13 @@ export class MultiplayerArena extends DurableObject {
     switch (msg.type) {
       case 'CREATE_CLASSROOM': {
         const teacherToken = `tt_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
-        const room = this.classroomManager.createRoom(meta.playerId, teacherToken, msg.payload.teacherName);
+        const room = this.classroomManager.createRoom(
+          meta.playerId,
+          teacherToken,
+          msg.payload.teacherName,
+          (msg.payload as any).initialAssignments,
+          (msg.payload as any).initialSettings
+        );
 
         meta.code = room.code;
         meta.role = 'teacher';
@@ -1060,7 +1066,7 @@ export class MultiplayerArena extends DurableObject {
         } else {
           const student = Object.values(room.students).find((s) => s.sessionToken === sessionToken);
           if (student) {
-            student.id = meta.playerId;
+            meta.playerId = student.id;
             student.disconnectedAt = undefined;
             if (student.status === 'DISCONNECTED') {
               student.status = student.isReady ? 'READY' : 'NOT_READY';
@@ -1140,7 +1146,8 @@ export class MultiplayerArena extends DurableObject {
     if (!room || room.status !== 'ACTIVE') return;
 
     room.status = 'ENDED';
-    const results = this.classroomManager.buildResults(room);
+    const results = this.classroomManager.calculateResults(room);
+    if (!results) return;
     this.broadcastToClassroomRoom(room.code, {
       type: 'SESSION_FINISHED',
       payload: { results },

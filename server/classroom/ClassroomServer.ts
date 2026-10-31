@@ -155,7 +155,13 @@ export class ClassroomServer {
     switch (msg.type) {
       case 'CREATE_CLASSROOM': {
         const teacherToken = `tt_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
-        const room = this.manager.createRoom(meta.playerId, teacherToken, msg.payload.teacherName);
+        const room = this.manager.createRoom(
+          meta.playerId,
+          teacherToken,
+          msg.payload.teacherName,
+          msg.payload.initialAssignments,
+          msg.payload.initialSettings
+        );
 
         meta.code = room.code;
         meta.role = 'teacher';
@@ -334,6 +340,17 @@ export class ClassroomServer {
             },
           });
 
+          // Broadcast updated student view so teacher and peers see new completedLessonIds
+          const roomView = this.manager.toRoomView(room);
+          this.broadcastToRoom(room.code, {
+            type: 'STUDENT_LIST_UPDATED',
+            payload: {
+              students: roomView.students,
+              studentCount: roomView.studentCount,
+              readyCount: roomView.readyCount,
+            },
+          });
+
           if (allFinished && results) {
             // Cancel timeout timer
             if (this.sessionTimers.has(room.code)) {
@@ -392,7 +409,7 @@ export class ClassroomServer {
           // Find student by token
           const student = Object.values(room.students).find((s) => s.sessionToken === sessionToken);
           if (student) {
-            student.id = meta.playerId;
+            meta.playerId = student.id;
             student.disconnectedAt = undefined;
             if (student.status === 'DISCONNECTED') {
               student.status = student.isReady ? 'READY' : 'NOT_READY';
@@ -458,6 +475,7 @@ export class ClassroomServer {
 
     room.status = 'FINISHED';
     const results = this.manager.calculateResults(room);
+    if (!results) return;
     this.broadcastToRoom(code, {
       type: 'SESSION_FINISHED',
       payload: { results },

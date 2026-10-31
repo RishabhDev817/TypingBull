@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Clock, Zap, Target, CheckCircle2 } from 'lucide-react';
 import { soundEngine } from '../../utils/audio';
 import { KeyboardDiagram } from '../keyboard/KeyboardDiagram';
+import { getLessonById } from '../../data/lessonData';
 import type { StudentProgressUpdate, StudentFinishPayload, ClassroomSessionType } from '../../types/classroom';
 
 interface Props {
@@ -11,6 +12,8 @@ interface Props {
   sessionStartAt: number;
   sessionEndAt: number;
   session_type?: ClassroomSessionType;
+  lesson_id?: number | string;
+  assignmentId?: string;
   targetKeys?: string[];
   assignmentCategory?: string;
   onProgressUpdate: (update: StudentProgressUpdate) => void;
@@ -23,6 +26,8 @@ export const ClassroomTypingArea: React.FC<Props> = ({
   sessionStartAt,
   sessionEndAt,
   session_type,
+  lesson_id,
+  assignmentId,
   targetKeys,
   assignmentCategory,
   onProgressUpdate,
@@ -41,8 +46,16 @@ export const ClassroomTypingArea: React.FC<Props> = ({
   const activeCharRef = useRef<HTMLSpanElement>(null);
   const isFinishedRef = useRef<boolean>(false);
 
-  const isCurriculum = session_type === 'curriculum' || assignmentCategory === 'learn-curriculum';
-  const safeTargetText = targetText || 'The morning sun rose gently over the emerald hills.';
+  const isCurriculum = session_type === 'curriculum' || assignmentCategory === 'learn-curriculum' || Boolean(lesson_id);
+  const canonicalLesson = lesson_id ? getLessonById(Number(lesson_id)) : undefined;
+  const safeTargetText =
+    canonicalLesson?.content ||
+    (targetText && targetText !== 'Practice typing drill' ? targetText : '') ||
+    'The morning sun rose gently over the emerald hills.';
+  const effectiveTargetKeys =
+    canonicalLesson?.targetKeys && canonicalLesson.targetKeys.length > 0
+      ? canonicalLesson.targetKeys
+      : targetKeys;
   const totalChars = safeTargetText.length;
 
   // Keep hidden input focused continuously
@@ -67,7 +80,7 @@ export const ClassroomTypingArea: React.FC<Props> = ({
       setTimeRemainingSec(remaining);
 
       if (remaining <= 0 && !isFinishedRef.current) {
-        handleComplete();
+        handleComplete(true);
       }
     }, 500);
 
@@ -93,7 +106,7 @@ export const ClassroomTypingArea: React.FC<Props> = ({
   }, [userInput.length]);
 
   // Complete handler
-  const handleComplete = useCallback(() => {
+  const handleComplete = useCallback((isTimeout = false) => {
     if (isFinishedRef.current) return;
     isFinishedRef.current = true;
     setIsFinished(true);
@@ -108,8 +121,11 @@ export const ClassroomTypingArea: React.FC<Props> = ({
       ? Math.round(((totalKeystrokes - mistakesCount) / totalKeystrokes) * 1000) / 10
       : 100;
     const timeSpentSec = Math.max(1, Math.round((now - effectiveStart) / 1000));
+    const isCompleted = !isTimeout && typedLen >= totalChars;
 
-    soundEngine.playVictory();
+    if (isCompleted) {
+      soundEngine.playVictory();
+    }
 
     onFinish({
       wpm: finalWpm,
@@ -118,8 +134,11 @@ export const ClassroomTypingArea: React.FC<Props> = ({
       incorrectChars: mistakesCount,
       totalChars: typedLen,
       timeSpentSec,
+      lessonId: lesson_id ? Number(lesson_id) : undefined,
+      assignmentId,
+      isCompleted,
     });
-  }, [userInput.length, mistakesCount, sessionStartAt, totalKeystrokes, onFinish]);
+  }, [userInput.length, mistakesCount, sessionStartAt, totalKeystrokes, onFinish, totalChars, lesson_id, assignmentId]);
 
   // Instant local keypress handler (zero latency)
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -167,11 +186,13 @@ export const ClassroomTypingArea: React.FC<Props> = ({
       correctChars,
       incorrectChars: newMistakesCount,
       totalChars: typedLen,
+      lessonId: lesson_id ? Number(lesson_id) : undefined,
+      assignmentId,
     });
 
     // If reached end of text
     if (value.length >= totalChars) {
-      handleComplete();
+      handleComplete(false);
     }
   };
 
@@ -228,10 +249,10 @@ export const ClassroomTypingArea: React.FC<Props> = ({
           <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
             {passageTitle}
           </h2>
-          {targetKeys && targetKeys.length > 0 && (
+          {effectiveTargetKeys && effectiveTargetKeys.length > 0 && (
             <div className="flex items-center gap-1.5 flex-wrap mt-2">
               <span className="text-[10px] font-bold text-slate-400">Target Focus Keys:</span>
-              {targetKeys.map((k) => (
+              {effectiveTargetKeys.map((k) => (
                 <span
                   key={k}
                   className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono text-xs font-black border border-blue-300 dark:border-blue-800 shadow-xs"
@@ -316,11 +337,11 @@ export const ClassroomTypingArea: React.FC<Props> = ({
           const isCorrect = isTyped && userInput[index] === char;
           const isIncorrect = isTyped && userInput[index] !== char;
 
-          let colorClass = 'text-slate-400 dark:text-slate-600';
+          let colorClass = 'text-slate-500 dark:text-slate-300 font-medium';
           if (isCorrect) {
             colorClass = 'text-emerald-600 dark:text-emerald-400 font-bold';
           } else if (isIncorrect) {
-            colorClass = 'text-rose-600 bg-rose-100 dark:bg-rose-950/80 rounded underline';
+            colorClass = 'text-white bg-rose-600 dark:bg-rose-600 rounded px-0.5 font-bold underline decoration-rose-300';
           }
 
           return (
@@ -329,7 +350,7 @@ export const ClassroomTypingArea: React.FC<Props> = ({
               ref={isCurrent ? activeCharRef : null}
               className={`relative transition-colors ${colorClass} ${
                 isCurrent
-                  ? 'bg-blue-200/60 dark:bg-blue-900/60 border-b-4 border-blue-500 rounded-sm'
+                  ? 'text-blue-700 dark:text-blue-300 bg-blue-100/90 dark:bg-blue-950/90 rounded px-0.5 font-black border-b-4 border-blue-500 ring-1 ring-blue-500/40'
                   : ''
               }`}
             >
@@ -341,33 +362,13 @@ export const ClassroomTypingArea: React.FC<Props> = ({
 
       {/* 1:1 Interactive Virtual Keyboard (When Curriculum Session is Active) */}
       {isCurriculum && (
-        <div className="mt-4 p-4 rounded-3xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
-          <div className="flex items-center justify-between mb-2 px-2">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-ping" />
-              <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                1:1 Interactive Key Guide
-              </span>
-            </div>
-            <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
-              <span>Next Key:</span>
-              <kbd className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 font-mono font-black text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-800 shadow-xs">
-                {safeTargetText[userInput.length] === ' '
-                  ? 'SPACE'
-                  : (safeTargetText[userInput.length] || '').toUpperCase()}
-              </kbd>
-            </div>
-          </div>
-
-          <div className="w-full flex justify-center overflow-x-auto py-2">
-            <KeyboardDiagram
-              highlightKeys={targetKeys && targetKeys.length > 0 ? targetKeys : []}
-              activeKey={safeTargetText[userInput.length] || ''}
-              compact={false}
-              showHandShadows={true}
-              showHandsOverlay={false}
-            />
-          </div>
+        <div className="card-game p-4 rounded-2xl bg-slate-900/75 border border-white/10 backdrop-blur-xl">
+          <KeyboardDiagram
+            highlightKeys={effectiveTargetKeys && effectiveTargetKeys.length > 0 ? effectiveTargetKeys : []}
+            activeKey={safeTargetText[userInput.length] || ''}
+            errorKeys={userInput.split('').filter((c, i) => c !== safeTargetText[i])}
+            compact={false}
+          />
         </div>
       )}
 

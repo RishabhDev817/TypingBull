@@ -9,6 +9,7 @@ import {
   type ClassroomStudent,
   type ClassroomStudentView,
   type ClassroomSettings,
+  type ClassroomAssignment,
   type StudentProgressUpdate,
   type StudentFinishPayload,
   type ClassroomResultItem,
@@ -98,19 +99,40 @@ export class ClassroomManager {
   }
 
   /** Create a new classroom room with default settings */
-  public createRoom(teacherId: string, teacherToken: string, teacherName?: string): ClassroomRoom {
+  public createRoom(
+    teacherId: string,
+    teacherToken: string,
+    teacherName?: string,
+    initialAssignments?: ClassroomAssignment[],
+    initialSettings?: Partial<ClassroomSettings>
+  ): ClassroomRoom {
     const code = this.generateUniqueCode();
     const defaultPassage = DEFAULT_CLASSROOM_PASSAGES[0];
 
+    const hasInitialAssignments = Boolean(initialAssignments && initialAssignments.length > 0);
+    const firstAssignment = hasInitialAssignments ? initialAssignments![0] : null;
+
     const defaultSettings: ClassroomSettings = {
-      activityType: 'practice',
-      session_type: 'passage',
-      passageId: defaultPassage.id,
-      passageTitle: defaultPassage.title,
-      targetText: defaultPassage.text,
-      durationSeconds: 300, // 5 minutes default
+      activityType: hasInitialAssignments ? 'lesson' : 'practice',
+      session_type: hasInitialAssignments ? 'curriculum' : 'passage',
+      lesson_id: firstAssignment ? firstAssignment.lessonId : undefined,
+      lessonId: firstAssignment ? `learn-${firstAssignment.lessonId}` : undefined,
+      activeAssignmentId: firstAssignment?.assignmentId,
+      passageId: firstAssignment ? `learn-lesson-${firstAssignment.lessonId}` : defaultPassage.id,
+      passageTitle: firstAssignment ? firstAssignment.title : defaultPassage.title,
+      targetText: firstAssignment ? (firstAssignment.targetText || '') : defaultPassage.text,
+      targetKeys: firstAssignment?.targetKeys || [],
+      durationSeconds:
+        initialSettings?.durationSeconds && typeof initialSettings.durationSeconds === 'number'
+          ? Math.min(3600, Math.max(30, Math.round(initialSettings.durationSeconds)))
+          : firstAssignment?.durationSeconds || 300,
       minStudents: 1, // Allow testing with 1 or full class
       maxStudents: 30, // Classroom computer lab capacity
+      assignmentCategory: hasInitialAssignments ? 'learn-curriculum' : 'passage',
+      assignmentId: firstAssignment?.assignmentId,
+      assignedAt: firstAssignment?.assignedAt || Date.now(),
+      assignments: initialAssignments || [],
+      ...initialSettings,
     };
 
     const room: ClassroomRoom = {
@@ -131,7 +153,7 @@ export class ClassroomManager {
     };
 
     this.rooms.set(code, room);
-    console.log(`[ClassroomManager] Created classroom ${code} by teacher ${room.teacherName}`);
+    console.log(`[ClassroomManager] Created classroom ${code} by teacher ${room.teacherName} with ${(initialAssignments || []).length} assigned lessons`);
     return room;
   }
 
@@ -235,7 +257,38 @@ export class ClassroomManager {
     const room = this.getRoom(code);
     if (!room) return null;
     if (room.teacherToken !== teacherToken) return null;
-    if (room.status !== 'WAITING') return null;
+    if (room.status === 'ENDED') return null;
+
+    // If session was FINISHED, updating settings (e.g. next lesson, new duration) resets room to WAITING for next round
+    if (room.status === 'FINISHED') {
+      room.status = 'WAITING';
+      room.countdownStartAt = null;
+      room.sessionStartAt = null;
+      room.sessionEndAt = null;
+      room.results = [];
+      for (const student of Object.values(room.students)) {
+        if (student.status !== 'DISCONNECTED') {
+          student.status = student.isReady ? 'READY' : 'NOT_READY';
+        }
+        student.progress = 0;
+        student.wpm = 0;
+        student.accuracy = 100;
+        student.correctChars = 0;
+        student.incorrectChars = 0;
+        student.totalChars = 0;
+        student.finishedAt = undefined;
+        student.rank = undefined;
+      }
+    } else if (room.status === 'ACTIVE') {
+      // While ACTIVE, teacher can add/reorder upcoming assignments, but cannot modify active typing target
+      if (newSettings.assignments !== undefined) {
+        room.settings.assignments = newSettings.assignments;
+      }
+      room.lastActivityAt = Date.now();
+      return room;
+    } else if (room.status !== 'WAITING') {
+      return null;
+    }
 
     if (newSettings.activityType && ['practice', 'lesson', 'game'].includes(newSettings.activityType)) {
       room.settings.activityType = newSettings.activityType;
@@ -249,6 +302,10 @@ export class ClassroomManager {
       room.settings.lesson_id = newSettings.lesson_id;
     }
 
+    if (newSettings.activeAssignmentId !== undefined) {
+      room.settings.activeAssignmentId = newSettings.activeAssignmentId;
+    }
+
     if (newSettings.gameId !== undefined) {
       room.settings.gameId = newSettings.gameId;
     }
@@ -259,6 +316,26 @@ export class ClassroomManager {
 
     if (newSettings.assignmentCategory !== undefined) {
       room.settings.assignmentCategory = newSettings.assignmentCategory;
+    }
+
+    if (newSettings.assignmentId !== undefined) {
+      room.settings.assignmentId = newSettings.assignmentId;
+    }
+
+    if (newSettings.assignedAt !== undefined) {
+      room.settings.assignedAt = newSettings.assignedAt;
+    }
+
+    if (newSettings.teacherNote !== undefined) {
+      room.settings.teacherNote = newSettings.teacherNote;
+    }
+
+    if (newSettings.previousAssignments !== undefined) {
+      room.settings.previousAssignments = newSettings.previousAssignments;
+    }
+
+    if (newSettings.assignments !== undefined) {
+      room.settings.assignments = newSettings.assignments;
     }
 
     if (newSettings.targetKeys && Array.isArray(newSettings.targetKeys)) {
@@ -286,7 +363,7 @@ export class ClassroomManager {
     }
 
     if (newSettings.durationSeconds && typeof newSettings.durationSeconds === 'number' && newSettings.durationSeconds > 0) {
-      room.settings.durationSeconds = Math.min(1800, Math.max(30, newSettings.durationSeconds));
+      room.settings.durationSeconds = Math.min(3600, Math.max(30, Math.round(newSettings.durationSeconds)));
     }
 
     room.lastActivityAt = Date.now();
@@ -348,7 +425,7 @@ export class ClassroomManager {
   public updateStudentProgress(
     code: string,
     studentId: string,
-    progress: StudentProgressUpdate
+    progress: StudentProgressUpdate & { lessonId?: number; assignmentId?: string }
   ): { room: ClassroomRoom; student: ClassroomStudent } | null {
     const room = this.getRoom(code);
     if (!room) return null;
@@ -362,50 +439,94 @@ export class ClassroomManager {
     student.incorrectChars = progress.incorrectChars;
     student.totalChars = progress.totalChars;
 
+    if (!student.assignmentProgress) student.assignmentProgress = {};
+    const aId = progress.assignmentId || (progress.lessonId ? `assign-${progress.lessonId}` : undefined);
+    if (aId) {
+      student.assignmentProgress[aId] = {
+        status: 'IN_PROGRESS',
+        progress: student.progress,
+        wpm: student.wpm,
+        accuracy: student.accuracy,
+      };
+    }
+
     room.lastActivityAt = Date.now();
     return { room, student };
   }
 
-  /** Student completed typing the assigned passage */
+  /** Student completed typing the assigned passage or lesson task */
   public finishStudent(
     code: string,
     studentId: string,
-    payload: StudentFinishPayload
+    payload: StudentFinishPayload & { lessonId?: number; assignmentId?: string }
   ): { room: ClassroomRoom; student: ClassroomStudent; allFinished: boolean; results?: ClassroomResultsView } | null {
     const room = this.getRoom(code);
     if (!room) return null;
     const student = room.students[studentId];
-    if (!student || student.status === 'FINISHED') return null;
+    if (!student) return null;
 
-    student.status = 'FINISHED';
-    student.progress = 1;
-    student.wpm = Math.max(0, Math.round(payload.wpm));
-    student.accuracy = Math.max(0, Math.min(100, Math.round(payload.accuracy * 10) / 10));
-    student.correctChars = payload.correctChars;
-    student.incorrectChars = payload.incorrectChars;
-    student.totalChars = payload.totalChars;
-    student.finishedAt = Date.now();
+    const lessonId = payload.lessonId ?? (typeof room.settings.lesson_id === 'number' ? room.settings.lesson_id : undefined);
+    const aId = payload.assignmentId || (lessonId ? `assign-${lessonId}` : room.settings.assignmentId);
+    const isCompleted = payload.isCompleted !== false;
 
-    // Assign rank based on finish order
-    const finishedCount = Object.values(room.students).filter((s) => s.status === 'FINISHED').length;
-    student.rank = finishedCount;
-
-    // Check if all connected students have finished
-    const connectedStudents = Object.values(room.students).filter((s) => s.status !== 'DISCONNECTED');
-    const allFinished = connectedStudents.every((s) => s.status === 'FINISHED');
-
-    let resultsView: ClassroomResultsView | undefined;
-    if (allFinished) {
-      resultsView = this.calculateResults(room);
-      room.status = 'FINISHED';
+    if (lessonId && isCompleted) {
+      const currentCompleted = student.completedLessonIds || [];
+      if (!currentCompleted.includes(lessonId)) {
+        student.completedLessonIds = [...currentCompleted, lessonId];
+      }
     }
 
-    room.lastActivityAt = Date.now();
-    return { room, student, allFinished, results: resultsView };
+    if (!student.assignmentProgress) student.assignmentProgress = {};
+    if (aId) {
+      student.assignmentProgress[aId] = {
+        status: isCompleted ? 'COMPLETED' : 'IN_PROGRESS',
+        progress: isCompleted ? 1 : student.progress,
+        wpm: Math.max(0, Math.round(payload.wpm)),
+        accuracy: Math.max(0, Math.min(100, Math.round(payload.accuracy * 10) / 10)),
+        completedAt: isCompleted ? Date.now() : undefined,
+      };
+    }
+
+    if (room.status === 'ACTIVE') {
+      student.status = 'FINISHED';
+      student.progress = isCompleted ? 1 : student.progress;
+      student.wpm = Math.max(0, Math.round(payload.wpm));
+      student.accuracy = Math.max(0, Math.min(100, Math.round(payload.accuracy * 10) / 10));
+      student.correctChars = payload.correctChars;
+      student.incorrectChars = payload.incorrectChars;
+      student.totalChars = payload.totalChars;
+      student.finishedAt = Date.now();
+
+      // Assign rank based on finish order for this active round
+      const finishedCount = Object.values(room.students).filter((s) => s.status === 'FINISHED').length;
+      student.rank = finishedCount;
+
+      // Check if all connected students have finished the current active lesson
+      const connectedStudents = Object.values(room.students).filter((s) => s.status !== 'DISCONNECTED');
+      const allFinished = connectedStudents.length > 0 && connectedStudents.every((s) => s.status === 'FINISHED');
+
+      let resultsView: ClassroomResultsView | undefined;
+      if (allFinished) {
+        resultsView = this.calculateResults(room);
+        room.status = 'FINISHED';
+      }
+
+      room.lastActivityAt = Date.now();
+      return { room, student, allFinished, results: resultsView };
+    } else {
+      // Lobby practice completed: update stats without marking student FINISHED in room race
+      student.progress = isCompleted ? 1 : student.progress;
+      student.wpm = Math.max(0, Math.round(payload.wpm));
+      student.accuracy = Math.max(0, Math.min(100, Math.round(payload.accuracy * 10) / 10));
+      room.lastActivityAt = Date.now();
+      return { room, student, allFinished: false };
+    }
   }
 
   /** Calculate complete classroom results view */
-  public calculateResults(room: ClassroomRoom): ClassroomResultsView {
+  public calculateResults(roomOrCode: ClassroomRoom | string): ClassroomResultsView | undefined {
+    const room = typeof roomOrCode === 'string' ? this.getRoom(roomOrCode) : roomOrCode;
+    if (!room) return undefined;
     const students = Object.values(room.students);
 
     // Sort: finished students first sorted by rank, then by progress/WPM
@@ -423,6 +544,8 @@ export class ClassroomManager {
         ? Math.max(1, Math.round((s.finishedAt - room.sessionStartAt) / 1000))
         : room.settings.durationSeconds;
 
+      const isCompleted = s.status === 'FINISHED' && (s.progress >= 1 || (typeof room.settings.lesson_id === 'number' && Boolean(s.completedLessonIds?.includes(room.settings.lesson_id))));
+
       return {
         playerId: s.id,
         name: s.name,
@@ -430,7 +553,7 @@ export class ClassroomManager {
         rank: idx + 1,
         wpm: s.wpm,
         accuracy: s.accuracy,
-        finished: s.status === 'FINISHED',
+        finished: isCompleted,
         timeSpentSec,
       };
     });
@@ -451,6 +574,11 @@ export class ClassroomManager {
       durationSeconds: room.settings.durationSeconds,
       passageTitle: room.settings.passageTitle,
     };
+  }
+
+  /** Alias for backward compatibility */
+  public buildResults(roomOrCode: ClassroomRoom | string): ClassroomResultsView | undefined {
+    return this.calculateResults(roomOrCode);
   }
 
   /** End the room cleanly (Teacher action) */
@@ -501,6 +629,9 @@ export class ClassroomManager {
       accuracy: student.accuracy,
       rank: student.rank,
       finishedAt: student.finishedAt,
+      currentAssignmentIndex: student.currentAssignmentIndex,
+      completedLessonIds: student.completedLessonIds || [],
+      assignmentProgress: student.assignmentProgress || {},
     };
   }
 

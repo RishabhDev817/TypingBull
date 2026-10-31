@@ -19,16 +19,19 @@ import {
   Keyboard,
   BookOpen,
   Search,
+  Plus,
+  Trash2,
 } from 'lucide-react';
-import type { ClassroomRoomView, ClassroomSettings } from '../../types/classroom';
+import type { ClassroomRoomView, ClassroomSettings, ClassroomAssignment } from '../../types/classroom';
 import { Mascot } from '../Mascot';
 import { ClassroomEndModal } from './ClassroomEndModal';
 import { ClassroomTargetSelectorModal } from './ClassroomTargetSelectorModal';
 import { CLASSROOM_LESSONS, type ClassroomLesson } from '../../data/classroom/classroomLessons';
 import { CHAPTERS } from '../../data/curriculum';
-import { getLessonsForChapter, type LessonDef } from '../../data/lessonData';
+import { getLessonsForChapter, getLessonById, type LessonDef } from '../../data/lessonData';
 import { ClassroomLessonViewer } from './ClassroomLessonViewer';
 import { StudentAvatarBadge } from './StudentAvatar';
+import { DurationSelector } from './DurationSelector';
 
 interface Props {
   room: ClassroomRoomView;
@@ -38,7 +41,7 @@ interface Props {
   onSwitchToStudentView?: () => void;
 }
 
-const PASSAGE_OPTIONS = [
+export const PASSAGE_OPTIONS = [
   {
     id: 'passage-fable-morning',
     title: 'Morning in the Valley',
@@ -69,7 +72,7 @@ const PASSAGE_OPTIONS = [
   },
 ];
 
-const CLASSROOM_ACTIVITIES = [
+export const CLASSROOM_ACTIVITIES = [
   {
     id: 'act-accuracy-sprint',
     title: 'Zero-Error Accuracy Sprint',
@@ -96,7 +99,7 @@ const CLASSROOM_ACTIVITIES = [
   },
 ];
 
-const CLASSROOM_GAMES = [
+export const CLASSROOM_GAMES = [
   {
     id: 'game-lilypad-leap',
     gameId: 'lilypad-leap' as const,
@@ -127,12 +130,6 @@ const CLASSROOM_GAMES = [
   },
 ];
 
-const DURATION_OPTIONS = [
-  { label: '1 Min', seconds: 60 },
-  { label: '3 Mins', seconds: 180 },
-  { label: '5 Mins', seconds: 300 },
-];
-
 type TeacherTab = 'overview' | 'learn' | 'lessons' | 'games' | 'activities' | 'passages' | 'students';
 
 export const TeacherClassroomLobby: React.FC<Props> = ({
@@ -152,6 +149,9 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
   const [showEndModal, setShowEndModal] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
   const [showTargetSelectorModal, setShowTargetSelectorModal] = useState(false);
+  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
+  const [editingTeacherNote, setEditingTeacherNote] = useState(false);
+  const [teacherNoteInput, setTeacherNoteInput] = useState(room.settings.teacherNote || '');
 
   const joinUrl = `${window.location.origin}/classroom?code=${room.code}`;
 
@@ -187,26 +187,196 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
   }, [onUpdateSettings]);
 
   const handleAssignLearnLesson = useCallback(
-    (lesson: LessonDef, chapterTitle: string) => {
+    (lesson: LessonDef, chapterTitle: string, customDurationSeconds?: number) => {
+      const companion = !lesson.content ? getLessonById(lesson.id + 1) : undefined;
+      const drillContent = lesson.content || companion?.content || 'ff jj fj jf ff jj fj jf';
+      const durationSec = customDurationSeconds || room.settings.durationSeconds || 300;
+      const previous = room.settings.previousAssignments || [];
+      const updatedPrevious = room.settings.passageTitle
+        ? [
+            ...previous.filter((p) => p.title !== room.settings.passageTitle),
+            {
+              assignmentId: room.settings.assignmentId || `assign-${Date.now()}`,
+              lessonId: room.settings.lesson_id || room.settings.passageId,
+              title: room.settings.passageTitle,
+              assignedAt: room.settings.assignedAt || Date.now(),
+            },
+          ].slice(-5)
+        : previous;
+
+      const assignmentTitle = `Step ${lesson.id}: ${lesson.title} (${chapterTitle})`;
+      const newAssignment: ClassroomAssignment = {
+        assignmentId: `assign-${lesson.id}-${Date.now()}`,
+        lessonId: lesson.id,
+        title: assignmentTitle,
+        chapterTitle,
+        chapterId: lesson.chapterId,
+        description: lesson.description,
+        order: (room.settings.assignments?.length || 0) + 1,
+        assignedAt: Date.now(),
+        targetKeys: lesson.targetKeys || [],
+        passingAccuracy: lesson.passingAccuracy || 80,
+        targetText: drillContent,
+        durationSeconds: durationSec,
+      };
+
+      const existingAssignments = room.settings.assignments || [];
+      const updatedAssignments = [...existingAssignments.filter((a) => a.lessonId !== lesson.id), newAssignment];
+
       onUpdateSettings({
         session_type: 'curriculum',
         activityType: 'lesson',
         lesson_id: lesson.id,
         lessonId: `learn-${lesson.id}`,
         passageId: `learn-lesson-${lesson.id}`,
-        passageTitle: `Step ${lesson.id}: ${lesson.title} (${chapterTitle})`,
-        targetText: lesson.content || 'Practice typing drill',
+        passageTitle: assignmentTitle,
+        targetText: drillContent,
         assignmentCategory: 'learn-curriculum',
         targetKeys: lesson.targetKeys || [],
-        durationSeconds: room.settings.durationSeconds || 180,
+        durationSeconds: durationSec,
+        assignmentId: newAssignment.assignmentId,
+        activeAssignmentId: newAssignment.assignmentId,
+        assignedAt: Date.now(),
+        previousAssignments: updatedPrevious,
+        assignments: updatedAssignments,
       });
       setActiveTab('overview');
     },
-    [onUpdateSettings, room.settings.durationSeconds]
+    [onUpdateSettings, room.settings]
+  );
+
+  const handleAddAssignment = useCallback(
+    (lesson: LessonDef, chapterTitle: string, customDurationSeconds?: number) => {
+      const existing = room.settings.assignments || [];
+      const companion = !lesson.content ? getLessonById(lesson.id + 1) : undefined;
+      const drillContent = lesson.content || companion?.content || 'ff jj fj jf ff jj fj jf';
+      const durationSec = customDurationSeconds || room.settings.durationSeconds || 300;
+
+      const newAssignment: ClassroomAssignment = {
+        assignmentId: `assign-${lesson.id}-${Date.now()}`,
+        lessonId: lesson.id,
+        title: `Step ${lesson.id}: ${lesson.title} (${chapterTitle})`,
+        chapterTitle,
+        chapterId: lesson.chapterId,
+        description: lesson.description,
+        order: existing.length + 1,
+        assignedAt: Date.now(),
+        targetKeys: lesson.targetKeys || [],
+        passingAccuracy: lesson.passingAccuracy || 80,
+        targetText: drillContent,
+        durationSeconds: durationSec,
+      };
+
+      const updated = [...existing, newAssignment];
+
+      onUpdateSettings({
+        assignments: updated,
+        ...(existing.length === 0
+          ? {
+              session_type: 'curriculum',
+              activityType: 'lesson',
+              lesson_id: lesson.id,
+              lessonId: `learn-${lesson.id}`,
+              passageId: `learn-lesson-${lesson.id}`,
+              passageTitle: newAssignment.title,
+              targetText: drillContent,
+              assignmentCategory: 'learn-curriculum',
+              targetKeys: lesson.targetKeys || [],
+              durationSeconds: durationSec,
+              assignmentId: newAssignment.assignmentId,
+              activeAssignmentId: newAssignment.assignmentId,
+              assignedAt: newAssignment.assignedAt,
+            }
+          : {}),
+      });
+    },
+    [onUpdateSettings, room.settings]
+  );
+
+  const handleActivateAssignment = useCallback(
+    (assignment: ClassroomAssignment) => {
+      const companion = getLessonById(assignment.lessonId + 1);
+      const drillContent = assignment.targetText || companion?.content || 'ff jj fj jf ff jj fj jf';
+      onUpdateSettings({
+        session_type: 'curriculum',
+        activityType: 'lesson',
+        lesson_id: assignment.lessonId,
+        lessonId: `learn-${assignment.lessonId}`,
+        passageId: `learn-lesson-${assignment.lessonId}`,
+        passageTitle: assignment.title,
+        targetText: drillContent,
+        assignmentCategory: 'learn-curriculum',
+        targetKeys: assignment.targetKeys || [],
+        durationSeconds: assignment.durationSeconds || room.settings.durationSeconds || 300,
+        assignmentId: assignment.assignmentId,
+        activeAssignmentId: assignment.assignmentId,
+        assignedAt: Date.now(),
+      });
+    },
+    [onUpdateSettings, room.settings]
+  );
+
+  const handleReorderAssignment = useCallback(
+    (index: number, direction: 'up' | 'down') => {
+      const list = [...(room.settings.assignments || [])];
+      const targetIndex = direction === 'up' ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= list.length) return;
+      const temp = list[index];
+      list[index] = list[targetIndex];
+      list[targetIndex] = temp;
+      const reindexed = list.map((a, i) => ({ ...a, order: i + 1 }));
+      onUpdateSettings({ assignments: reindexed });
+    },
+    [onUpdateSettings, room.settings.assignments]
+  );
+
+  const handleRemoveAssignment = useCallback(
+    (assignmentId: string) => {
+      const list = (room.settings.assignments || []).filter((a) => a.assignmentId !== assignmentId);
+      const reindexed = list.map((a, i) => ({ ...a, order: i + 1 }));
+      onUpdateSettings({ assignments: reindexed });
+    },
+    [onUpdateSettings, room.settings.assignments]
+  );
+
+  const handleAssignMultipleAssignments = useCallback(
+    (assignments: ClassroomAssignment[], customDurationSeconds?: number) => {
+      if (!assignments.length) return;
+      const first = assignments[0];
+      const companion = getLessonById(first.lessonId + 1);
+      const drillContent = first.targetText || companion?.content || 'ff jj fj jf ff jj fj jf';
+      const durationSec = customDurationSeconds || first.durationSeconds || room.settings.durationSeconds || 300;
+
+      const preparedAssignments = assignments.map((a, idx) => ({
+        ...a,
+        order: idx + 1,
+        durationSeconds: customDurationSeconds || a.durationSeconds || durationSec,
+      }));
+
+      onUpdateSettings({
+        session_type: 'curriculum',
+        activityType: 'lesson',
+        lesson_id: first.lessonId,
+        lessonId: `learn-${first.lessonId}`,
+        passageId: `learn-lesson-${first.lessonId}`,
+        passageTitle: first.title,
+        targetText: drillContent,
+        assignmentCategory: 'learn-curriculum',
+        targetKeys: first.targetKeys || [],
+        durationSeconds: durationSec,
+        assignmentId: first.assignmentId,
+        activeAssignmentId: first.assignmentId,
+        assignedAt: Date.now(),
+        assignments: preparedAssignments,
+      });
+      setShowTargetSelectorModal(false);
+      setActiveTab('overview');
+    },
+    [onUpdateSettings, room.settings]
   );
 
   const handleAssignPassage = useCallback(
-    (passage: (typeof PASSAGE_OPTIONS)[number]) => {
+    (passage: (typeof PASSAGE_OPTIONS)[number], customDurationSeconds?: number) => {
       onUpdateSettings({
         session_type: 'passage',
         activityType: 'practice',
@@ -217,6 +387,7 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
         targetText: passage.text,
         assignmentCategory: 'passage',
         targetKeys: [],
+        ...(customDurationSeconds ? { durationSeconds: customDurationSeconds } : {}),
       });
       setActiveTab('overview');
     },
@@ -390,118 +561,402 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
               </div>
             </div>
 
-            {/* Active Assignment Preview Card */}
-            <div className="rounded-3xl p-6 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 shadow-lg">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Current Session Target
-                </span>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    id="teacher-open-target-modal-btn"
-                    onClick={() => setShowTargetSelectorModal(true)}
-                    className="px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 text-xs font-black flex items-center gap-1.5 transition cursor-pointer shadow-xs"
-                  >
-                    <BookOpen className="w-3.5 h-3.5" />
-                    <span>Change Target</span>
-                  </button>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 mb-4">
-                <div className="flex items-center gap-2 mb-2 flex-wrap">
-                  {room.settings.session_type === 'curriculum' || room.settings.assignmentCategory === 'learn-curriculum' ? (
-                    <span className="px-2.5 py-1 rounded-lg bg-blue-600 text-white font-mono text-[10px] font-black uppercase flex items-center gap-1.5 shadow-sm shadow-blue-500/20">
+              {/* Active Assignment Preview Card */}
+              <div className="rounded-3xl p-6 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 shadow-lg">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Current Session Target
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      id="teacher-open-target-modal-btn"
+                      onClick={() => setShowTargetSelectorModal(true)}
+                      className="px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 text-xs font-black flex items-center gap-1.5 transition cursor-pointer shadow-xs"
+                    >
                       <BookOpen className="w-3.5 h-3.5" />
-                      <span>Skill Drill • Learn Module</span>
+                      <span>Change Target</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Teacher's Daily Focus Note / Instruction */}
+                {room.settings.teacherNote ? (
+                  <div className="p-3.5 mb-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <span className="text-[10px] font-black uppercase text-amber-700 dark:text-amber-400 block mb-0.5 tracking-wider">
+                        📢 Teacher's Daily Tip / Focus Note
+                      </span>
+                      <p className="text-xs text-slate-800 dark:text-slate-200 font-medium italic break-words">
+                        "{room.settings.teacherNote}"
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTeacherNoteInput(room.settings.teacherNote || '');
+                        setEditingTeacherNote(true);
+                      }}
+                      className="text-[11px] font-bold text-amber-700 hover:text-amber-900 dark:text-amber-400 underline cursor-pointer shrink-0 ml-2"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                ) : (
+                  <div className="mb-3">
+                    {editingTeacherNote ? (
+                      <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 space-y-2">
+                        <label htmlFor="teacher-lobby-note-input" className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                          Teacher's Daily Note or Focus Tip for Students:
+                        </label>
+                        <input
+                          id="teacher-lobby-note-input"
+                          type="text"
+                          value={teacherNoteInput}
+                          onChange={(e) => setTeacherNoteInput(e.target.value)}
+                          placeholder="e.g., Focus on keeping fingers on the home row bumps and steady rhythm today!"
+                          className="w-full text-xs py-2 px-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-amber-500"
+                        />
+                        <div className="flex justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setEditingTeacherNote(false)}
+                            className="px-2.5 py-1 text-xs font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 cursor-pointer"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              onUpdateSettings({ teacherNote: teacherNoteInput.trim() });
+                              setEditingTeacherNote(false);
+                            }}
+                            className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl cursor-pointer shadow-xs"
+                          >
+                            Save Note
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTeacherNoteInput('');
+                          setEditingTeacherNote(true);
+                        }}
+                        className="text-[11px] font-bold text-amber-700 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300 flex items-center gap-1 cursor-pointer transition py-1"
+                      >
+                        <span>+ Add daily focus tip / instruction for students</span>
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {/* Active Target Banner */}
+                <div className="p-3.5 mb-4 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40 border border-blue-200 dark:border-blue-800">
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                      Active Exercise
                     </span>
-                  ) : room.settings.session_type === 'game' || room.settings.activityType === 'game' ? (
-                    <span className="px-2.5 py-1 rounded-lg bg-purple-600 text-white font-mono text-[10px] font-black uppercase flex items-center gap-1.5 shadow-sm shadow-purple-500/20">
-                      <Gamepad2 className="w-3.5 h-3.5" />
-                      <span>Classroom Arcade Game</span>
-                    </span>
-                  ) : (
-                    <span className="px-2.5 py-1 rounded-lg bg-amber-500 text-white font-mono text-[10px] font-black uppercase flex items-center gap-1.5 shadow-sm shadow-amber-500/20">
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>Synchronized Passage</span>
-                    </span>
+                    {room.settings.durationSeconds && (
+                      <span className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">
+                        {Math.round(room.settings.durationSeconds / 60)} min limit
+                      </span>
+                    )}
+                  </div>
+                  <h4 className="text-sm font-black text-slate-900 dark:text-white truncate">
+                    {room.settings.passageTitle || 'No target selected'}
+                  </h4>
+                  {room.settings.targetText && (
+                    <p className="text-xs text-slate-600 dark:text-slate-400 font-mono truncate mt-1">
+                      "{room.settings.targetText}"
+                    </p>
                   )}
                 </div>
 
-                <div className="text-sm font-black text-slate-900 dark:text-white mb-1">
-                  {room.settings.passageTitle}
-                </div>
-
-                {/* Dynamic Preview Area */}
-                {room.settings.session_type === 'curriculum' || room.settings.assignmentCategory === 'learn-curriculum' ? (
-                  <div className="p-3.5 rounded-2xl bg-blue-50/80 dark:bg-blue-950/40 border-2 border-blue-200 dark:border-blue-800/80 space-y-2.5 mt-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-black uppercase tracking-wider text-blue-800 dark:text-blue-300">
-                        Target Keys Being Taught:
-                      </span>
-                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200">
-                        {room.settings.lesson_id ? `Step ${room.settings.lesson_id}` : 'Interactive Drill'}
-                      </span>
+                {/* CLASSROOM LESSONS & PROGRESS AREA */}
+                <div className="space-y-4 mb-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <GraduationCap className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                      <div>
+                        <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                          Classroom Lessons
+                        </h4>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">
+                          {(room.settings.assignments || []).length} assigned • sequential student progression
+                        </p>
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      {(room.settings.targetKeys && room.settings.targetKeys.length > 0
-                        ? room.settings.targetKeys
-                        : ['f', 'j']
-                      ).map((k) => (
-                        <span
-                          key={k}
-                          className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border-2 border-blue-400 dark:border-blue-600 font-mono font-black text-sm text-blue-700 dark:text-blue-300 shadow-sm"
-                        >
-                          {k === ' ' ? 'SPACE' : k.toUpperCase()}
-                        </span>
-                      ))}
+                    <button
+                      type="button"
+                      id="teacher-add-lesson-btn"
+                      onClick={() => setShowTargetSelectorModal(true)}
+                      className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black flex items-center gap-1.5 transition cursor-pointer shadow-md shadow-blue-600/20"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>+ Add Lesson</span>
+                    </button>
+                  </div>
+
+                  {/* Ordered Assignments List */}
+                  {room.settings.assignments && room.settings.assignments.length > 0 ? (
+                    <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
+                      {room.settings.assignments.map((assignment, idx) => {
+                        const isCurrentlyActive =
+                          assignment.assignmentId === room.settings.assignmentId ||
+                          assignment.assignmentId === room.settings.activeAssignmentId ||
+                          (assignment.lessonId && assignment.lessonId === room.settings.lesson_id);
+                        const totalStudents = room.students.length;
+                        const completedStudents = room.students.filter((s) =>
+                          s.completedLessonIds?.includes(assignment.lessonId)
+                        );
+                        const completedCount = completedStudents.length;
+                        const inProgressStudents = room.students.filter(
+                          (s) =>
+                            !s.completedLessonIds?.includes(assignment.lessonId) &&
+                            (s.progress > 0 ||
+                              s.assignmentProgress?.[assignment.assignmentId]?.status === 'IN_PROGRESS' ||
+                              s.assignmentProgress?.[`assign-${assignment.lessonId}`]?.status === 'IN_PROGRESS')
+                        );
+                        const notStartedStudents = room.students.filter(
+                          (s) =>
+                            !s.completedLessonIds?.includes(assignment.lessonId) &&
+                            !inProgressStudents.some((ip) => ip.id === s.id)
+                        );
+
+                        const pct = totalStudents > 0 ? Math.round((completedCount / totalStudents) * 100) : 0;
+                        const isExpanded = expandedTaskId === assignment.assignmentId;
+
+                        return (
+                          <div
+                            key={assignment.assignmentId || assignment.lessonId}
+                            className={`p-3.5 rounded-2xl transition border ${
+                              isCurrentlyActive
+                                ? 'bg-blue-50/70 dark:bg-blue-950/30 border-blue-400 dark:border-blue-600 ring-2 ring-blue-500/20'
+                                : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <div
+                                onClick={() =>
+                                  setExpandedTaskId((prev) =>
+                                    prev === assignment.assignmentId ? null : assignment.assignmentId
+                                  )
+                                }
+                                className="cursor-pointer flex-1 min-w-0"
+                              >
+                                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                  <span className="font-mono text-xs font-black text-blue-600 dark:text-blue-400">
+                                    #{idx + 1}
+                                  </span>
+                                  {isCurrentlyActive ? (
+                                    <span className="px-2 py-0.5 rounded-md bg-blue-600 text-white text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+                                      <Play className="w-2.5 h-2.5 fill-current" /> Active
+                                    </span>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleActivateAssignment(assignment);
+                                      }}
+                                      className="px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-700 hover:bg-blue-600 hover:text-white text-slate-700 dark:text-slate-300 text-[10px] font-black uppercase transition cursor-pointer"
+                                      title="Make this the active assignment for the next round"
+                                    >
+                                      Activate
+                                    </button>
+                                  )}
+                                  {assignment.durationSeconds && (
+                                    <span className="text-[10px] font-mono text-slate-400">
+                                      ⏱ {Math.round(assignment.durationSeconds / 60)}m
+                                    </span>
+                                  )}
+                                  <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white truncate">
+                                    {assignment.title}
+                                  </span>
+                                </div>
+
+                                {assignment.targetKeys && assignment.targetKeys.length > 0 && (
+                                  <div className="flex items-center gap-1 mb-1.5">
+                                    <span className="text-[10px] font-bold text-slate-400">Keys:</span>
+                                    {assignment.targetKeys.map((k) => (
+                                      <span
+                                        key={k}
+                                        className="px-1.5 py-0.2 rounded bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-300 font-mono text-[10px] font-bold border border-slate-200 dark:border-slate-700"
+                                      >
+                                        {k === ' ' ? 'Space' : k.toUpperCase()}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+
+                                {/* Progress bar & Real Student Tally */}
+                                <div className="flex items-center gap-2">
+                                  <div className="flex-1 h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                                    <div
+                                      className="h-full bg-emerald-500 rounded-full transition-all duration-300"
+                                      style={{ width: `${pct}%` }}
+                                    />
+                                  </div>
+                                  <span className="text-xs font-mono font-bold text-slate-600 dark:text-slate-300 shrink-0">
+                                    {completedCount}/{totalStudents} completed ({pct}%)
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Reorder and Delete controls */}
+                              <div className="flex items-center gap-1 shrink-0 ml-2">
+                                <button
+                                  type="button"
+                                  disabled={idx === 0}
+                                  onClick={() => handleReorderAssignment(idx, 'up')}
+                                  title="Move task up"
+                                  className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 disabled:opacity-30 cursor-pointer"
+                                >
+                                  <ChevronUp className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={idx === (room.settings.assignments?.length || 1) - 1}
+                                  onClick={() => handleReorderAssignment(idx, 'down')}
+                                  title="Move task down"
+                                  className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 disabled:opacity-30 cursor-pointer"
+                                >
+                                  <ChevronDown className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveAssignment(assignment.assignmentId)}
+                                  title="Remove task"
+                                  className="p-1 rounded hover:bg-rose-100 dark:hover:bg-rose-950/60 text-rose-500 cursor-pointer"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Expandable Individual Student Breakdown */}
+                            {isExpanded && (
+                              <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 space-y-2 text-xs">
+                                {completedStudents.length > 0 && (
+                                  <div>
+                                    <span className="font-bold text-emerald-600 dark:text-emerald-400 block mb-1">
+                                      ✓ Completed ({completedStudents.length}):
+                                    </span>
+                                    <div className="flex flex-wrap gap-1.5">
+                                      {completedStudents.map((s) => (
+                                        <span
+                                          key={s.id}
+                                          className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-semibold text-[11px] flex items-center gap-1"
+                                        >
+                                          <span>{s.avatarEmoji}</span>
+                                          <span>{s.name}</span>
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {inProgressStudents.length > 0 && (
+                                  <div>
+                                    <span className="font-bold text-blue-600 dark:text-blue-400 block mb-1">
+                                      ⏳ In Progress ({inProgressStudents.length}):
+                                    </span>
+                                    <div className="flex flex-wrap gap-1.5">
+                                      {inProgressStudents.map((s) => (
+                                        <span
+                                          key={s.id}
+                                          className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 font-semibold text-[11px] flex items-center gap-1"
+                                        >
+                                          <span>{s.avatarEmoji}</span>
+                                          <span>
+                                            {s.name} ({Math.round(s.progress * 100)}%)
+                                          </span>
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {notStartedStudents.length > 0 && (
+                                  <div>
+                                    <span className="font-bold text-slate-400 block mb-1">
+                                      ○ Not Started ({notStartedStudents.length}):
+                                    </span>
+                                    <div className="flex flex-wrap gap-1.5">
+                                      {notStartedStudents.map((s) => (
+                                        <span
+                                          key={s.id}
+                                          className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-semibold text-[11px] flex items-center gap-1"
+                                        >
+                                          <span>{s.avatarEmoji}</span>
+                                          <span>{s.name}</span>
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
-
-                    <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 truncate">
-                      Drill Prompt: {room.settings.targetText}
-                    </div>
-                  </div>
-                ) : room.settings.session_type === 'game' || room.settings.activityType === 'game' ? (
-                  <div className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 italic mt-2">
-                    All connected students will play this live arcade typing game synchronously in the classroom.
-                  </div>
-                ) : (
-                  <div className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 italic mt-2">
-                    "{room.settings.targetText}"
-                  </div>
-                )}
-              </div>
-
-              {/* Duration Selector */}
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5 text-xs font-black text-slate-700 dark:text-slate-300">
-                  <Clock className="w-4 h-4 text-primary" />
-                  <span>Duration:</span>
-                </div>
-
-                <div className="flex gap-1.5">
-                  {DURATION_OPTIONS.map((dur) => {
-                    const isSelected = room.settings.durationSeconds === dur.seconds;
-                    return (
+                  ) : (
+                    <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-dashed border-slate-300 dark:border-slate-700 text-center space-y-2">
+                      <p className="text-xs text-slate-500 font-semibold">
+                        No multiple lessons assigned yet. Click "+ Add Lesson" to assign tasks from the Learn curriculum.
+                      </p>
                       <button
-                        key={dur.seconds}
                         type="button"
-                        onClick={() => onUpdateSettings({ durationSeconds: dur.seconds })}
-                        className={`py-1 px-2.5 rounded-lg text-xs font-black transition cursor-pointer border ${
-                          isSelected
-                            ? 'bg-primary text-white border-primary shadow-xs'
-                            : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent hover:bg-slate-200'
-                        }`}
+                        onClick={() => setShowTargetSelectorModal(true)}
+                        className="px-3.5 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-bold transition hover:bg-blue-700 cursor-pointer"
                       >
-                        {dur.label}
+                        + Assign First Lesson
                       </button>
-                    );
-                  })}
+                    </div>
+                  )}
+
+                  {/* All Tasks Completed Notice */}
+                  {room.settings.assignments &&
+                    room.settings.assignments.length > 0 &&
+                    room.students.length > 0 &&
+                    room.settings.assignments.every((a) =>
+                      room.students.every((s) => s.completedLessonIds?.includes(a.lessonId))
+                    ) && (
+                      <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 text-center space-y-2">
+                        <div className="text-sm font-black text-emerald-800 dark:text-emerald-300">
+                          All assigned lessons completed 🎉
+                        </div>
+                        <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">
+                          Every student has finished all current tasks. Assign the next lesson to continue!
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setShowTargetSelectorModal(true)}
+                          className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-md shadow-emerald-600/30 transition cursor-pointer inline-flex items-center gap-1.5"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>+ Assign Next Lesson</span>
+                        </button>
+                      </div>
+                    )}
+                </div>
+
+                {/* Duration Selector */}
+                <div className="pt-3 border-t border-slate-200 dark:border-slate-700 space-y-2">
+                  <div className="flex items-center gap-1.5 text-xs font-black text-slate-700 dark:text-slate-300">
+                    <Clock className="w-4 h-4 text-primary" />
+                    <span>Session Duration:</span>
+                  </div>
+                  <DurationSelector
+                    durationSeconds={room.settings.durationSeconds || 300}
+                    onChange={(sec) => onUpdateSettings({ durationSeconds: sec })}
+                  />
                 </div>
               </div>
-            </div>
           </div>
 
           {/* RIGHT: STUDENT ROSTER & START ACTION */}
@@ -1307,6 +1762,8 @@ export const TeacherClassroomLobby: React.FC<Props> = ({
         passages={PASSAGE_OPTIONS}
         games={CLASSROOM_GAMES}
         onAssignCurriculumLesson={handleAssignLearnLesson}
+        onAddAssignment={handleAddAssignment}
+        onAssignMultipleAssignments={handleAssignMultipleAssignments}
         onAssignPassage={handleAssignPassage}
         onAssignGame={handleAssignGameToClassroom}
       />

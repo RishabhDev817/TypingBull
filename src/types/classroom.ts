@@ -14,6 +14,7 @@ export interface ClassroomSettings {
   activityType: ClassroomActivityType;
   session_type?: ClassroomSessionType;
   lesson_id?: number | string;
+  activeAssignmentId?: string;
   passageId: string;
   passageTitle: string;
   targetText: string;
@@ -24,6 +25,31 @@ export interface ClassroomSettings {
   gameId?: 'lilypad-leap' | 'neon-velocity';
   assignmentCategory?: string;
   targetKeys?: string[];
+  assignmentId?: string;
+  assignedAt?: number;
+  teacherNote?: string;
+  previousAssignments?: Array<{
+    assignmentId: string;
+    lessonId: number | string;
+    title: string;
+    assignedAt: number;
+  }>;
+  assignments?: ClassroomAssignment[];
+}
+
+export interface ClassroomAssignment {
+  assignmentId: string;
+  lessonId: number;
+  title: string;
+  chapterTitle?: string;
+  chapterId?: string;
+  description?: string;
+  order: number;
+  assignedAt: number;
+  targetKeys?: string[];
+  passingAccuracy?: number;
+  targetText?: string;
+  durationSeconds?: number;
 }
 
 export interface ClassroomStudentView {
@@ -37,6 +63,15 @@ export interface ClassroomStudentView {
   accuracy: number;
   rank?: number;
   finishedAt?: number;
+  currentAssignmentIndex?: number;
+  completedLessonIds?: number[];
+  assignmentProgress?: Record<string, {
+    status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
+    progress: number;
+    wpm: number;
+    accuracy: number;
+    completedAt?: number;
+  }>;
 }
 
 export interface ClassroomRoomView {
@@ -82,6 +117,8 @@ export interface StudentProgressUpdate {
   correctChars: number;
   incorrectChars: number;
   totalChars: number;
+  lessonId?: number;
+  assignmentId?: string;
 }
 
 export interface StudentFinishPayload {
@@ -91,16 +128,19 @@ export interface StudentFinishPayload {
   incorrectChars: number;
   totalChars: number;
   timeSpentSec: number;
+  lessonId?: number;
+  assignmentId?: string;
+  isCompleted?: boolean;
 }
 
 export type ClientMessage =
-  | { type: 'CREATE_CLASSROOM'; payload: { teacherName?: string } }
+  | { type: 'CREATE_CLASSROOM'; payload: { teacherName?: string; initialAssignments?: ClassroomAssignment[]; initialSettings?: Partial<ClassroomSettings> } }
   | { type: 'JOIN_CLASSROOM'; payload: { code: string; studentName: string; avatarEmoji?: string; sessionToken?: string } }
   | { type: 'STUDENT_READY'; payload: { isReady: boolean } }
   | { type: 'UPDATE_SETTINGS'; payload: { teacherToken: string; settings: Partial<ClassroomSettings> } }
   | { type: 'START_SESSION'; payload: { teacherToken: string } }
-  | { type: 'STUDENT_PROGRESS'; payload: StudentProgressUpdate }
-  | { type: 'STUDENT_FINISH'; payload: StudentFinishPayload }
+  | { type: 'STUDENT_PROGRESS'; payload: StudentProgressUpdate & { lessonId?: number; assignmentId?: string } }
+  | { type: 'STUDENT_FINISH'; payload: StudentFinishPayload & { lessonId?: number; assignmentId?: string } }
   | { type: 'END_CLASSROOM'; payload: { teacherToken: string } }
   | { type: 'RECONNECT'; payload: { sessionToken: string; code: string; role: 'teacher' | 'student' } }
   | { type: 'LEAVE_CLASSROOM'; payload?: Record<string, never> }

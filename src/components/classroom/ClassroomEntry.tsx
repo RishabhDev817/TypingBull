@@ -6,15 +6,27 @@ import {
   X,
   Check,
   Zap,
+  ChevronUp,
+  ChevronDown,
+  Trash2,
+  GraduationCap,
 } from 'lucide-react';
 import { STUDENT_AVATARS } from '../../data/classroom/studentAvatars';
 import { soundEngine } from '../../utils/audio';
 import { sanitizeAndModerateName } from '../../utils/nameModeration';
+import { CHAPTERS } from '../../data/curriculum';
+import { getLessonsForChapter, getLessonById, type LessonDef } from '../../data/lessonData';
+import type { ClassroomAssignment, ClassroomSettings } from '../../types/classroom';
+import { DurationSelector } from './DurationSelector';
 
 interface Props {
   initialCode?: string;
   initialTab?: 'student' | 'teacher';
-  onCreateClassroom: (teacherName?: string) => void;
+  onCreateClassroom: (
+    teacherName?: string,
+    initialAssignments?: ClassroomAssignment[],
+    initialSettings?: Partial<ClassroomSettings>
+  ) => void;
   onJoinClassroom: (code: string, studentName: string, avatarEmoji?: string) => void;
   isLoading?: boolean;
   onBackToLanding?: () => void;
@@ -36,6 +48,19 @@ export const ClassroomEntry: React.FC<Props> = ({
   const [teacherName, setTeacherName] = useState<string>('Teacher');
   const [selectedAvatarId, setSelectedAvatarId] = useState<string>(STUDENT_AVATARS[0].id);
   const [validationError, setValidationError] = useState<string | null>(null);
+
+  // Initial lessons selection for classroom creation
+  const [selectedChapterId, setSelectedChapterId] = useState<string>('home-row');
+  const currentChapterLessons = React.useMemo(() => {
+    return getLessonsForChapter(selectedChapterId);
+  }, [selectedChapterId]);
+
+  // Pre-select first 3 lessons of home row (e.g. Lesson 1: FF Basics, Lesson 2: FJ Basics, Lesson 3: JF Basics)
+  const [selectedLessons, setSelectedLessons] = useState<LessonDef[]>(() => {
+    const homeRowLessons = getLessonsForChapter('home-row');
+    return homeRowLessons.slice(0, 3);
+  });
+  const [durationSeconds, setDurationSeconds] = useState<number>(300); // 5 minutes default
 
   // Close on Escape key
   useEffect(() => {
@@ -75,7 +100,70 @@ export const ClassroomEntry: React.FC<Props> = ({
     e.preventDefault();
     soundEngine.playPop();
     const moderatedTeacher = sanitizeAndModerateName(teacherName.trim() || 'Teacher', 'Teacher');
-    onCreateClassroom(moderatedTeacher);
+
+    // Build ordered ClassroomAssignment[] with full Learn drill content
+    const assignments: ClassroomAssignment[] = selectedLessons.map((l, index) => {
+      const ch = CHAPTERS.find((c) => c.id === selectedChapterId) || CHAPTERS[0];
+      const companion = !l.content ? getLessonById(l.id + 1) : undefined;
+      const drillContent = l.content || companion?.content || 'ff jj fj jf ff jj fj jf';
+      return {
+        assignmentId: `assign-${l.id}-${Date.now()}-${index}`,
+        lessonId: l.id,
+        title: `Step ${l.id}: ${l.title}`,
+        chapterTitle: ch.title,
+        chapterId: ch.id,
+        description: l.description,
+        order: index + 1,
+        assignedAt: Date.now(),
+        targetKeys: l.targetKeys || [],
+        passingAccuracy: l.passingAccuracy || 80,
+        targetText: drillContent,
+        durationSeconds,
+      };
+    });
+
+    onCreateClassroom(moderatedTeacher, assignments, { durationSeconds });
+  };
+
+  const handleToggleLessonSelection = (lesson: LessonDef) => {
+    soundEngine.playPop();
+    setSelectedLessons((prev) => {
+      const exists = prev.some((l) => l.id === lesson.id);
+      if (exists) {
+        return prev.filter((l) => l.id !== lesson.id);
+      } else {
+        return [...prev, lesson];
+      }
+    });
+  };
+
+  const handleMoveLessonUp = (index: number) => {
+    if (index <= 0) return;
+    soundEngine.playPop();
+    setSelectedLessons((prev) => {
+      const next = [...prev];
+      const temp = next[index - 1];
+      next[index - 1] = next[index];
+      next[index] = temp;
+      return next;
+    });
+  };
+
+  const handleMoveLessonDown = (index: number) => {
+    if (index >= selectedLessons.length - 1) return;
+    soundEngine.playPop();
+    setSelectedLessons((prev) => {
+      const next = [...prev];
+      const temp = next[index + 1];
+      next[index + 1] = next[index];
+      next[index] = temp;
+      return next;
+    });
+  };
+
+  const handleRemoveSelectedLesson = (lessonId: number) => {
+    soundEngine.playPop();
+    setSelectedLessons((prev) => prev.filter((l) => l.id !== lessonId));
   };
 
   const handleAvatarSelect = (avatarId: string) => {
@@ -269,10 +357,10 @@ export const ClassroomEntry: React.FC<Props> = ({
                 {/* Classroom Invite Code Input */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                      Classroom Invite Code
+                    <label htmlFor="student-classroom-code-input" className="block text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
+                      Classroom Invite Code <span className="text-rose-500 font-bold" aria-hidden="true">*</span>
                     </label>
-                    <span className="text-[11px] font-semibold text-slate-400">6 characters</span>
+                    <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">6 characters</span>
                   </div>
                   <input
                     type="text"
@@ -281,18 +369,19 @@ export const ClassroomEntry: React.FC<Props> = ({
                     onChange={(e) => setCode(e.target.value.toUpperCase())}
                     placeholder="e.g. TB-4821"
                     maxLength={8}
+                    required
                     autoFocus={!initialCode}
-                    className="w-full font-mono text-xl sm:text-2xl font-bold tracking-[0.3em] uppercase text-center py-3 bg-slate-50 dark:bg-slate-800/80 border-2 border-indigo-200 dark:border-indigo-800 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 rounded-2xl text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-600 outline-none transition"
+                    className="w-full font-mono text-xl sm:text-2xl font-bold tracking-[0.3em] uppercase text-center py-3 bg-slate-50 dark:bg-slate-800/80 border-2 border-indigo-200 dark:border-indigo-800 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 rounded-2xl text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition"
                   />
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 font-medium">
                     Ask your teacher for the 6-character room code.
                   </p>
                 </div>
 
                 {/* Display Name Input (>=16px font size) */}
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                    Your Name or Nickname
+                  <label htmlFor="student-name-input" className="block text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 mb-1">
+                    Your Name or Nickname <span className="text-rose-500 font-bold" aria-hidden="true">*</span>
                   </label>
                   <input
                     type="text"
@@ -301,14 +390,15 @@ export const ClassroomEntry: React.FC<Props> = ({
                     onChange={(e) => setStudentName(e.target.value)}
                     placeholder="e.g., Alex, Priya, Marcus, Maya..."
                     maxLength={24}
-                    className="w-full text-base py-3 px-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 font-semibold focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 outline-none transition"
+                    required
+                    className="w-full text-base py-3 px-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-semibold focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 outline-none transition"
                   />
                 </div>
 
                 {/* ─── "Choose your Avatar" Section (Pure Circular Avatar Icons, No Names) ─── */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
                       Choose your Avatar
                     </label>
                     <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
@@ -378,42 +468,194 @@ export const ClassroomEntry: React.FC<Props> = ({
               <form onSubmit={handleTeacherSubmit} className="space-y-4">
                 {/* Teacher Display Name Input (>= 16px font size) */}
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                    Teacher or Room Host Name
+                  <label htmlFor="teacher-name-input" className="block text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 mb-1">
+                    Teacher or Room Host Name <span className="text-rose-500 font-bold" aria-hidden="true">*</span>
                   </label>
                   <input
                     type="text"
+                    id="teacher-name-input"
                     value={teacherName}
                     onChange={(e) => setTeacherName(e.target.value)}
                     placeholder="e.g., Mrs. Harper, Prof. Roy, Computer Lab 2..."
                     maxLength={32}
-                    className="w-full text-base py-3 px-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 font-semibold focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 outline-none transition"
+                    required
+                    className="w-full text-base py-3 px-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-semibold focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 outline-none transition"
                   />
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 font-medium">
                     This name will appear on student monitors when they connect.
                   </p>
                 </div>
 
+                {/* Multi-Lesson Assignment Selection for Classroom Creation */}
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <GraduationCap className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                        Assign Lessons from Learn Curriculum
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+                      {selectedLessons.length} Lesson{selectedLessons.length === 1 ? '' : 's'} Selected
+                    </span>
+                  </div>
+
+                  {/* Chapter Selector Dropdown */}
+                  <div className="flex items-center gap-2">
+                    <label htmlFor="teacher-chapter-select" className="text-xs font-bold text-slate-700 dark:text-slate-300 shrink-0">Chapter:</label>
+                    <select
+                      id="teacher-chapter-select"
+                      value={selectedChapterId}
+                      onChange={(e) => setSelectedChapterId(e.target.value)}
+                      className="w-full text-xs font-bold py-2 px-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 outline-none"
+                    >
+                      {CHAPTERS.map((ch) => (
+                        <option key={ch.id} value={ch.id}>
+                          {ch.icon} {ch.title} ({getLessonsForChapter(ch.id).length} lessons)
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Quick Preset Buttons */}
+                  <div className="flex items-center gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        soundEngine.playPop();
+                        setSelectedLessons(currentChapterLessons.slice(0, 3));
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 text-[11px] font-bold hover:bg-emerald-200 transition cursor-pointer"
+                    >
+                      First 3 Lessons
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        soundEngine.playPop();
+                        setSelectedLessons(currentChapterLessons.slice(0, 5));
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-bold hover:bg-slate-300 transition cursor-pointer"
+                    >
+                      First 5 Lessons
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        soundEngine.playPop();
+                        setSelectedLessons([]);
+                      }}
+                      className="px-2 py-1 rounded-lg text-slate-400 hover:text-slate-600 text-[11px] font-semibold transition ml-auto cursor-pointer"
+                    >
+                      Clear
+                    </button>
+                  </div>
+
+                  {/* Chapter Lessons Checkbox Grid */}
+                  <div className="max-h-36 overflow-y-auto space-y-1.5 p-2 rounded-xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800">
+                    {currentChapterLessons.map((lesson) => {
+                      const isChecked = selectedLessons.some((l) => l.id === lesson.id);
+                      return (
+                        <label
+                          key={lesson.id}
+                          className={`flex items-center justify-between p-2 rounded-lg text-xs font-semibold cursor-pointer transition ${
+                            isChecked
+                              ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800'
+                              : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => handleToggleLessonSelection(lesson)}
+                              className="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer"
+                            />
+                            <span>
+                              <strong>Step {lesson.id}:</strong> {lesson.title}
+                            </span>
+                          </div>
+                          {lesson.targetKeys && lesson.targetKeys.length > 0 && (
+                            <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                              {lesson.targetKeys.join(', ').toUpperCase()}
+                            </span>
+                          )}
+                        </label>
+                      );
+                    })}
+                  </div>
+
+                  {/* Ordered Sequence & Reordering Panel */}
+                  {selectedLessons.length > 0 && (
+                    <div className="pt-2 border-t border-slate-200 dark:border-slate-700/60">
+                      <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-2">
+                        Assigned Sequence (Students will complete sequentially):
+                      </div>
+                      <div className="space-y-1.5 max-h-32 overflow-y-auto">
+                        {selectedLessons.map((l, idx) => (
+                          <div
+                            key={l.id}
+                            className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs"
+                          >
+                            <span className="font-bold text-slate-700 dark:text-slate-200 truncate mr-2">
+                              <span className="text-emerald-600 dark:text-emerald-400 mr-1.5 font-mono">
+                                #{idx + 1}
+                              </span>
+                              Step {l.id}: {l.title}
+                            </span>
+                            <div className="flex items-center gap-1 shrink-0">
+                              <button
+                                type="button"
+                                disabled={idx === 0}
+                                onClick={() => handleMoveLessonUp(idx)}
+                                title="Move up"
+                                className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 text-slate-500 cursor-pointer"
+                              >
+                                <ChevronUp className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                disabled={idx === selectedLessons.length - 1}
+                                onClick={() => handleMoveLessonDown(idx)}
+                                title="Move down"
+                                className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 text-slate-500 cursor-pointer"
+                              >
+                                <ChevronDown className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveSelectedLesson(l.id)}
+                                title="Remove lesson"
+                                className="p-1 rounded hover:bg-rose-50 dark:hover:bg-rose-950/60 text-rose-500 cursor-pointer ml-1"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Custom Duration Selector */}
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80">
+                  <DurationSelector
+                    label="Lesson Duration"
+                    durationSeconds={durationSeconds}
+                    onChange={setDurationSeconds}
+                  />
+                </div>
+
                 {/* Session Configuration & Features Preview Card */}
-                <div className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/30 p-4 rounded-2xl space-y-2">
+                <div className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/30 p-3 sm:p-4 rounded-2xl space-y-2">
                   <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 text-base font-bold">
                     <Zap className="w-5 h-5 text-emerald-500" />
                     <span>Host Controls Ready</span>
                   </div>
-                  <p className="text-sm sm:text-base text-slate-700 dark:text-slate-200 leading-relaxed font-medium">
-                    Instantly generates an active 6-letter room code. You can start synchronized countdowns, select custom text drills, and view real-time student WPM metrics as they type.
+                  <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed font-medium">
+                    Creates an active 6-letter room code. Students receive your assigned curriculum tasks in order and unlock the next task as they complete each one. You can assign additional lessons anytime.
                   </p>
-                  <div className="pt-1 flex flex-wrap gap-2 text-xs font-bold text-emerald-700 dark:text-emerald-300">
-                    <span className="px-2.5 py-0.5 rounded-lg bg-emerald-500/15 border border-emerald-400/30">
-                      ✓ Instant Code Generation
-                    </span>
-                    <span className="px-2.5 py-0.5 rounded-lg bg-emerald-500/15 border border-emerald-400/30">
-                      ✓ Live Student Telemetry
-                    </span>
-                    <span className="px-2.5 py-0.5 rounded-lg bg-emerald-500/15 border border-emerald-400/30">
-                      ✓ Automatic Reset
-                    </span>
-                  </div>
                 </div>
 
                 {/* Submit Action Button */}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Zap, Target, ArrowLeft } from 'lucide-react';
+import { Zap, Target, ArrowLeft, CheckCircle2, Clock } from 'lucide-react';
 import type { ClassroomResultsView } from '../../types/classroom';
 import { Mascot } from '../Mascot';
 import { ConfettiFireworks } from '../game/ConfettiFireworks';
@@ -22,10 +22,11 @@ export const StudentClassroomResults: React.FC<Props> = ({
   const myResult = results.results.find((r) => r.playerId === myStudentId);
   const myRank = myResult?.rank || 1;
   const isTopThree = myRank <= 3;
+  const isCompleted = myResult?.finished ?? false;
 
   return (
     <div className="w-full max-w-xl mx-auto px-4 py-8 select-none flex flex-col items-center">
-      <ConfettiFireworks active={isTopThree} />
+      <ConfettiFireworks active={isTopThree && isCompleted} />
 
       {/* Mascot Celebration */}
       <motion.div
@@ -37,17 +38,26 @@ export const StudentClassroomResults: React.FC<Props> = ({
           <Mascot mood={isTopThree ? 'cheering' : 'happy'} size="md" />
         </div>
 
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs font-black uppercase tracking-wider mb-2">
-          <Trophy className="w-3.5 h-3.5" />
-          <span>Session Finished!</span>
-        </div>
+        {isCompleted ? (
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs font-black uppercase tracking-wider mb-2">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            <span>Lesson Completed!</span>
+          </div>
+        ) : (
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950 border border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs font-black uppercase tracking-wider mb-2">
+            <Clock className="w-3.5 h-3.5" />
+            <span>Time Expired</span>
+          </div>
+        )}
 
         <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight flex items-center justify-center gap-3">
           <StudentAvatarBadge avatar={myResult?.avatarEmoji} size="md" />
-          <span>Great Job, {studentName}!</span>
+          <span>{isCompleted ? `Great Job, ${studentName}!` : `Good Effort, ${studentName}!`}</span>
         </h1>
         <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mt-1">
-          Here is your classroom performance summary.
+          {isCompleted
+            ? 'You finished the exercise. Waiting for your teacher to assign the next step.'
+            : 'Session time ended before completion. Your speed and accuracy are recorded.'}
         </p>
       </motion.div>
 

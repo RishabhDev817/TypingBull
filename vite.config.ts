@@ -112,7 +112,7 @@ function geminiDevApiPlugin(): Plugin {
             console.log('[Vite Dev Feedback API Received]:', body);
             res.statusCode = 200;
             res.end(JSON.stringify({ success: true, id: feedbackId }));
-          } catch (err: unknown) {
+          } catch {
             res.statusCode = 400;
             res.end(JSON.stringify({ error: 'Invalid JSON payload' }));
           }

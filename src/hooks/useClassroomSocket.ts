@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { soundEngine } from '../utils/audio';
 import type {
   ClassroomRoomView,
   ClassroomRole,
@@ -15,6 +16,7 @@ import type {
   ServerMessage,
   StudentProgressUpdate,
   StudentFinishPayload,
+  ClassroomAssignment,
 } from '../types/classroom.ts';
 
 const SESSION_TOKEN_KEY = 'typingbull_cr_session_token';
@@ -149,7 +151,30 @@ export function useClassroomSocket(initialRoomCode?: string) {
         }
 
         case 'ROOM_UPDATED': {
-          setRoom(msg.payload.room);
+          const updatedRoom = msg.payload.room;
+          setRoom((prev) => {
+            if (prev && sessionStorage.getItem(ROLE_KEY) === 'student') {
+              const prevAssignments = prev.settings?.assignments || [];
+              const nextAssignments = updatedRoom.settings?.assignments || [];
+
+              if (nextAssignments.length > prevAssignments.length) {
+                const latestAdded = nextAssignments[nextAssignments.length - 1];
+                addNotification(
+                  'info',
+                  `New lesson added: ${latestAdded.title}. It will become available after you finish your current lesson.`
+                );
+                soundEngine.playPop();
+              } else if (
+                prev.settings?.passageTitle &&
+                updatedRoom.settings?.passageTitle &&
+                prev.settings.passageTitle !== updatedRoom.settings.passageTitle
+              ) {
+                addNotification('info', `New lesson assigned: ${updatedRoom.settings.passageTitle}`);
+                soundEngine.playPop();
+              }
+            }
+            return updatedRoom;
+          });
           break;
         }
 
@@ -337,10 +362,18 @@ export function useClassroomSocket(initialRoomCode?: string) {
 
   // Actions
   const createClassroom = useCallback(
-    (teacherDisplayName?: string) => {
+    (
+      teacherDisplayName?: string,
+      initialAssignments?: ClassroomAssignment[],
+      initialSettings?: Partial<ClassroomSettings>
+    ) => {
       sendJson({
         type: 'CREATE_CLASSROOM',
-        payload: { teacherName: teacherDisplayName || 'Teacher' },
+        payload: {
+          teacherName: teacherDisplayName || 'Teacher',
+          initialAssignments,
+          initialSettings,
+        },
       });
     },
     [sendJson]
@@ -393,15 +426,20 @@ export function useClassroomSocket(initialRoomCode?: string) {
 
   // Throttled progress sending (5-8 updates per second max)
   const sendProgress = useCallback(
-    (progress: StudentProgressUpdate) => {
+    (progress: StudentProgressUpdate, lessonId?: number, assignmentId?: string) => {
       const now = Date.now();
-      pendingProgressRef.current = progress;
+      const payload: StudentProgressUpdate = {
+        ...progress,
+        lessonId: lessonId !== undefined ? lessonId : progress.lessonId,
+        assignmentId: assignmentId !== undefined ? assignmentId : progress.assignmentId,
+      };
+      pendingProgressRef.current = payload;
 
       if (now - lastProgressSentRef.current >= 150) {
         lastProgressSentRef.current = now;
         sendJson({
           type: 'STUDENT_PROGRESS',
-          payload: progress,
+          payload,
         });
         pendingProgressRef.current = null;
       } else if (!throttleTimerRef.current) {
@@ -422,10 +460,14 @@ export function useClassroomSocket(initialRoomCode?: string) {
   );
 
   const finishSession = useCallback(
-    (payload: StudentFinishPayload) => {
+    (payload: StudentFinishPayload, lessonId?: number, assignmentId?: string) => {
       sendJson({
         type: 'STUDENT_FINISH',
-        payload,
+        payload: {
+          ...payload,
+          lessonId: lessonId !== undefined ? lessonId : payload.lessonId,
+          assignmentId: assignmentId !== undefined ? assignmentId : payload.assignmentId,
+        },
       });
     },
     [sendJson]

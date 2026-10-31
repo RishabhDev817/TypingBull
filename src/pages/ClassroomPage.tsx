@@ -14,6 +14,10 @@ import { TeacherLiveMonitoring } from '../components/classroom/TeacherLiveMonito
 import { StudentClassroomResults } from '../components/classroom/StudentClassroomResults';
 import { TeacherClassroomResults } from '../components/classroom/TeacherClassroomResults';
 import { ClassroomReconnectBanner } from '../components/classroom/ClassroomReconnectBanner';
+import { ClassroomTargetSelectorModal } from '../components/classroom/ClassroomTargetSelectorModal';
+import { PASSAGE_OPTIONS, CLASSROOM_GAMES } from '../components/classroom/TeacherClassroomLobby';
+import { getLessonById, type LessonDef } from '../data/lessonData';
+import type { ClassroomAssignment } from '../types/classroom';
 
 export const ClassroomPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -24,7 +28,33 @@ export const ClassroomPage: React.FC = () => {
   const isCreateRoute = location.pathname.includes('/create') || searchParams.get('action') === 'create';
   const isJoinRoute = location.pathname.includes('/join') || searchParams.get('action') === 'join' || Boolean(codeParam);
 
-  const isPrivateSession = Boolean(codeParam || isCreateRoute || isJoinRoute);
+  const {
+    status,
+    role,
+    room,
+    myStudentId,
+    studentName,
+    teacherToken,
+    sessionStartAt,
+    sessionEndAt,
+    sessionResults,
+    notifications,
+    createClassroom,
+    joinClassroom,
+    setReady,
+    updateSettings,
+    startSession,
+    sendProgress,
+    finishSession,
+    endClassroom,
+    leaveClassroom,
+    resetToEntry,
+  } = useClassroomSocket(codeParam);
+
+  const isInActiveRoom = Boolean(room && role && room.status !== 'ENDED');
+  const isTeacherAuthorized = role === 'teacher' && Boolean(teacherToken);
+  const isPrivateSession = Boolean(codeParam || isCreateRoute || isJoinRoute || isInActiveRoom || room);
+
   usePageSEO({
     canonicalPath: '/classroom/',
     title: 'TypingBull Classroom — Real-Time Typing Lab for Schools & Computer Labs',
@@ -42,6 +72,8 @@ export const ClassroomPage: React.FC = () => {
     return isCreateRoute ? 'teacher' : 'student';
   });
 
+  const [showResultsAssignModal, setShowResultsAssignModal] = useState(false);
+
   // Sync if URL query or path changes
   useEffect(() => {
     if (codeParam || isCreateRoute || isJoinRoute) {
@@ -54,28 +86,6 @@ export const ClassroomPage: React.FC = () => {
     }
   }, [codeParam, isCreateRoute, isJoinRoute]);
 
-  const {
-    status,
-    role,
-    room,
-    myStudentId,
-    studentName,
-    sessionStartAt,
-    sessionEndAt,
-    sessionResults,
-    notifications,
-    createClassroom,
-    joinClassroom,
-    setReady,
-    updateSettings,
-    startSession,
-    sendProgress,
-    finishSession,
-    endClassroom,
-    leaveClassroom,
-    resetToEntry,
-  } = useClassroomSocket(codeParam);
-
   // Teacher Next Round handler
   const handleTeacherNextRound = () => {
     if (room) {
@@ -83,7 +93,117 @@ export const ClassroomPage: React.FC = () => {
     }
   };
 
-  const isInActiveRoom = Boolean(room && role && room.status !== 'ENDED');
+  const handleAssignCurriculumLessonFromResults = (
+    lesson: LessonDef,
+    chapterTitle: string,
+    customDurationSeconds?: number
+  ) => {
+    if (!room) return;
+    const companion = !lesson.content ? getLessonById(lesson.id + 1) : undefined;
+    const drillContent = lesson.content || companion?.content || 'ff jj fj jf ff jj fj jf';
+    const durationSec = customDurationSeconds || room.settings.durationSeconds || 300;
+    const assignmentTitle = `Step ${lesson.id}: ${lesson.title} (${chapterTitle})`;
+    const newAssignment: ClassroomAssignment = {
+      assignmentId: `assign-${lesson.id}-${Date.now()}`,
+      lessonId: lesson.id,
+      title: assignmentTitle,
+      chapterTitle,
+      chapterId: lesson.chapterId,
+      description: lesson.description,
+      order: 1,
+      assignedAt: Date.now(),
+      targetKeys: lesson.targetKeys || [],
+      passingAccuracy: lesson.passingAccuracy || 80,
+      targetText: drillContent,
+      durationSeconds: durationSec,
+    };
+
+    updateSettings({
+      session_type: 'curriculum',
+      activityType: 'lesson',
+      lesson_id: lesson.id,
+      lessonId: `learn-${lesson.id}`,
+      passageId: `learn-lesson-${lesson.id}`,
+      passageTitle: assignmentTitle,
+      targetText: drillContent,
+      assignmentCategory: 'learn-curriculum',
+      targetKeys: lesson.targetKeys || [],
+      durationSeconds: durationSec,
+      assignmentId: newAssignment.assignmentId,
+      activeAssignmentId: newAssignment.assignmentId,
+      assignedAt: Date.now(),
+      assignments: [newAssignment],
+    });
+    setShowResultsAssignModal(false);
+  };
+
+  const handleAssignMultipleAssignmentsFromResults = (
+    assignments: ClassroomAssignment[],
+    customDurationSeconds?: number
+  ) => {
+    if (!room || !assignments.length) return;
+    const first = assignments[0];
+    const companion = getLessonById(first.lessonId + 1);
+    const drillContent = first.targetText || companion?.content || 'ff jj fj jf ff jj fj jf';
+    const durationSec = customDurationSeconds || first.durationSeconds || room.settings.durationSeconds || 300;
+
+    const preparedAssignments = assignments.map((a, idx) => ({
+      ...a,
+      order: idx + 1,
+      durationSeconds: customDurationSeconds || a.durationSeconds || durationSec,
+    }));
+
+    updateSettings({
+      session_type: 'curriculum',
+      activityType: 'lesson',
+      lesson_id: first.lessonId,
+      lessonId: `learn-${first.lessonId}`,
+      passageId: `learn-lesson-${first.lessonId}`,
+      passageTitle: first.title,
+      targetText: drillContent,
+      assignmentCategory: 'learn-curriculum',
+      targetKeys: first.targetKeys || [],
+      durationSeconds: durationSec,
+      assignmentId: first.assignmentId,
+      activeAssignmentId: first.assignmentId,
+      assignedAt: Date.now(),
+      assignments: preparedAssignments,
+    });
+    setShowResultsAssignModal(false);
+  };
+
+  const handleAssignPassageFromResults = (passage: any, customDurationSeconds?: number) => {
+    if (!room) return;
+    updateSettings({
+      session_type: 'passage',
+      activityType: 'practice',
+      lesson_id: undefined,
+      lessonId: undefined,
+      passageId: passage.id,
+      passageTitle: passage.title,
+      targetText: passage.text,
+      assignmentCategory: 'passage',
+      targetKeys: [],
+      ...(customDurationSeconds ? { durationSeconds: customDurationSeconds } : {}),
+    });
+    setShowResultsAssignModal(false);
+  };
+
+  const handleAssignGameFromResults = (game: any) => {
+    if (!room) return;
+    updateSettings({
+      session_type: 'game',
+      activityType: 'game',
+      gameId: game.gameId,
+      passageId: game.id,
+      passageTitle: game.title,
+      targetText: `Classroom Arcade Challenge: ${game.title}`,
+      assignmentCategory: 'game',
+      durationSeconds: game.duration,
+      targetKeys: [],
+    });
+    setShowResultsAssignModal(false);
+  };
 
   const handleCreateClassroomClick = () => {
     setEntryTab('teacher');
@@ -201,7 +321,7 @@ export const ClassroomPage: React.FC = () => {
         )}
 
         {/* ─── CASE 3: TEACHER ACTIVE IN ROOM ─── */}
-        {isInActiveRoom && role === 'teacher' && room && (
+        {isInActiveRoom && isTeacherAuthorized && room && (
           <motion.div
             key="teacher-view"
             initial={{ opacity: 0 }}
@@ -241,11 +361,44 @@ export const ClassroomPage: React.FC = () => {
             )}
 
             {room.status === 'FINISHED' && sessionResults && (
-              <TeacherClassroomResults
-                results={sessionResults}
-                onNextRound={handleTeacherNextRound}
-                onEndClassroom={endClassroom}
-              />
+              <>
+                <TeacherClassroomResults
+                  results={sessionResults}
+                  room={room}
+                  onNextRound={handleTeacherNextRound}
+                  onEndClassroom={endClassroom}
+                  onOpenAssignModal={() => setShowResultsAssignModal(true)}
+                  onActivateAssignment={(assignment) => {
+                    updateSettings({
+                      session_type: 'curriculum',
+                      activityType: 'lesson',
+                      lesson_id: assignment.lessonId,
+                      lessonId: `learn-${assignment.lessonId}`,
+                      passageId: `learn-lesson-${assignment.lessonId}`,
+                      passageTitle: assignment.title,
+                      targetText: assignment.targetText || 'ff jj fj jf ff jj fj jf',
+                      assignmentCategory: 'learn-curriculum',
+                      targetKeys: assignment.targetKeys || [],
+                      durationSeconds: assignment.durationSeconds || room.settings.durationSeconds || 300,
+                      assignmentId: assignment.assignmentId,
+                      activeAssignmentId: assignment.assignmentId,
+                      assignedAt: Date.now(),
+                    });
+                  }}
+                />
+
+                <ClassroomTargetSelectorModal
+                  isOpen={showResultsAssignModal}
+                  onClose={() => setShowResultsAssignModal(false)}
+                  currentSettings={room.settings}
+                  passages={PASSAGE_OPTIONS}
+                  games={CLASSROOM_GAMES}
+                  onAssignCurriculumLesson={handleAssignCurriculumLessonFromResults}
+                  onAssignMultipleAssignments={handleAssignMultipleAssignmentsFromResults}
+                  onAssignPassage={handleAssignPassageFromResults}
+                  onAssignGame={handleAssignGameFromResults}
+                />
+              </>
             )}
           </motion.div>
         )}
@@ -267,6 +420,8 @@ export const ClassroomPage: React.FC = () => {
                 studentName={studentName || 'Student'}
                 onToggleReady={setReady}
                 onLeaveClassroom={leaveClassroom}
+                onProgressUpdate={sendProgress}
+                onFinish={finishSession}
               />
             )}
 
@@ -278,6 +433,8 @@ export const ClassroomPage: React.FC = () => {
                   studentName={studentName || 'Student'}
                   onToggleReady={setReady}
                   onLeaveClassroom={leaveClassroom}
+                  onProgressUpdate={sendProgress}
+                  onFinish={finishSession}
                 />
                 <ClassroomCountdown sessionStartAt={sessionStartAt} />
               </>
@@ -299,6 +456,8 @@ export const ClassroomPage: React.FC = () => {
                   sessionStartAt={sessionStartAt}
                   sessionEndAt={sessionEndAt}
                   session_type={room.settings.session_type}
+                  lesson_id={room.settings.lesson_id}
+                  assignmentId={room.settings.assignmentId}
                   targetKeys={room.settings.targetKeys}
                   assignmentCategory={room.settings.assignmentCategory}
                   onProgressUpdate={sendProgress}
