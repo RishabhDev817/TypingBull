@@ -422,6 +422,21 @@ export class ClassroomManager {
   }
 
   /** Update student live typing progress */
+  /**
+   * Server-side sanity cap for client-reported speed: never above a human limit, and never above
+   * what the reported correct characters allow for the time since the session started.
+   */
+  private plausibleWpm(room: ClassroomRoom, reportedWpm: number, correctChars?: number): number {
+    const MAX_HUMAN_WPM = 320;
+    let wpm = Math.max(0, Math.round(Number(reportedWpm) || 0));
+    wpm = Math.min(wpm, MAX_HUMAN_WPM);
+    if (room.sessionStartAt && typeof correctChars === 'number' && correctChars >= 0) {
+      const elapsedMinutes = Math.max(0.05, (Date.now() - room.sessionStartAt) / 60000);
+      wpm = Math.min(wpm, Math.round((correctChars / 5) / elapsedMinutes) + 10);
+    }
+    return wpm;
+  }
+
   public updateStudentProgress(
     code: string,
     studentId: string,
@@ -433,7 +448,7 @@ export class ClassroomManager {
     if (!student || student.status === 'FINISHED') return null;
 
     student.progress = Math.max(0, Math.min(1, progress.progress));
-    student.wpm = Math.max(0, Math.round(progress.wpm));
+    student.wpm = this.plausibleWpm(room, progress.wpm, progress.correctChars);
     student.accuracy = Math.max(0, Math.min(100, Math.round(progress.accuracy * 10) / 10));
     student.correctChars = progress.correctChars;
     student.incorrectChars = progress.incorrectChars;
@@ -481,7 +496,7 @@ export class ClassroomManager {
       student.assignmentProgress[aId] = {
         status: isCompleted ? 'COMPLETED' : 'IN_PROGRESS',
         progress: isCompleted ? 1 : student.progress,
-        wpm: Math.max(0, Math.round(payload.wpm)),
+        wpm: this.plausibleWpm(room, payload.wpm, payload.correctChars),
         accuracy: Math.max(0, Math.min(100, Math.round(payload.accuracy * 10) / 10)),
         completedAt: isCompleted ? Date.now() : undefined,
       };
@@ -490,7 +505,7 @@ export class ClassroomManager {
     if (room.status === 'ACTIVE') {
       student.status = 'FINISHED';
       student.progress = isCompleted ? 1 : student.progress;
-      student.wpm = Math.max(0, Math.round(payload.wpm));
+      student.wpm = this.plausibleWpm(room, payload.wpm, payload.correctChars);
       student.accuracy = Math.max(0, Math.min(100, Math.round(payload.accuracy * 10) / 10));
       student.correctChars = payload.correctChars;
       student.incorrectChars = payload.incorrectChars;
@@ -516,7 +531,7 @@ export class ClassroomManager {
     } else {
       // Lobby practice completed: update stats without marking student FINISHED in room race
       student.progress = isCompleted ? 1 : student.progress;
-      student.wpm = Math.max(0, Math.round(payload.wpm));
+      student.wpm = this.plausibleWpm(room, payload.wpm, payload.correctChars);
       student.accuracy = Math.max(0, Math.min(100, Math.round(payload.accuracy * 10) / 10));
       room.lastActivityAt = Date.now();
       return { room, student, allFinished: false };

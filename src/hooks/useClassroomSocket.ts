@@ -104,7 +104,8 @@ export function useClassroomSocket(initialRoomCode?: string) {
     (msg: ServerMessage) => {
       switch (msg.type) {
         case 'CONNECTED': {
-          sessionStorage.setItem(SESSION_TOKEN_KEY, msg.payload.sessionToken);
+          // Keep the token this browser joined with: the server identifies a returning student by it.
+          const previousToken = sessionStorage.getItem(SESSION_TOKEN_KEY);
           // Try auto-reconnect if session details exist
           const savedCode = sessionStorage.getItem(ROOM_CODE_KEY);
           const savedRole = sessionStorage.getItem(ROLE_KEY) as ClassroomRole;
@@ -112,11 +113,15 @@ export function useClassroomSocket(initialRoomCode?: string) {
             sendJson({
               type: 'RECONNECT',
               payload: {
-                sessionToken: msg.payload.sessionToken,
+                sessionToken: previousToken || msg.payload.sessionToken,
                 code: savedCode,
                 role: savedRole,
+                // The server only restores the teacher role with the secret token issued at creation.
+                teacherToken: savedRole === 'teacher' ? sessionStorage.getItem(TEACHER_TOKEN_KEY) || undefined : undefined,
               },
             });
+          } else {
+            sessionStorage.setItem(SESSION_TOKEN_KEY, msg.payload.sessionToken);
           }
           break;
         }
@@ -281,6 +286,12 @@ export function useClassroomSocket(initialRoomCode?: string) {
         }
 
         case 'ERROR': {
+          if (msg.payload.code === 'UNAUTHORIZED' && sessionStorage.getItem(ROLE_KEY) === 'teacher') {
+            // A teacher session that can't be verified is stale: forget it so we don't retry forever.
+            sessionStorage.removeItem(ROOM_CODE_KEY);
+            sessionStorage.removeItem(ROLE_KEY);
+            sessionStorage.removeItem(TEACHER_TOKEN_KEY);
+          }
           setErrorMessage(msg.payload.message);
           addNotification('error', msg.payload.message);
           break;

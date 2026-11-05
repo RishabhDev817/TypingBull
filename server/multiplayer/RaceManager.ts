@@ -87,9 +87,9 @@ export class RaceManager {
     );
 
     player.progress = validation.validatedProgress;
-    player.correctChars = data.correctChars;
-    player.incorrectChars = data.incorrectChars;
-    player.totalChars = data.totalChars;
+    player.correctChars = validation.validatedCorrectChars;
+    player.incorrectChars = validation.validatedIncorrectChars;
+    player.totalChars = validation.validatedTotalChars;
     player.wpm = validation.validatedWpm;
     player.accuracy = validation.validatedAccuracy;
 

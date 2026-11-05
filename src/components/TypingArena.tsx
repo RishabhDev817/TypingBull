@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Keyboard } from 'lucide-react';
 import { soundEngine } from '../utils/audio';
+import { PASTE_GUARD_PROPS, isBulkInsert } from '../utils/typingGuard';
 
 interface TypingArenaProps {
   words: string[];
@@ -69,6 +70,8 @@ export const TypingArena: React.FC<TypingArenaProps> = ({
     if (isCompleted) return;
 
     const value = e.target.value;
+    // Reject paste / bulk inserts: only real keystrokes count.
+    if (isBulkInsert(userInput, value)) return;
     
     // Space bar pressed -> proceed to next word
     if (value.endsWith(' ')) {
@@ -140,6 +143,7 @@ export const TypingArena: React.FC<TypingArenaProps> = ({
         type="text"
         value={userInput}
         onKeyDown={handleKeyDown}
+        {...PASTE_GUARD_PROPS}
         onChange={handleInputChange}
         onBlur={() => setIsFocused(false)}
         onFocus={() => setIsFocused(true)}

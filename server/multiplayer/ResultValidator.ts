@@ -10,9 +10,16 @@ export interface ProgressValidationResult {
   validatedWpm: number;
   validatedAccuracy: number;
   validatedProgress: number;
+  /** Character counts after server-side bounding (store these, not the raw client values). */
+  validatedCorrectChars: number;
+  validatedIncorrectChars: number;
+  validatedTotalChars: number;
   isCompleted: boolean;
   reason?: string;
 }
+
+/** Characters a fast human can burst before the rate cap applies (a short word typed instantly). */
+const BURST_ALLOWANCE_CHARS = 10;
 
 export class ResultValidator {
   /**
@@ -76,44 +83,56 @@ export class ResultValidator {
     const textLength = raceText.length;
 
     // 1. Bound check: correct chars cannot exceed race text length
-    const boundedCorrect = Math.min(Math.max(0, correctChars), textLength);
-    const boundedIncorrect = Math.max(0, incorrectChars);
-    const calculatedTotal = Math.max(totalChars, boundedCorrect + boundedIncorrect);
+    let boundedCorrect = Math.min(Math.max(0, Math.floor(correctChars) || 0), textLength);
+    let boundedIncorrect = Math.max(0, Math.floor(incorrectChars) || 0);
 
-    // 2. Canonical TypingBull WPM formula:
-    // (correctChars / 5) / elapsedMinutes
+    // 2. Anti-cheat from the very first update (no grace window): nobody can have typed more
+    // characters than MAX_WPM_LIMIT allows for the time elapsed, plus a small burst allowance.
+    // Typos count too, so a client can't "finish" by padding incorrectChars.
+    const maxCharsPerSecond = (MULTIPLAYER_CONSTANTS.MAX_WPM_LIMIT * 5) / 60;
+    const maxTypedByNow = Math.ceil(maxCharsPerSecond * (elapsedMs / 1000)) + BURST_ALLOWANCE_CHARS;
+    let rateExceeded = false;
+    if (boundedCorrect + boundedIncorrect > maxTypedByNow) {
+      rateExceeded = true;
+      boundedCorrect = Math.min(boundedCorrect, maxTypedByNow);
+      boundedIncorrect = Math.max(0, Math.min(boundedIncorrect, maxTypedByNow - boundedCorrect));
+    }
+    const boundedTotal = Math.min(
+      Math.max(Math.floor(totalChars) || 0, boundedCorrect + boundedIncorrect),
+      maxTypedByNow
+    );
+
+    // 3. Canonical TypingBull WPM formula: (correctChars / 5) / elapsedMinutes, never above the human limit
     const calculatedWpm = elapsedMinutes > 0
-      ? Math.round((boundedCorrect / 5) / elapsedMinutes)
+      ? Math.min(MULTIPLAYER_CONSTANTS.MAX_WPM_LIMIT, Math.round((boundedCorrect / 5) / elapsedMinutes))
       : 0;
 
-    // 3. Canonical TypingBull Accuracy formula (0-100%, 1 decimal place):
-    const calculatedAccuracy = calculatedTotal > 0
-      ? Math.round((boundedCorrect / calculatedTotal) * 1000) / 10
+    // 4. Canonical TypingBull Accuracy formula (0-100%, 1 decimal place):
+    const accuracyBase = Math.max(boundedTotal, boundedCorrect + boundedIncorrect);
+    const calculatedAccuracy = accuracyBase > 0
+      ? Math.round((boundedCorrect / accuracyBase) * 1000) / 10
       : 100;
 
-    // 4. Progress percentage (0 - 100)
+    // 5. Progress percentage (0 - 100)
     const calculatedProgress = Math.min(100, Math.round((boundedCorrect / textLength) * 100));
 
-    // 5. Anti-cheat check: Impossible typing speeds (> MAX_WPM_LIMIT e.g. 320 WPM)
-    // Allow small burst grace period in first 3.5 seconds (e.g. typing 1 short word fast)
-    if (elapsedMs > 3500 && calculatedWpm > MULTIPLAYER_CONSTANTS.MAX_WPM_LIMIT) {
+    if (rateExceeded) {
       return {
         isValid: false,
-        validatedWpm: MULTIPLAYER_CONSTANTS.MAX_WPM_LIMIT,
+        validatedWpm: calculatedWpm,
         validatedAccuracy: calculatedAccuracy,
         validatedProgress: calculatedProgress,
+        validatedCorrectChars: boundedCorrect,
+        validatedIncorrectChars: boundedIncorrect,
+        validatedTotalChars: boundedTotal,
         isCompleted: false,
         reason: 'Typing speed exceeds human feasibility threshold.',
       };
     }
 
-    // 6. Completion validation: client completes when full passage has been typed
-    // Allows completion with typos (real-world typing accuracy < 100%)
-    const hasTypedFullPassage =
-      totalChars >= textLength ||
-      (boundedCorrect + boundedIncorrect) >= textLength ||
-      boundedCorrect >= textLength;
-
+    // 6. Completion validation: the full passage must have been typed (typos allowed),
+    // within the human rate limit already enforced above.
+    const hasTypedFullPassage = boundedCorrect + boundedIncorrect >= textLength;
     const isActuallyCompleted = Boolean(clientCompleted && hasTypedFullPassage);
 
     return {
@@ -121,6 +140,9 @@ export class ResultValidator {
       validatedWpm: calculatedWpm,
       validatedAccuracy: calculatedAccuracy,
       validatedProgress: calculatedProgress,
+      validatedCorrectChars: boundedCorrect,
+      validatedIncorrectChars: boundedIncorrect,
+      validatedTotalChars: boundedTotal,
       isCompleted: isActuallyCompleted,
     };
   }

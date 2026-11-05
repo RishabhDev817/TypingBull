@@ -16,6 +16,7 @@ import { SiteFooter } from '../components/navigation/SiteFooter';
 import { usePageSEO } from '../hooks/usePageSEO';
 import { PracticeGuideSection } from '../components/educational/PracticeGuideSection';
 import { KeyboardNotice } from '../components/KeyboardNotice';
+import { PASTE_GUARD_PROPS, isBulkInsert } from '../utils/typingGuard';
 
 type PracticeStatus = 'idle' | 'typing' | 'completed' | 'failed';
 
@@ -283,6 +284,8 @@ export const PracticePage: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (gameStatus === 'completed') return;
     const value = e.target.value;
+    // Reject paste / bulk inserts: only real keystrokes count.
+    if (isBulkInsert(userInput, value)) return;
 
     if (gameStatus === 'idle' && value.length > 0) {
       startTimer();
@@ -507,6 +510,7 @@ export const PracticePage: React.FC = () => {
             ref={hiddenInputRef}
             type="text"
             value={userInput}
+            {...PASTE_GUARD_PROPS}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             className="absolute opacity-0 pointer-events-none -top-40"
