@@ -10,6 +10,8 @@ export interface QueuedPlayer {
   player: Player;
   queuedAt: number;
   language?: string;
+  /** Player's recent typing speed, used to give them a fair bot opponent. */
+  skillWpm?: number;
 }
 
 const BOT_CHALLENGERS = [
@@ -31,9 +33,14 @@ export class MatchmakingManager {
   /**
    * Creates an arena challenger bot with realistic speed and avatar.
    */
-  createChallengerBot(targetWpm?: number): Player {
+  createChallengerBot(targetWpm?: number, skillWpm?: number): Player {
     const template = BOT_CHALLENGERS[Math.floor(Math.random() * BOT_CHALLENGERS.length)];
-    const speed = targetWpm || Math.floor(Math.random() * (template.maxWpm - template.minWpm + 1)) + template.minWpm;
+    // With a known player speed, race at roughly that speed (±8%) so beginners get a winnable race.
+    const matchedSpeed =
+      typeof skillWpm === 'number' && skillWpm >= 5 && skillWpm <= 250
+        ? Math.max(12, Math.min(120, Math.round(skillWpm * (0.92 + Math.random() * 0.16))))
+        : undefined;
+    const speed = targetWpm || matchedSpeed || Math.floor(Math.random() * (template.maxWpm - template.minWpm + 1)) + template.minWpm;
     const botId = `bot_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 
     return {
@@ -58,9 +65,9 @@ export class MatchmakingManager {
   /**
    * Immediately matches a player with an arena challenger bot.
    */
-  matchWithBot(player: Player, language?: string): { roomCode: string; botPlayer: Player } {
+  matchWithBot(player: Player, language?: string, skillWpm?: number): { roomCode: string; botPlayer: Player } {
     this.removePlayer(player.id);
-    const botPlayer = this.createChallengerBot();
+    const botPlayer = this.createChallengerBot(undefined, skillWpm);
 
     // Create a 2-player quick match room with the human as host and designated language
     const room = this.roomManager.createRoom(
@@ -79,7 +86,7 @@ export class MatchmakingManager {
    * Enqueues a player searching for a match.
    * If an opponent is found, creates a new 2-player room and returns the room code.
    */
-  findMatch(player: Player, language?: string): { status: 'QUEUED' | 'MATCHED'; roomCode?: string } {
+  findMatch(player: Player, language?: string, skillWpm?: number): { status: 'QUEUED' | 'MATCHED'; roomCode?: string } {
     // Remove if already in queue
     this.removePlayer(player.id);
 
@@ -108,6 +115,7 @@ export class MatchmakingManager {
       player,
       queuedAt: Date.now(),
       language,
+      skillWpm,
     });
 
     return { status: 'QUEUED' };
@@ -122,7 +130,7 @@ export class MatchmakingManager {
     if (queueIdx === -1) return null;
 
     const [queued] = this.queue.splice(queueIdx, 1);
-    const { roomCode, botPlayer } = this.matchWithBot(queued.player, queued.language);
+    const { roomCode, botPlayer } = this.matchWithBot(queued.player, queued.language, queued.skillWpm);
     return { roomCode, botPlayer, player: queued.player };
   }
 

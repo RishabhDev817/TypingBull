@@ -334,7 +334,7 @@ export class MultiplayerServer {
           accuracy: 100,
         };
 
-        const matchResult = this.matchmakingManager.findMatch(player);
+        const matchResult = this.matchmakingManager.findMatch(player, message.payload?.language, Number(message.payload?.skillWpm) || undefined);
 
         if (matchResult.status === 'MATCHED' && matchResult.roomCode) {
           const room = this.roomManager.getRoom(matchResult.roomCode);

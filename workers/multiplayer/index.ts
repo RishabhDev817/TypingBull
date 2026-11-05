@@ -108,7 +108,19 @@ export class MultiplayerArena extends DurableObject {
     const [client, server] = Object.values(webSocketPair);
 
     // Accept WebSocket into Durable Object context
-    this.ctx.acceptWebSocket(server);
+    // Standard (non-hibernating) WebSocket. All live race and classroom state lives in memory,
+    // so the object must stay resident while anyone is connected; with the Hibernation API
+    // Cloudflare could evict it between messages and every room would vanish.
+    server.accept();
+    server.addEventListener('message', (event: MessageEvent) => {
+      void this.webSocketMessage(server, event.data as string | ArrayBuffer);
+    });
+    server.addEventListener('close', () => {
+      void this.webSocketClose(server);
+    });
+    server.addEventListener('error', () => {
+      void this.webSocketError(server);
+    });
 
     const isClassroom = url.pathname.includes('classroom');
     if (isClassroom) {
@@ -409,7 +421,7 @@ export class MultiplayerArena extends DurableObject {
           accuracy: 100,
         };
 
-        const matchResult = this.matchmakingManager.findMatch(player, language);
+        const matchResult = this.matchmakingManager.findMatch(player, language, Number(message.payload?.skillWpm) || undefined);
 
         if (matchResult.status === 'MATCHED' && matchResult.roomCode) {
           const room = this.roomManager.getRoom(matchResult.roomCode);

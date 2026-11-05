@@ -1,15 +1,20 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PEB27YTSN1"></script>
+    <!-- Apply the saved theme before first paint (no light-to-dark flash) -->
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-PEB27YTSN1');
+      (function () {
+        var mode = 'night';
+        try { mode = localStorage.getItem('tb_theme_mode') || 'night'; } catch (e) {}
+        var h = new Date().getHours();
+        var dark = mode === 'night' || (mode === 'auto' && (h < 6 || h >= 19));
+        var root = document.documentElement;
+        root.setAttribute('data-theme', dark ? 'dark' : 'light');
+        root.classList.toggle('dark', dark);
+      })();
     </script>
+    <!-- Google Analytics loads only after consent, never on classroom pages -->
+    <script src="/analytics-consent.js"></script>
     <meta charset="UTF-8" />
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

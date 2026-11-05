@@ -1,6 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, MotionConfig } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import { Sidebar } from './components/navigation/Sidebar';
 import { BottomNav } from './components/navigation/BottomNav';
@@ -172,9 +172,12 @@ function App() {
     <ThemeProvider>
       <I18nProvider>
         <FeedbackProvider>
-          <BrowserRouter>
-            <MainLayout />
-          </BrowserRouter>
+          {/* Honour the OS "reduce motion" setting for every framer-motion animation */}
+          <MotionConfig reducedMotion="user">
+            <BrowserRouter>
+              <MainLayout />
+            </BrowserRouter>
+          </MotionConfig>
         </FeedbackProvider>
       </I18nProvider>
     </ThemeProvider>

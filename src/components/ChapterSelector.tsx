@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { Lock, Star, CheckCircle2, ChevronRight } from 'lucide-react';
 import { SECTIONS, getChaptersInOrder } from '../data/curriculum';
 import type { Chapter } from '../data/lessons/types';
+import { getLessonsForChapter } from '../data/lessons/index';
 import { getChapterProgress, isChapterUnlocked } from '../engine/sessionStore';
 import { useI18n } from '../context/I18nContext';
 import { getLocalizedChapter } from '../data/curriculumI18n';
@@ -68,7 +69,11 @@ interface ChapterCardProps {
 const ChapterCard: React.FC<ChapterCardProps> = ({ chapter, isSelected, onSelect }) => {
   const { t } = useI18n();
   const unlocked = isChapterUnlocked(chapter.lessonRange[0]);
-  const progress = getChapterProgress(chapter.lessonRange[0], chapter.lessonRange[1]);
+  const progress = getChapterProgress(
+    chapter.lessonRange[0],
+    chapter.lessonRange[1],
+    getLessonsForChapter(chapter.id).map((l) => l.id)
+  );
   const isComplete = progress.completed === progress.total;
 
   return (

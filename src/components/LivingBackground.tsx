@@ -273,12 +273,14 @@ export const LivingBackground: React.FC = () => {
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // A soft background doesn't need full retina resolution; 1.5x keeps it sharp at far lower GPU cost.
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     // Enable soft shadow mapping
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-    containerRef.current.appendChild(renderer.domElement);
+    const container = containerRef.current;
+    container.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
     // ─── Sky Background Canvas Texture ────────────────────────────────
@@ -1185,6 +1187,13 @@ export const LivingBackground: React.FC = () => {
 
     tick();
 
+    // Stop rendering while the tab is hidden; resume when it's visible again.
+    const handleVisibility = () => {
+      cancelAnimationFrame(animFrameId);
+      if (!document.hidden) animFrameId = requestAnimationFrame(tick);
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
     // ─── Handle Resize ────────────────────────────────────────────────
     const handleResize = () => {
       if (!cameraRef.current || !rendererRef.current) return;
@@ -1200,6 +1209,7 @@ export const LivingBackground: React.FC = () => {
     // ─── Cleanup ─────────────────────────────────────────────────────
     return () => {
       cancelAnimationFrame(animFrameId);
+      document.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('mousemove', handleMouseMove);
@@ -1208,8 +1218,9 @@ export const LivingBackground: React.FC = () => {
       clearTimeout(birdFlockTimer);
 
       renderer.dispose();
-      if (containerRef.current && renderer.domElement) {
-        containerRef.current.removeChild(renderer.domElement);
+      // Remove this effect's own canvas (the ref may already be gone), so remounts never stack canvases.
+      if (renderer.domElement.parentNode === container) {
+        container.removeChild(renderer.domElement);
       }
       gsap.killTweensOf('*');
     };

@@ -11,7 +11,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "deploy:worker": "cd workers/multiplayer && wrangler deploy",
-    "deploy": "npm run build && wrangler pages deploy dist --project-name=typingbull"
+    "deploy": "npm run build && wrangler pages deploy dist --project-name=typingbull",
+    "test": "node --test --experimental-strip-types \"tests/**/*.test.ts\""
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

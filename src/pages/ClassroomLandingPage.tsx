@@ -286,7 +286,7 @@ export const ClassroomLandingPage: React.FC<Props> = ({
                     <span className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
                       <Check className="w-3.5 h-3.5 stroke-[3]" />
                     </span>
-                    <span>Teacher Moderation Controls</span>
+                    <span>Teacher Session Controls</span>
                   </div>
                 </div>
               </div>

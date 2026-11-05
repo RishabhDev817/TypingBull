@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, X } from 'lucide-react';
 import { Mascot } from '../Mascot';
-import { AITutorReport } from '../AITutorReport';
+// The tutor report is large; load it only when the visitor first opens BullBot.
+const AITutorReport = lazy(() => import('../AITutorReport'));
 import { soundEngine } from '../../utils/audio';
 import { useI18n } from '../../context/I18nContext';
 import { FLOATING_BOT_I18N } from '../../i18n/tutorTranslations';
@@ -27,6 +28,8 @@ export const FloatingBot: React.FC = () => {
   const botUi = FLOATING_BOT_I18N[currentLang] || FLOATING_BOT_I18N.en;
 
   const [isOpen, setIsOpen] = useState(false);
+  const [hasOpened, setHasOpened] = useState(false);
+  if (isOpen && !hasOpened) setHasOpened(true);
   const [showBubble, setShowBubble] = useState(false);
   const [hasDismissedBubble, setHasDismissedBubble] = useState(hasSeenTip);
 
@@ -66,7 +69,8 @@ export const FloatingBot: React.FC = () => {
 
   return (
     <>
-      <div className={`fixed right-3 lg:bottom-[16px] lg:right-[20px] z-40 flex flex-col items-end pointer-events-none ${isFocusRoute ? 'bottom-[88px]' : 'bottom-20'}`}>
+      {/* On phones, typing screens hide the bot so it never covers the passage */}
+      <div className={`fixed right-3 lg:bottom-[16px] lg:right-[20px] z-40 flex-col items-end pointer-events-none ${isFocusRoute ? 'hidden lg:flex bottom-[88px]' : 'flex bottom-20'}`}>
         {/* Friendly speech greeting bubble */}
         <AnimatePresence>
           {showBubble && !isOpen && (
@@ -150,14 +154,18 @@ export const FloatingBot: React.FC = () => {
         </motion.button>
       </div>
 
-      {/* Global AI Tutor Report Modal */}
-      <AITutorReport
-        sessionResult={null}
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        targetWpm={40}
-        showReplayButtons={true}
-      />
+      {/* Global AI Tutor Report Modal (loaded on first open, then kept mounted for its close animation) */}
+      {hasOpened && (
+        <Suspense fallback={null}>
+          <AITutorReport
+            sessionResult={null}
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+            targetWpm={40}
+            showReplayButtons={true}
+          />
+        </Suspense>
+      )}
     </>
   );
 };
