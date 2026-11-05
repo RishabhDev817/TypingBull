@@ -147,18 +147,26 @@ export function getCompletedLessonCount(): number {
 }
 
 /** Get progress for a specific chapter (by lesson range). */
-export function getChapterProgress(startId: number, endId: number): {
+/**
+ * Progress for one chapter. Pass `lessonIds` (the lessons that really exist in the chapter):
+ * chapter ranges contain gaps, so counting every number in the range would make some chapters
+ * impossible to finish.
+ */
+export function getChapterProgress(startId: number, endId: number, lessonIds?: number[]): {
   completed: number;
   total: number;
   stars: number;
   maxStars: number;
   percent: number;
 } {
-  const total = endId - startId + 1;
+  const ids = lessonIds && lessonIds.length > 0
+    ? lessonIds
+    : Array.from({ length: endId - startId + 1 }, (_, i) => startId + i);
+  const total = ids.length;
   const progress = getLessonProgress();
   let completed = 0;
   let stars = 0;
-  for (let id = startId; id <= endId; id++) {
+  for (const id of ids) {
     const p = progress.find(l => l.lessonId === id);
     if (p?.completed) completed++;
     if (p) stars += p.starsEarned;

@@ -28,7 +28,7 @@ export const BottomNav: React.FC = () => {
         WebkitBackdropFilter: 'blur(16px) saturate(180%)',
       }}
     >
-      <div className="flex items-center justify-around h-16 px-2">
+      <div className="flex items-stretch h-16 px-1 pb-[env(safe-area-inset-bottom,0px)]">
         {navItems.map(({ to, icon: Icon, label, color }) => {
           const isItemActive = to === '/' ? normalizedCurrentPath === '/' : normalizedCurrentPath.startsWith(to);
 
@@ -38,10 +38,10 @@ export const BottomNav: React.FC = () => {
               to={to}
               end={to === '/'}
               onClick={() => soundEngine.playPop()}
-              className="flex flex-col items-center justify-center gap-0.5 px-3 py-1 rounded-2xl transition-all"
+              className="flex-1 min-w-0 flex flex-col items-center justify-center gap-0.5 px-0.5 py-1 rounded-2xl transition-all"
             >
               <motion.div
-                className="flex flex-col items-center"
+                className="flex flex-col items-center w-full min-w-0"
                 whileTap={{ scale: 0.85 }}
               >
                 <div
@@ -53,7 +53,7 @@ export const BottomNav: React.FC = () => {
                   <Icon className="w-5 h-5" style={{ color: isItemActive ? color : 'var(--color-mute)' }} />
                 </div>
                 <span
-                  className="text-[11px] font-bold mt-0.5"
+                  className="w-full truncate text-center text-[10px] leading-tight font-bold mt-0.5"
                   style={{ color: isItemActive ? color : 'var(--color-mute)' }}
                 >
                   {label}

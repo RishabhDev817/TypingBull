@@ -12,6 +12,18 @@ import type {
   RoomSettings,
 } from '../types/multiplayer.ts';
 import { sanitizeAndModerateName } from '../utils/nameModeration';
+import { getSessions } from '../engine/sessionStore';
+
+/** Average WPM of the player's last few saved sessions (undefined for new players). */
+function recentSkillWpm(): number | undefined {
+  try {
+    const recent = getSessions().slice(0, 5).map((r) => r.wpm).filter((w) => typeof w === 'number' && w > 0);
+    if (recent.length === 0) return undefined;
+    return Math.round(recent.reduce((a, b) => a + b, 0) / recent.length);
+  } catch {
+    return undefined;
+  }
+}
 
 export type PracticeGroundPhase =
   | 'MENU'
@@ -382,7 +394,7 @@ export function usePracticeGroundSocket(initialRoomCode?: string) {
 
     sendJson({
       type: 'FIND_MATCH',
-      payload: { name: finalName, avatarEmoji: finalEmoji, language },
+      payload: { name: finalName, avatarEmoji: finalEmoji, language, skillWpm: recentSkillWpm() },
     });
   };
 

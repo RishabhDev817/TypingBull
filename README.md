@@ -40,18 +40,18 @@ Moving beyond dry, monotone typing drills, TypingBull integrates:
 ### 🏎️ Real-Time Multiplayer Speedway (Practice Ground)
 - **Live Head-to-Head Racing**: Compete in real-time against live human typists or intelligent AI challenger bots across custom lobbies or quick-match queues.
 - **Edge-Powered WebSockets**: Ultra-low latency state synchronization utilizing Cloudflare Workers & Durable Objects (with a standalone Node.js fallback server).
-- **Anti-Cheat & Result Validation**: Server-side keystroke cadence verification, pacing checks, and completion validation to ensure fair competition.
+- **Anti-Cheat & Result Validation**: Paste and bulk-insert blocking in every typing box, plus server-side pacing checks (a human speed limit from the first update) and completion validation to keep races fair.
 - **Race Telemetry & Podiums**: Live raceway progress bars, real-time WPM feeds, dynamic car placement, and post-race winner podiums.
 - **Instant Invite Links**: Shareable room links (`?room=ROOM_CODE`) supporting spectator and racer modes.
 
 ### 🏫 TypingBull Classroom Mode (For Schools & Labs)
-- **Zero-Account Setup**: Privacy-first, COPPA/FERPA-compliant architecture requiring no student accounts, emails, or passwords.
+- **Zero-Account Setup**: Privacy-first design requiring no student accounts, emails, or passwords; analytics never load on classroom pages.
 - **Teacher Live Control Center**:
   - Launch rooms instantly with 6-character access codes.
   - Choose from curated curriculum passages or input custom assignments.
   - Live synchronized countdowns and test starts.
   - Real-time student progress dashboard (WPM, accuracy %, errors, active position, completion status).
-  - One-click student moderation (kick/ban) and detailed end-of-session grade books.
+  - Detailed end-of-session grade books.
 - **Student Experience**:
   - Instant join with room code and display name.
   - Fun animal avatar selection (Bull, Fox, Owl, Panda, Lion, Falcon, etc.).
