@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import type { ClassroomLesson } from '../../data/classroom/classroomLessons';
 import { soundEngine } from '../../utils/audio';
+import { PASTE_GUARD_PROPS, isBulkInsert } from '../../utils/typingGuard';
 
 interface Props {
   lesson: ClassroomLesson;
@@ -54,6 +55,8 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
   // Compute live WPM and Accuracy
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
+    // Reject paste / bulk inserts: only real keystrokes count.
+    if (isBulkInsert(userInput, val)) return;
     if (isExerciseDone) return;
 
     if (!startTime) {
@@ -510,6 +513,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                 ref={inputRef}
                 type="text"
                 value={userInput}
+                {...PASTE_GUARD_PROPS}
                 onChange={handleInputChange}
                 disabled={isExerciseDone}
                 placeholder={isExerciseDone ? 'Exercise Complete!' : 'Type the text above...'}

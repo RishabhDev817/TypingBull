@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Clock, Zap, Target } from 'lucide-react';
 import { soundEngine } from '../../utils/audio';
 import { useI18n } from '../../context/I18nContext';
+import { PASTE_GUARD_PROPS, isBulkInsert } from '../../utils/typingGuard';
 
 interface Props {
   targetText: string;
@@ -92,6 +93,8 @@ export const PracticeGroundTypingArea: React.FC<Props> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (isFinished) return;
     const value = e.target.value;
+    // Reject paste / bulk inserts: only real keystrokes count.
+    if (isBulkInsert(userInput, value)) return;
 
     const newTotalKeystrokes = totalKeystrokes + 1;
     setTotalKeystrokes(newTotalKeystrokes);
@@ -173,6 +176,7 @@ export const PracticeGroundTypingArea: React.FC<Props> = ({
         ref={hiddenInputRef}
         type="text"
         value={userInput}
+        {...PASTE_GUARD_PROPS}
         onChange={handleInputChange}
         disabled={isFinished}
         className="absolute opacity-0 pointer-events-none -top-40"

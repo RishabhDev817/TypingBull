@@ -5,6 +5,7 @@ import { soundEngine } from '../../utils/audio';
 import { KeyboardDiagram } from '../keyboard/KeyboardDiagram';
 import { getLessonById } from '../../data/lessonData';
 import type { StudentProgressUpdate, StudentFinishPayload, ClassroomSessionType } from '../../types/classroom';
+import { PASTE_GUARD_PROPS, isBulkInsert } from '../../utils/typingGuard';
 
 interface Props {
   targetText: string;
@@ -144,6 +145,8 @@ export const ClassroomTypingArea: React.FC<Props> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (isFinishedRef.current) return;
     const value = e.target.value;
+    // Reject paste / bulk inserts: only real keystrokes count.
+    if (isBulkInsert(userInput, value)) return;
 
     const newTotalKeystrokes = totalKeystrokes + 1;
     setTotalKeystrokes(newTotalKeystrokes);
@@ -220,6 +223,7 @@ export const ClassroomTypingArea: React.FC<Props> = ({
         ref={hiddenInputRef}
         type="text"
         value={userInput}
+        {...PASTE_GUARD_PROPS}
         onChange={handleInputChange}
         disabled={isFinished}
         autoComplete="off"

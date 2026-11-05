@@ -189,7 +189,7 @@ export type ClientMessage =
   | { type: 'STUDENT_PROGRESS'; payload: StudentProgressUpdate & { lessonId?: number; assignmentId?: string } }
   | { type: 'STUDENT_FINISH'; payload: StudentFinishPayload & { lessonId?: number; assignmentId?: string } }
   | { type: 'END_CLASSROOM'; payload: { teacherToken: string } }
-  | { type: 'RECONNECT'; payload: { sessionToken: string; code: string; role: 'teacher' | 'student' } }
+  | { type: 'RECONNECT'; payload: { sessionToken: string; code: string; role: 'teacher' | 'student'; teacherToken?: string } }
   | { type: 'LEAVE_CLASSROOM'; payload?: Record<string, never> }
   | { type: 'PING'; payload?: { timestamp?: number } };
 

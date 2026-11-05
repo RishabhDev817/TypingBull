@@ -393,6 +393,15 @@ export class ClassroomServer {
           return;
         }
 
+        if (role === 'teacher' && (!msg.payload.teacherToken || msg.payload.teacherToken !== room.teacherToken)) {
+          // Never hand the teacher role to a client that can't prove it created the room.
+          this.send(socket, {
+            type: 'ERROR',
+            payload: { code: 'UNAUTHORIZED', message: 'Teacher session could not be verified. Please create a new classroom.' },
+          });
+          return;
+        }
+
         meta.code = room.code;
         meta.role = role;
         meta.sessionToken = sessionToken;
