@@ -21,6 +21,9 @@ import { Mascot } from '../Mascot';
 import type { MascotMood } from '../Mascot';
 import type { StudentProgressUpdate, StudentFinishPayload, ClassroomAssignment } from '../../types/classroom';
 import { emitKeystroke } from '../../utils/typingEvents';
+import { useI18n } from '../../context/I18nContext';
+import { CLASSROOM_SESSION, LESSON_TYPE_KEYS } from '../../i18n/classroomSessionI18n';
+import { fill } from '../../i18n/classroomEntryI18n';
 
 interface Props {
   lesson: LessonDef;
@@ -43,6 +46,8 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
   onClose,
   onSelectNextLesson,
 }) => {
+  const { currentLang } = useI18n();
+  const s = CLASSROOM_SESSION[currentLang] ?? CLASSROOM_SESSION.en;
   const [currentLesson, setCurrentLesson] = useState<LessonDef>(initialLesson);
 
   useEffect(() => {
@@ -293,23 +298,27 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
             type="button"
             onClick={onClose}
             className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer flex items-center gap-1.5 text-xs font-bold"
-            title="Return to classroom lobby"
+            title={s.lobbyBackTitle}
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Classroom Lobby</span>
+            <span>{s.lobbyBack}</span>
           </button>
 
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-[11px] font-black uppercase tracking-wider border border-blue-200 dark:border-blue-800">
-                Classroom Assignment
+                {s.assignment}
               </span>
               <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
-                Step {currentLesson.id} of {TOTAL_LESSONS} • {chapter?.title || 'Learn Curriculum'}
+                {fill(s.stepOf, { id: currentLesson.id, total: TOTAL_LESSONS, chapter: chapter?.title || s.learnCurriculum })}
               </span>
             </div>
             <div className="text-[11px] text-slate-400 font-semibold mt-0.5">
-              Assigned by your teacher, <strong className="text-slate-700 dark:text-slate-200">{teacherName}</strong>
+              {s.assignedByTeacher.split('{teacher}').flatMap((part, i, arr) =>
+                i < arr.length - 1
+                  ? [part, <strong key={i} className="text-slate-700 dark:text-slate-200">{teacherName}</strong>]
+                  : [part]
+              )}
             </div>
           </div>
         </div>
@@ -317,13 +326,13 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
         <div className="flex items-center gap-2 self-end sm:self-center">
           {currentLesson.targetKeys && currentLesson.targetKeys.length > 0 && (
             <div className="flex items-center gap-1">
-              <span className="text-[11px] font-bold text-slate-400">Target Keys:</span>
+              <span className="text-[11px] font-bold text-slate-400">{s.targetKeys}</span>
               {currentLesson.targetKeys.map((k) => (
                 <span
                   key={k}
                   className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-300 font-mono text-xs font-black border border-blue-200 dark:border-blue-800 shadow-xs"
                 >
-                  {k === ' ' ? 'Space' : k.toUpperCase()}
+                  {k === ' ' ? s.space : k.toUpperCase()}
                 </span>
               ))}
             </div>
@@ -334,7 +343,7 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
               type="button"
               onClick={handleRestart}
               className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-600 dark:text-slate-300 text-xs font-bold transition cursor-pointer"
-              title="Restart Drill"
+              title={s.restart}
             >
               <RotateCcw className="w-4 h-4" />
             </button>
@@ -346,9 +355,9 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
       <div className="text-center mb-5">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-black mb-2 text-slate-700 dark:text-slate-300">
           <span>{currentLesson.icon}</span>
-          <span className="uppercase tracking-wider text-[11px] text-primary">{currentLesson.type}</span>
+          <span className="uppercase tracking-wider text-[11px] text-primary">{LESSON_TYPE_KEYS[currentLesson.type] ? s[LESSON_TYPE_KEYS[currentLesson.type]] : currentLesson.type}</span>
           <span>•</span>
-          <span>Passing Accuracy: {currentLesson.passingAccuracy}%</span>
+          <span>{fill(s.passingAccuracy, { pct: currentLesson.passingAccuracy })}</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
           {currentLesson.title}
@@ -383,8 +392,11 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
             <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-900/60 text-indigo-900 dark:text-indigo-200 text-xs font-bold">
               <Compass className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
               <span>
-                Assigned Finger Rest Position:{' '}
-                <strong className="text-slate-900 dark:text-white">{currentLesson.fingerGuide}</strong>
+                {s.fingerRest.split('{guide}').flatMap((part, i, arr) =>
+                  i < arr.length - 1
+                    ? [part, <strong key={i} className="text-slate-900 dark:text-white">{currentLesson.fingerGuide}</strong>]
+                    : [part]
+                )}
               </span>
             </div>
           )}
@@ -392,7 +404,7 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
           {currentLesson.targetKeys && currentLesson.targetKeys.length > 0 && (
             <div className="card-game p-4 rounded-2xl bg-slate-900/75 border border-white/10 backdrop-blur-xl">
               <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 mb-3 text-center">
-                Target Coordinates
+                {s.targetCoords}
               </div>
               <KeyboardDiagram
                 highlightKeys={currentLesson.targetKeys}
@@ -404,7 +416,7 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
 
           <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
             <span className="text-xs font-semibold text-slate-400">
-              Review tactile anchor points before starting typing drill.
+              {s.reviewHint}
             </span>
 
             <button
@@ -412,7 +424,7 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
               onClick={handleCompleteReadingLesson}
               className="px-6 py-3 rounded-2xl bg-primary hover:bg-primary-dark text-white font-black text-xs sm:text-sm shadow-lg shadow-primary/25 flex items-center gap-2 cursor-pointer transition active:scale-95"
             >
-              <span>Got It! Start Practice Drill</span>
+              <span>{s.gotIt}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -427,7 +439,7 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
                 <Zap className="w-4 h-4" />
               </div>
               <div>
-                <span className="text-[10.5px] font-black uppercase text-slate-400 block">WPM</span>
+                <span className="text-[10.5px] font-black uppercase text-slate-400 block">{s.wpm}</span>
                 <span className="font-mono text-base font-black text-slate-900 dark:text-white">
                   {engine.metrics.wpm}
                 </span>
@@ -439,7 +451,7 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
                 <Target className="w-4 h-4" />
               </div>
               <div>
-                <span className="text-[10.5px] font-black uppercase text-slate-400 block">Accuracy</span>
+                <span className="text-[10.5px] font-black uppercase text-slate-400 block">{s.accuracy}</span>
                 <span
                   className={`font-mono text-base font-black ${
                     engine.metrics.accuracy >= currentLesson.passingAccuracy
@@ -457,7 +469,7 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
                 <Clock className="w-4 h-4" />
               </div>
               <div>
-                <span className="text-[10.5px] font-black uppercase text-slate-400 block">Progress</span>
+                <span className="text-[10.5px] font-black uppercase text-slate-400 block">{s.progress}</span>
                 <span className="font-mono text-base font-black text-slate-900 dark:text-white">
                   {progressPercent}%
                 </span>
@@ -487,9 +499,9 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
             {!isFocused && lessonState !== 'completed' && (
               <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-xs flex flex-col items-center justify-center gap-2 z-20 rounded-3xl text-white">
                 <Mascot mood="idle" size="sm" />
-                <p className="text-sm font-extrabold">Click here to start typing!</p>
+                <p className="text-sm font-extrabold">{s.clickToStart}</p>
                 <p className="text-[11px] text-slate-400 font-semibold">
-                  Press any key to begin the assigned curriculum drill.
+                  {s.pressAnyKey}
                 </p>
               </div>
             )}
@@ -563,16 +575,16 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
 
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-xs font-black uppercase">
                 <GraduationCap className="w-3.5 h-3.5" />
-                <span>Classroom Assignment Complete</span>
+                <span>{s.completeTitle}</span>
               </div>
 
               <h3 className="text-2xl font-black text-slate-900 dark:text-white">
-                {passed ? '🎉 Assignment Completed!' : '💪 Keep Practicing!'}
+                {passed ? s.passedTitle : s.failedTitle}
               </h3>
               <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                 {passed
-                  ? `Great work! Your progress has been submitted to ${teacherName}.`
-                  : `You need ${currentLesson.passingAccuracy}% accuracy to pass. You achieved ${engine.metrics.accuracy.toFixed(1)}%.`}
+                  ? fill(s.passedBody, { teacher: teacherName })
+                  : fill(s.failedBody, { pct: currentLesson.passingAccuracy, got: engine.metrics.accuracy.toFixed(1) })}
               </p>
 
               {/* Stars */}
@@ -605,13 +617,13 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
               {/* Stats Summary */}
               <div className="grid grid-cols-2 gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
                 <div>
-                  <span className="text-[11px] font-black uppercase text-slate-400 block">WPM</span>
+                  <span className="text-[11px] font-black uppercase text-slate-400 block">{s.wpm}</span>
                   <span className="font-mono text-xl font-black text-blue-600 dark:text-blue-400">
                     {engine.metrics.wpm}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[11px] font-black uppercase text-slate-400 block">Accuracy</span>
+                  <span className="text-[11px] font-black uppercase text-slate-400 block">{s.accuracy}</span>
                   <span className="font-mono text-xl font-black text-emerald-600 dark:text-emerald-400">
                     {engine.metrics.accuracy.toFixed(1)}%
                   </span>
@@ -625,7 +637,7 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
                     onClick={handleProceedToNextLesson}
                     className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm shadow-lg shadow-emerald-500/25 cursor-pointer transition active:scale-95 flex items-center justify-center gap-2"
                   >
-                    <span>Next Lesson: {nextAssignment.title}</span>
+                    <span>{fill(s.nextLesson, { title: nextAssignment.title })}</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 )}
@@ -635,14 +647,14 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
                   onClick={onClose}
                   className="w-full py-3 rounded-2xl bg-primary hover:bg-primary-dark text-white font-black text-sm shadow-md shadow-primary/20 cursor-pointer transition active:scale-95"
                 >
-                  Return to Classroom Tasks
+                  {s.returnTasks}
                 </button>
                 <button
                   type="button"
                   onClick={handleRestart}
                   className="w-full py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-600 dark:text-slate-300 font-bold text-xs cursor-pointer transition"
                 >
-                  Practice This Lesson Again
+                  {s.practiceAgain}
                 </button>
               </div>
             </motion.div>

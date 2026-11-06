@@ -7,6 +7,9 @@ import { getLessonById } from '../../data/lessonData';
 import type { StudentProgressUpdate, StudentFinishPayload, ClassroomSessionType } from '../../types/classroom';
 import { PASTE_GUARD_PROPS, isBulkInsert } from '../../utils/typingGuard';
 import { emitKeystroke } from '../../utils/typingEvents';
+import { useI18n } from '../../context/I18nContext';
+import { CLASSROOM_SESSION } from '../../i18n/classroomSessionI18n';
+import { fill } from '../../i18n/classroomEntryI18n';
 
 interface Props {
   targetText: string;
@@ -35,6 +38,8 @@ export const ClassroomTypingArea: React.FC<Props> = ({
   onProgressUpdate,
   onFinish,
 }) => {
+  const { currentLang } = useI18n();
+  const s = CLASSROOM_SESSION[currentLang] ?? CLASSROOM_SESSION.en;
   const [userInput, setUserInput] = useState<string>('');
   const [mistakesCount, setMistakesCount] = useState<number>(0);
   const [totalKeystrokes, setTotalKeystrokes] = useState<number>(0);
@@ -242,14 +247,14 @@ export const ClassroomTypingArea: React.FC<Props> = ({
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
               {isCurriculum
-                ? 'Skill Drill • Learn Curriculum'
+                ? s.skillDrill
                 : assignmentCategory === 'homerow'
-                ? 'Home Row Drill'
-                : 'Classroom Exercise'}
+                ? s.homeRowDrill
+                : s.exercise}
             </span>
             {isCurriculum && (
               <span className="px-2.5 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono text-[10.5px] font-black uppercase border border-blue-200 dark:border-blue-800 flex items-center gap-1">
-                <span>Learn Module</span>
+                <span>{s.learnModule}</span>
               </span>
             )}
           </div>
@@ -258,13 +263,13 @@ export const ClassroomTypingArea: React.FC<Props> = ({
           </h2>
           {effectiveTargetKeys && effectiveTargetKeys.length > 0 && (
             <div className="flex items-center gap-1.5 flex-wrap mt-2">
-              <span className="text-[11px] font-bold text-slate-400">Target Focus Keys:</span>
+              <span className="text-[11px] font-bold text-slate-400">{s.focusKeys}</span>
               {effectiveTargetKeys.map((k) => (
                 <span
                   key={k}
                   className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono text-xs font-black border border-blue-300 dark:border-blue-800 shadow-xs"
                 >
-                  {k === ' ' ? 'Space' : k.toUpperCase()}
+                  {k === ' ' ? s.space : k.toUpperCase()}
                 </span>
               ))}
             </div>
@@ -279,7 +284,7 @@ export const ClassroomTypingArea: React.FC<Props> = ({
             </div>
             <div>
               <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 block">
-                WPM
+                {s.wpm}
               </span>
               <span className="font-mono text-lg font-black text-slate-900 dark:text-white">
                 {liveWpm}
@@ -294,7 +299,7 @@ export const ClassroomTypingArea: React.FC<Props> = ({
             </div>
             <div>
               <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 block">
-                Accuracy
+                {s.accuracy}
               </span>
               <span className="font-mono text-lg font-black text-slate-900 dark:text-white">
                 {liveAccuracy}%
@@ -313,7 +318,7 @@ export const ClassroomTypingArea: React.FC<Props> = ({
             </div>
             <div>
               <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 block">
-                Time Left
+                {s.timeLeft}
               </span>
               <span className="font-mono text-lg font-black text-slate-900 dark:text-white">
                 {formatTimer(timeRemainingSec)}
@@ -388,13 +393,13 @@ export const ClassroomTypingArea: React.FC<Props> = ({
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500 text-white font-black text-xs uppercase mb-2">
             <CheckCircle2 className="w-4 h-4" />
-            <span>Activity Completed!</span>
+            <span>{s.activityDone}</span>
           </div>
           <h3 className="text-xl font-black text-slate-900 dark:text-white">
-            🏁 You Finished! ({liveWpm} WPM • {liveAccuracy}%)
+            {fill(s.finishedTitle, { wpm: liveWpm, acc: liveAccuracy })}
           </h3>
           <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 mt-1">
-            Waiting for remaining classmates or session timer to conclude. Your final score is saved.
+            {s.waitingNote}
           </p>
         </motion.div>
       )}
