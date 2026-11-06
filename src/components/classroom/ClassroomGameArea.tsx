@@ -3,6 +3,8 @@ import { Clock, Gamepad2 } from 'lucide-react';
 import type { ClassroomRoomView, StudentProgressUpdate, StudentFinishPayload } from '../../types/classroom';
 import { LilypadLeapGame } from '../game/lilypad/LilypadLeapGame';
 import { NeonVelocityGame } from '../game/neon/NeonVelocityGame';
+import { useI18n } from '../../context/I18nContext';
+import { CLASSROOM_STUDENT } from '../../i18n/classroomStudentI18n';
 
 interface Props {
   room: ClassroomRoomView;
@@ -19,6 +21,8 @@ export const ClassroomGameArea: React.FC<Props> = ({
   onProgressUpdate,
   onFinish,
 }) => {
+  const { currentLang } = useI18n();
+  const s = CLASSROOM_STUDENT[currentLang] ?? CLASSROOM_STUDENT.en;
   const [timeRemainingSec, setTimeRemainingSec] = useState<number>(() => {
     return Math.max(0, Math.ceil((sessionEndAt - Date.now()) / 1000));
   });
@@ -85,10 +89,10 @@ export const ClassroomGameArea: React.FC<Props> = ({
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-black uppercase tracking-wider text-indigo-400">
-                Classroom Arcade Challenge
+                {s.arcade}
               </span>
               <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-bold">
-                Live Session
+                {s.live}
               </span>
             </div>
             <h3 className="text-sm sm:text-base font-black text-white">
@@ -106,7 +110,7 @@ export const ClassroomGameArea: React.FC<Props> = ({
           </div>
 
           <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 text-xs font-bold text-slate-300">
-            <span>Room:</span>
+            <span>{s.room}</span>
             <strong className="font-mono text-primary">{room.code}</strong>
           </div>
         </div>

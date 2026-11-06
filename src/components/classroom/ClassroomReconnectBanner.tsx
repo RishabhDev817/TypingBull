@@ -2,12 +2,16 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { WifiOff, Loader2 } from 'lucide-react';
 import type { SocketStatus } from '../../types/classroom';
+import { useI18n } from '../../context/I18nContext';
+import { CLASSROOM_STUDENT } from '../../i18n/classroomStudentI18n';
 
 interface Props {
   status: SocketStatus;
 }
 
 export const ClassroomReconnectBanner: React.FC<Props> = ({ status }) => {
+  const { currentLang } = useI18n();
+  const s = CLASSROOM_STUDENT[currentLang] ?? CLASSROOM_STUDENT.en;
   const show = status === 'DISCONNECTED' || status === 'RECONNECTING';
 
   return (
@@ -22,12 +26,12 @@ export const ClassroomReconnectBanner: React.FC<Props> = ({ status }) => {
           {status === 'RECONNECTING' ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Restoring classroom connection...</span>
+              <span>{s.restoring}</span>
             </>
           ) : (
             <>
               <WifiOff className="w-4 h-4" />
-              <span>Connection lost. Attempting to reconnect...</span>
+              <span>{s.lost}</span>
             </>
           )}
         </motion.div>
