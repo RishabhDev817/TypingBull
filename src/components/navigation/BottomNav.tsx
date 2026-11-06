@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, BookOpen, Gamepad2, Keyboard, Info, Sparkles, School, Timer, MoreHorizontal } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Gamepad2, Keyboard, Info, Sparkles, School, Timer, MoreHorizontal, MessageSquareHeart } from 'lucide-react';
 import { soundEngine } from '../../utils/audio';
 import { useI18n } from '../../context/I18nContext';
 import { stripLocaleFromPathname } from '../../i18n/utils';
+import { useFeedback } from '../../context/FeedbackContext';
 
 export const BottomNav: React.FC = () => {
   const { t } = useI18n();
   const location = useLocation();
   const normalizedCurrentPath = stripLocaleFromPathname(location.pathname);
   const [moreOpen, setMoreOpen] = useState(false);
+  const { openFeedback } = useFeedback();
 
   // Five primary destinations fit a phone without truncated labels; the rest live under "More".
   const primary = [
@@ -25,7 +27,12 @@ export const BottomNav: React.FC = () => {
     { to: '/classroom', icon: School, label: t('nav.classroom') || 'Classroom', color: '#3B82F6' },
     { to: '/roadmap', icon: Sparkles, label: t('nav.roadmap'), color: '#06B6D4' },
   ];
-  const isActive = (to: string) => (to === '/' ? normalizedCurrentPath === '/' : normalizedCurrentPath.startsWith(to));
+  const isActive = (to: string) => {
+    if (to === '/') return normalizedCurrentPath === '/';
+    // The speed-benchmark page belongs to the Test section
+    if (to === '/typing-test') return normalizedCurrentPath.startsWith('/typing-test') || normalizedCurrentPath.startsWith('/average-typing-speed');
+    return normalizedCurrentPath.startsWith(to);
+  };
   const moreActive = more.some((m) => isActive(m.to));
 
   // Escape closes the menu (links close it themselves on click)
@@ -69,6 +76,15 @@ export const BottomNav: React.FC = () => {
                 {label}
               </NavLink>
             ))}
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => { soundEngine.playPop(); setMoreOpen(false); openFeedback('feature_request', 'bottom_nav'); }}
+              className="col-span-2 flex items-center gap-3 min-h-12 px-3 rounded-xl text-sm font-bold text-ink hover:bg-black/5 dark:hover:bg-white/10 text-left"
+            >
+              <MessageSquareHeart className="w-5 h-5 shrink-0 text-purple-500" aria-hidden="true" />
+              {t('nav.feedback') || 'Feedback & Review'}
+            </button>
           </div>
         </>
       )}
@@ -98,9 +114,9 @@ export const BottomNav: React.FC = () => {
             className={itemClass}
           >
             <motion.div className="flex flex-col items-center w-full min-w-0" whileTap={{ scale: 0.85 }} tabIndex={-1}>
-              {icon(MoreHorizontal, '#64748B', moreActive || moreOpen)}
-              {labelEl(t('nav.more'), '#64748B', moreActive || moreOpen)}
-              {moreActive && <div className="w-1.5 h-1.5 rounded-full mt-0.5" style={{ backgroundColor: '#64748B' }} />}
+              {icon(MoreHorizontal, '#7C3AED', moreActive || moreOpen)}
+              {labelEl(t('nav.more'), '#7C3AED', moreActive || moreOpen)}
+              {moreActive && <div className="w-1.5 h-1.5 rounded-full mt-0.5" style={{ backgroundColor: '#7C3AED' }} />}
             </motion.div>
           </button>
         </div>

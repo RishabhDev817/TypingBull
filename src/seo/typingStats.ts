@@ -24,16 +24,18 @@ export interface SpeedBand {
   /** Exclusive upper bound (Infinity for the last band). */
   max: number;
   blurb: string;
+  /** Encouraging line for the result screen. */
+  encourage: string;
 }
 
 /** Typical bands. Ranges are rules of thumb drawn from widely cited typing studies, not exact cut-offs. */
 export const SPEED_BANDS: SpeedBand[] = [
-  { id: 'beginner', label: 'Beginner', title: 'Warming up', mood: 'happy', min: 0, max: 25, blurb: 'Hunting for keys, usually looking at the keyboard. Touch typing practice will lift this quickly.' },
-  { id: 'below', label: 'Below average', title: 'Finding your rhythm', mood: 'happy', min: 25, max: 38, blurb: 'Comfortable with most keys but still slowed by hesitations and corrections.' },
-  { id: 'average', label: 'Average', title: 'Right on track', mood: 'happy', min: 38, max: 55, blurb: 'Typical for adults who type every day. Fine for most office work.' },
-  { id: 'good', label: 'Above average', title: 'Sharp fingers', mood: 'cheering', min: 55, max: 75, blurb: 'Meets the usual target for administrative and professional roles.' },
-  { id: 'fast', label: 'Fast', title: 'Speedy', mood: 'cheering', min: 75, max: 100, blurb: 'Strong touch typist. Typing no longer limits how fast you can write.' },
-  { id: 'expert', label: 'Expert', title: 'Lightning fast', mood: 'cheering', min: 100, max: Infinity, blurb: 'Competitive territory. Few people sustain this speed with high accuracy.' },
+  { id: 'beginner', label: 'Beginner', title: 'Warming up', mood: 'happy', min: 0, max: 25, blurb: 'Hunting for keys, usually looking at the keyboard. Touch typing practice will lift this quickly.', encourage: 'Great start. Everyone begins here, and a few short practice sessions move this number fast.' },
+  { id: 'below', label: 'Below average', title: 'Finding your rhythm', mood: 'happy', min: 25, max: 38, blurb: 'Comfortable with most keys but still slowed by hesitations and corrections.', encourage: 'You know your way around the keys. Steadier typing will lift you into the average range.' },
+  { id: 'average', label: 'Average', title: 'Right on track', mood: 'happy', min: 38, max: 55, blurb: 'Typical for adults who type every day. Fine for most office work.', encourage: 'Right where most adults are. A little daily practice will take you well past it.' },
+  { id: 'good', label: 'Above average', title: 'Sharp fingers', mood: 'cheering', min: 55, max: 75, blurb: 'Meets the usual target for administrative and professional roles.', encourage: 'Above average, and enough for most office roles. Nice typing.' },
+  { id: 'fast', label: 'Fast', title: 'Speedy', mood: 'cheering', min: 75, max: 100, blurb: 'Strong touch typist. Typing no longer limits how fast you can write.', encourage: 'Fast. Typing is no longer what slows you down.' },
+  { id: 'expert', label: 'Expert', title: 'Lightning fast', mood: 'cheering', min: 100, max: Infinity, blurb: 'Competitive territory. Few people sustain this speed with high accuracy.', encourage: 'Expert speed. Very few people type this fast with high accuracy.' },
 ];
 
 export function bandForWpm(wpm: number): SpeedBand {
