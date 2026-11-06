@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Mascot } from '../components/Mascot';
+import { SpeedGauge } from '../components/SpeedGauge';
 import { SiteFooter } from '../components/navigation/SiteFooter';
 import { usePageSEO } from '../hooks/usePageSEO';
 import { useI18n } from '../context/I18nContext';
@@ -67,9 +68,12 @@ export const AverageTypingSpeedPage: React.FC = () => {
             </Link>
           </div>
           {band && (
-            <p role="status" className="rounded-2xl border border-purple-500/25 bg-purple-500/10 p-4 text-sm font-semibold text-slate-800 dark:text-slate-100">
-              <strong>{band.title}.</strong> {band.blurb}{next ? ` Next level: ${next.title}, from ${next.min} WPM (${next.min - wpm} more).` : ''}
-            </p>
+            <div className="space-y-4">
+              <p role="status" className="rounded-2xl border border-purple-500/25 bg-purple-500/10 p-4 text-sm font-semibold text-slate-800 dark:text-slate-100">
+                <strong>{band.title}.</strong> {band.blurb}{next ? ` Next level: ${next.title}, from ${next.min} WPM (${next.min - wpm} more).` : ''}
+              </p>
+              <SpeedGauge wpm={wpm} />
+            </div>
           )}
         </section>
 
