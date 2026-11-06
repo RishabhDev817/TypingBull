@@ -21,7 +21,7 @@ export const SiteFooter: React.FC = () => {
               onClick={onLinkClick}
               className="inline-flex items-center gap-3 cursor-pointer group"
             >
-              <img src="/typingbull-logo.png" alt="TypingBull logo" width="44" height="44" className="w-11 h-11 object-contain shrink-0 drop-shadow-md group-hover:scale-105 transition-transform" draggable={false} />
+              <img src="/typingbull-logo-96.png" alt="TypingBull logo" width="44" height="44" className="w-11 h-11 object-contain shrink-0 drop-shadow-md group-hover:scale-105 transition-transform" draggable={false} />
               <div>
                 <span className="font-black text-xl text-slate-900 dark:text-white tracking-tight leading-none block">
                   Typing<span className="text-purple-600 dark:text-purple-400">Bull</span>
