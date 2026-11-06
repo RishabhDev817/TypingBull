@@ -6,6 +6,7 @@ import { LilypadLeapGame } from '../components/game/lilypad/LilypadLeapGame';
 import { NeonVelocityGame } from '../components/game/neon/NeonVelocityGame';
 import { PracticeGroundView } from '../components/practice-ground/PracticeGroundView';
 import { usePageSEO } from '../hooks/usePageSEO';
+import { ROUTE_META } from '../seo/routeMeta';
 import { useI18n } from '../context/I18nContext';
 import { PlayGuideSection } from '../components/educational/PlayGuideSection';
 import { SiteFooter } from '../components/navigation/SiteFooter';
@@ -27,12 +28,10 @@ export const PlayPage: React.FC = () => {
   usePageSEO({
     lang: currentLang,
     canonicalPath: isPracticeGroundRoute ? '/practice-ground/' : '/play/',
-    title: isPracticeGroundRoute
-      ? 'Practice Ground — TypingBull | Real-Time Multiplayer Speedway Races'
-      : 'Typing Games Arcade — TypingBull | Lilypad Leap & Neon Velocity',
+    title: isPracticeGroundRoute ? ROUTE_META.practiceGround.title : ROUTE_META.play.title,
     description: isPracticeGroundRoute
-      ? 'Race head-to-head against live players or AI challenger bots in the Practice Ground speedway. Real-time WPM progress tracking and post-race telemetry.'
-      : 'Fun, gamified typing arcade modes on TypingBull. Play Lilypad Leap for young typists or Neon Velocity for high-cadence highway speed flow.',
+      ? ROUTE_META.practiceGround.description
+      : ROUTE_META.play.description,
     noindex: Boolean(roomParam),
   });
 

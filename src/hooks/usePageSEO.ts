@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import type { SupportedLocale } from '../i18n/ui';
 import { getLocalizedFaqData } from '../i18n/faqData';
+import { PRODUCTION_DOMAIN, normalizeCanonicalPath, buildCanonicalUrl } from '../seo/canonical';
 
 export interface LocalizedSEOMetadata {
   title: string;
@@ -13,9 +14,9 @@ export interface LocalizedSEOMetadata {
 
 export const SEO_DATA_BY_LANG: Record<SupportedLocale, LocalizedSEOMetadata> = {
   en: {
-    title: 'TypingBull — Free Gamified Typing Tutor | Online Typing Test WPM & Real-Time Multiplayer Races',
+    title: 'TypingBull: Free Typing Test & Touch Typing Games Online',
     description:
-      'TypingBull is the ultimate free gamified typing tutor and real-time multiplayer typing speedway. Learn touch typing online with arcade games, live multiplayer races, AI typing coach analytics, and fast keyboard speed drills.',
+      'Free touch typing tutor with arcade games, live multiplayer typing races, a WPM speed test and an AI coach that spots your weak keys.',
     keywords:
       'Free Gamified Typing Tutor, online typing test wpm, learn touch typing online, multiplayer typing race, real-time typing competition, practice ground typing speedway, ai typing coach, typing practice for kids, fast keyboard speed drills, coding typing test',
     ogTitle: 'TypingBull — Free Gamified Typing Tutor & Multiplayer Typing Races',
@@ -24,7 +25,7 @@ export const SEO_DATA_BY_LANG: Record<SupportedLocale, LocalizedSEOMetadata> = {
     locale: 'en_US',
   },
   es: {
-    title: 'TypingBull — Tutor de Mecanografía Gamificado Gratis | Carreras Multijugador y Test WPM Online',
+    title: 'TypingBull — Tutor de Mecanografía Gamificado Gratis',
     description:
       'Aprende con TypingBull, el tutor de mecanografía gamificado gratis líder. Carreras de mecanografía multijugador en tiempo real, prueba de mecanografía online, aprender mecanografía gratis y test de velocidad WPM.',
     keywords:
@@ -35,7 +36,7 @@ export const SEO_DATA_BY_LANG: Record<SupportedLocale, LocalizedSEOMetadata> = {
     locale: 'es_ES',
   },
   fr: {
-    title: 'TypingBull — Tuteur de Dactylographie Ludique Gratuit | Courses Multijoueur et Test de Vitesse',
+    title: 'TypingBull — Tuteur de Dactylographie Ludique Gratuit',
     description:
       'Découvrez TypingBull, votre tuteur de dactylographie ludique gratuit. Courses de dactylo multijoueur en temps réel, test de dactylographie en ligne, apprendre la dactylo azerty et jeux de frappe au clavier.',
     keywords:
@@ -46,7 +47,7 @@ export const SEO_DATA_BY_LANG: Record<SupportedLocale, LocalizedSEOMetadata> = {
     locale: 'fr_FR',
   },
   de: {
-    title: 'TypingBull — Kostenloser Gamifizierter Schreibtrainer | Mehrspieler-Tipprennen & Tipptest Online',
+    title: 'TypingBull — Kostenloser Gamifizierter Schreibtrainer',
     description:
       'Lerne das Zehnfingersystem mit TypingBull, dem kostenlosen gamifizierten Schreibtrainer. Trete in Echtzeit-Mehrspieler-Tipprennen an, mache den Tipptest online kostenlos und übe Tastatur tippen mit Arcade-Games.',
     keywords:
@@ -57,7 +58,7 @@ export const SEO_DATA_BY_LANG: Record<SupportedLocale, LocalizedSEOMetadata> = {
     locale: 'de_DE',
   },
   pt: {
-    title: 'TypingBull — Tutor de Digitação Gamificado Grátis | Corridas Multijogador e Teste WPM',
+    title: 'TypingBull — Tutor de Digitação Gamificado Grátis',
     description:
       'Domine o teclado com o TypingBull, seu tutor de digitação gamificado grátis. Corridas de digitação multijogador em tempo real no Practice Ground, teste de digitação grátis e treino de velocidade.',
     keywords:
@@ -68,7 +69,7 @@ export const SEO_DATA_BY_LANG: Record<SupportedLocale, LocalizedSEOMetadata> = {
     locale: 'pt_BR',
   },
   it: {
-    title: 'TypingBull — Tutor di Dattilografia Gamificato Gratuito | Gare Multigiocatore e Test Tastiera',
+    title: 'TypingBull — Tutor di Dattilografia Gamificato Gratuito',
     description:
       'Impara a digitare veloce con TypingBull, il tutor di dattilografia gamificato gratuito. Gare di dattilografia multigiocatore in tempo reale nel Practice Ground, test online e allenamento tastiera con IA.',
     keywords:
@@ -79,7 +80,7 @@ export const SEO_DATA_BY_LANG: Record<SupportedLocale, LocalizedSEOMetadata> = {
     locale: 'it_IT',
   },
   ja: {
-    title: 'TypingBull — 無料のゲーム化されたタイピングチューター | リアルタイム対戦レース＆タイピング練習',
+    title: 'TypingBull — 無料のゲーム化されたタイピングチューター',
     description:
       'TypingBullは無料のゲーム化されたタイピングチューターです。Practice Groundのリアルタイムマルチプレイヤー対戦レース、タイピング練習 無料、タイピングスピードテスト、ブラインドタッチ練習で楽しく上達。',
     keywords:
@@ -90,7 +91,7 @@ export const SEO_DATA_BY_LANG: Record<SupportedLocale, LocalizedSEOMetadata> = {
     locale: 'ja_JP',
   },
   ko: {
-    title: 'TypingBull — 무료 게임형 타자 연습 튜터 | 실시간 멀티플레이어 타자 레이스 & WPM 검정',
+    title: 'TypingBull — 무료 게임형 타자 연습 튜터',
     description:
       'TypingBull은 최고의 무료 게임형 타자 연습 튜터입니다. Practice Ground 실시간 멀티플레이어 타자 레이스, 무료 타자 연습, 온라인 한글 타자 테스트, 타자 속도 검정 wpm으로 속도를 극대화하세요.',
     keywords:
@@ -101,7 +102,7 @@ export const SEO_DATA_BY_LANG: Record<SupportedLocale, LocalizedSEOMetadata> = {
     locale: 'ko_KR',
   },
   hi: {
-    title: 'TypingBull — मुफ्त गेमिफाइड टाइपिंग ट्यूटर | रीयल-टाइम मल्टीप्लेयर टाइपिंग रेस & WPM टेस्ट',
+    title: 'TypingBull — मुफ्त गेमिफाइड टाइपिंग ट्यूटर',
     description:
       'TypingBull सर्वश्रेष्ठ मुफ्त गेमिफाइड टाइपिंग ट्यूटर है। Practice Ground रीयल-टाइम मल्टीप्लेयर टाइपिंग रेस, ऑनलाइन टाइपिंग टेस्ट, टाइपिंग स्पीड टेस्ट हिंदी और AI ट्यूटर का आनंद लें।',
     keywords:
@@ -150,42 +151,7 @@ export interface PageSEOOptions {
   includeFaqSchema?: boolean;
 }
 
-const PRODUCTION_DOMAIN = 'https://typingbull.com';
-
-/**
- * Normalizes a pathname into a consistent canonical path with a trailing slash.
- */
-export function normalizeCanonicalPath(rawPath: string): string {
-  // Strip query and hash
-  const clean = rawPath.split('?')[0].split('#')[0].trim();
-  if (!clean || clean === '/') return '/';
-  return clean.endsWith('/') ? clean : `${clean}/`;
-}
-
-/**
- * Builds the canonical URL for a given path and optional locale.
- */
-export function buildCanonicalUrl(path: string, lang: SupportedLocale = 'en'): string {
-  const normalized = normalizeCanonicalPath(path);
-  if (normalized === '/') {
-    return lang === 'en' ? `${PRODUCTION_DOMAIN}/` : `${PRODUCTION_DOMAIN}/${lang}/`;
-  }
-
-  // Check if path already starts with a locale
-  const segments = normalized.split('/').filter(Boolean);
-  const supportedLocales: string[] = ['en', 'es', 'fr', 'de', 'pt', 'it', 'ja', 'ko', 'hi'];
-
-  let pureSubpath = normalized;
-  if (segments.length > 0 && supportedLocales.includes(segments[0])) {
-    pureSubpath = '/' + segments.slice(1).join('/') + (segments.length > 1 ? '/' : '');
-  }
-
-  if (lang === 'en' || pureSubpath === '/') {
-    return `${PRODUCTION_DOMAIN}${pureSubpath}`;
-  }
-
-  return `${PRODUCTION_DOMAIN}/${lang}${pureSubpath}`;
-}
+export { normalizeCanonicalPath, buildCanonicalUrl };
 
 /**
  * Custom React hook to dynamically update document title, description,
@@ -282,25 +248,14 @@ export function usePageSEO(optionsOrLang: SupportedLocale | PageSEOOptions = 'en
       const locales: { langCode: string; hreflang: string }[] = [
         { langCode: 'en', hreflang: 'x-default' },
         { langCode: 'en', hreflang: 'en' },
-        { langCode: 'en', hreflang: 'en-US' },
-        { langCode: 'en', hreflang: 'en-GB' },
         { langCode: 'es', hreflang: 'es' },
-        { langCode: 'es', hreflang: 'es-ES' },
-        { langCode: 'es', hreflang: 'es-MX' },
         { langCode: 'fr', hreflang: 'fr' },
-        { langCode: 'fr', hreflang: 'fr-FR' },
         { langCode: 'de', hreflang: 'de' },
-        { langCode: 'de', hreflang: 'de-DE' },
         { langCode: 'pt', hreflang: 'pt' },
-        { langCode: 'pt', hreflang: 'pt-BR' },
         { langCode: 'it', hreflang: 'it' },
-        { langCode: 'it', hreflang: 'it-IT' },
         { langCode: 'ja', hreflang: 'ja' },
-        { langCode: 'ja', hreflang: 'ja-JP' },
         { langCode: 'ko', hreflang: 'ko' },
-        { langCode: 'ko', hreflang: 'ko-KR' },
         { langCode: 'hi', hreflang: 'hi' },
-        { langCode: 'hi', hreflang: 'hi-IN' },
       ];
 
       locales.forEach(({ langCode, hreflang }) => {
