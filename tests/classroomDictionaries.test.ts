@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { CLASSROOM_SESSION, LESSON_TYPE_KEYS } from '../src/i18n/classroomSessionI18n.ts';
 import { CLASSROOM_TEACHER } from '../src/i18n/classroomTeacherI18n.ts';
 import { CLASSROOM_PICKER } from '../src/i18n/classroomPickerI18n.ts';
+import { CLASSROOM_LANDING_A } from '../src/i18n/classroomLandingAI18n.ts';
+import { CLASSROOM_LANDING_B } from '../src/i18n/classroomLandingBI18n.ts';
 
 const LOCALES = ['en', 'es', 'ja', 'fr', 'de', 'pt', 'ko', 'it', 'hi'];
 const placeholders = (t: string) => (t.match(/\{\w+\}/g) ?? []).sort().join(',');
@@ -11,6 +13,8 @@ const dictionaries: Record<string, Record<string, Record<string, string>>> = {
   session: CLASSROOM_SESSION as never,
   teacher: CLASSROOM_TEACHER as never,
   picker: CLASSROOM_PICKER as never,
+  landingA: CLASSROOM_LANDING_A as never,
+  landingB: CLASSROOM_LANDING_B as never,
 };
 
 for (const [name, dict] of Object.entries(dictionaries)) {
