@@ -10,7 +10,7 @@ import { useI18n } from '../../context/I18nContext';
 import { FLOATING_BOT_I18N } from '../../i18n/tutorTranslations';
 
 /** Routes where the user is actively typing: the bot must never cover the text, stats or game area. */
-const FOCUS_ROUTES = /^\/(practice|play|practice-ground|classroom|learn\/)/;
+const FOCUS_ROUTES = /^\/(practice|play|practice-ground|classroom|learn\/|typing-test|average-typing-speed)/;
 const TIP_SEEN_KEY = 'tb_bot_tip_seen';
 
 const hasSeenTip = () => {

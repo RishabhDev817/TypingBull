@@ -1,6 +1,7 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import { Mascot } from '../components/Mascot';
 import { SiteFooter } from '../components/navigation/SiteFooter';
 import { usePageSEO } from '../hooks/usePageSEO';
 import { useI18n } from '../context/I18nContext';
@@ -11,6 +12,7 @@ const TypingTest = lazy(() => import('../components/TypingTest'));
 
 export const TypingTestPage: React.FC = () => {
   const { currentLang } = useI18n();
+  const [showingResult, setShowingResult] = useState(false);
   usePageSEO({
     lang: currentLang,
     canonicalPath: ROUTE_META.typingTest.path,
@@ -21,21 +23,25 @@ export const TypingTestPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col font-sans">
       <main className="flex-1 max-w-4xl mx-auto px-4 pt-8 pb-24 w-full space-y-10">
-        <header className="space-y-3 text-center">
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white text-balance">
-            Free typing test
-          </h1>
-          <p className="text-base sm:text-lg font-semibold text-slate-700 dark:text-slate-200 max-w-2xl mx-auto">
-            Check your typing speed in words per minute (WPM) and your accuracy. Pick a length, type the words, and see
-            your result the moment the timer ends.
-          </p>
+        <header className="flex flex-col sm:flex-row items-center gap-5 sm:gap-8 text-center sm:text-left">
+          {/* The result screen has its own mascot, so the header one steps aside */}
+          {!showingResult && <div className="shrink-0"><Mascot mood="typing" size="lg" /></div>}
+          <div className="space-y-3">
+            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white text-balance">
+              Free typing test
+            </h1>
+            <p className="text-base sm:text-lg font-semibold text-slate-700 dark:text-slate-200 max-w-2xl">
+              Check your typing speed in words per minute (WPM) and your accuracy. Pick a length, type the words, and
+              see your result the moment the timer ends.
+            </p>
+          </div>
         </header>
 
-        <Suspense fallback={<div className="card-frosted-standard h-72 animate-pulse" aria-hidden="true" />}>
-          <TypingTest />
+        <Suspense fallback={<div className="card-game card-static h-72 animate-pulse" aria-hidden="true" />}>
+          <TypingTest onPhaseChange={(p) => setShowingResult(p === 'done')} />
         </Suspense>
 
-        <section className="card-frosted-standard p-6 sm:p-8 space-y-3">
+        <section className="card-game card-static p-6 sm:p-8 space-y-3">
           <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">How the typing test works</h2>
           <p className="text-sm sm:text-base font-semibold leading-relaxed text-slate-700 dark:text-slate-200">
             You get a stream of common English words. The timer starts on your first keystroke and stops when time is up.
@@ -52,7 +58,7 @@ export const TypingTestPage: React.FC = () => {
           </p>
         </section>
 
-        <section className="card-frosted-standard p-6 sm:p-8 space-y-3">
+        <section className="card-game card-static p-6 sm:p-8 space-y-3">
           <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">Tips for a better score</h2>
           <ul className="list-disc pl-5 space-y-2 text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">
             <li>Rest your fingers on the home row (ASDF and JKL;) and let each finger own its keys.</li>
@@ -69,7 +75,7 @@ export const TypingTestPage: React.FC = () => {
           </h2>
           <div className="space-y-3">
             {TYPING_TEST_FAQ.map((f) => (
-              <details key={f.question} className="card-frosted-standard p-5 group">
+              <details key={f.question} className="card-game card-static p-5 group">
                 <summary className="cursor-pointer font-black text-slate-900 dark:text-white text-sm sm:text-base">
                   {f.question}
                 </summary>
@@ -81,7 +87,7 @@ export const TypingTestPage: React.FC = () => {
           </div>
         </section>
 
-        <section className="card-frosted-standard p-6 sm:p-8 flex flex-wrap items-center justify-between gap-4">
+        <section className="card-game card-static p-6 sm:p-8 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 className="text-lg font-black text-slate-900 dark:text-white">Want to get faster?</h2>
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">

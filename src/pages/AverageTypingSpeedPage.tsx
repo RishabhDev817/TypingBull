@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import { Mascot } from '../components/Mascot';
 import { SiteFooter } from '../components/navigation/SiteFooter';
 import { usePageSEO } from '../hooks/usePageSEO';
 import { useI18n } from '../context/I18nContext';
@@ -22,21 +23,25 @@ export const AverageTypingSpeedPage: React.FC = () => {
   const [value, setValue] = useState('');
   const wpm = Number.parseInt(value, 10);
   const band = Number.isFinite(wpm) && wpm >= 0 ? bandForWpm(wpm) : null;
+  const next = band ? SPEED_BANDS[SPEED_BANDS.findIndex((b) => b.id === band.id) + 1] : undefined;
 
   return (
     <div className="min-h-screen flex flex-col font-sans">
       <main className="flex-1 max-w-4xl mx-auto px-4 pt-8 pb-24 w-full space-y-10">
-        <header className="space-y-3 text-center">
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white text-balance">
-            Average typing speed: what is a good WPM?
-          </h1>
-          <p className="text-base sm:text-lg font-semibold text-slate-700 dark:text-slate-200 max-w-2xl mx-auto">
-            Most adults type around 40 words per minute. Professional jobs usually expect 50 to 70, and fast typists
-            reach 80 or more. Here is how each speed compares, and what to aim for.
-          </p>
+        <header className="flex flex-col sm:flex-row items-center gap-5 sm:gap-8 text-center sm:text-left">
+          <div className="shrink-0"><Mascot mood={band && band.min >= 55 ? 'cheering' : 'happy'} size="lg" /></div>
+          <div className="space-y-3">
+            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white text-balance">
+              Average typing speed: what is a good WPM?
+            </h1>
+            <p className="text-base sm:text-lg font-semibold text-slate-700 dark:text-slate-200 max-w-2xl">
+              Most adults type around 40 words per minute. Professional jobs usually expect 50 to 70, and fast typists
+              reach 80 or more. Here is how each speed compares, and what to aim for.
+            </p>
+          </div>
         </header>
 
-        <section className="card-frosted-standard p-6 sm:p-8 space-y-4" aria-labelledby="check-heading">
+        <section className="card-game card-static p-6 sm:p-8 space-y-4" aria-labelledby="check-heading">
           <h2 id="check-heading" className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
             Where does your speed fit?
           </h2>
@@ -63,7 +68,7 @@ export const AverageTypingSpeedPage: React.FC = () => {
           </div>
           {band && (
             <p role="status" className="rounded-2xl border border-purple-500/25 bg-purple-500/10 p-4 text-sm font-semibold text-slate-800 dark:text-slate-100">
-              <strong>{band.label}.</strong> {band.blurb}
+              <strong>{band.title}.</strong> {band.blurb}{next ? ` Next level: ${next.title}, from ${next.min} WPM (${next.min - wpm} more).` : ''}
             </p>
           )}
         </section>
@@ -72,7 +77,7 @@ export const AverageTypingSpeedPage: React.FC = () => {
           <h2 id="bands-heading" className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
             Typing speed levels
           </h2>
-          <div className="card-frosted-standard overflow-x-auto">
+          <div className="card-game card-static overflow-x-auto">
             <table className="w-full text-left text-sm">
               <caption className="sr-only">Typing speed levels in words per minute</caption>
               <thead>
@@ -84,7 +89,7 @@ export const AverageTypingSpeedPage: React.FC = () => {
               </thead>
               <tbody className="font-semibold text-slate-800 dark:text-slate-100">
                 {SPEED_BANDS.map((b) => (
-                  <tr key={b.id} className="border-t border-slate-200/70 dark:border-slate-700/60">
+                  <tr key={b.id} aria-current={band?.id === b.id ? 'true' : undefined} className={`border-t border-slate-200/70 dark:border-slate-700/60 ${band?.id === b.id ? 'bg-purple-500/15' : ''}`}>
                     <th scope="row" className="p-4 font-black">{b.label}</th>
                     <td className="p-4 whitespace-nowrap">{rangeLabel(b.min, b.max)}</td>
                     <td className="p-4">{b.blurb}</td>
@@ -103,7 +108,7 @@ export const AverageTypingSpeedPage: React.FC = () => {
           <h2 id="jobs-heading" className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
             What typing speed do jobs ask for?
           </h2>
-          <div className="card-frosted-standard overflow-x-auto">
+          <div className="card-game card-static overflow-x-auto">
             <table className="w-full text-left text-sm">
               <caption className="sr-only">Typical typing speed targets by purpose</caption>
               <thead>
@@ -126,7 +131,7 @@ export const AverageTypingSpeedPage: React.FC = () => {
           </div>
         </section>
 
-        <section className="card-frosted-standard p-6 sm:p-8 space-y-3">
+        <section className="card-game card-static p-6 sm:p-8 space-y-3">
           <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">How to raise your typing speed</h2>
           <ol className="list-decimal pl-5 space-y-2 text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">
             <li>Learn proper finger placement. The <Link to="/guidelines" className="text-purple-600 dark:text-purple-300 underline underline-offset-2">touch typing guide</Link> shows which finger owns each key.</li>
@@ -143,7 +148,7 @@ export const AverageTypingSpeedPage: React.FC = () => {
           </h2>
           <div className="space-y-3">
             {AVERAGE_SPEED_FAQ.map((f) => (
-              <details key={f.question} className="card-frosted-standard p-5">
+              <details key={f.question} className="card-game card-static p-5">
                 <summary className="cursor-pointer font-black text-slate-900 dark:text-white text-sm sm:text-base">
                   {f.question}
                 </summary>

@@ -53,7 +53,7 @@ export const SiteFooter: React.FC = () => {
                 <Link
                   to="/learn"
                   onClick={onLinkClick}
-                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
+                  className="inline-flex items-center min-h-11 lg:min-h-0 hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
                 >
                   The Great Typing Railway
                 </Link>
@@ -62,7 +62,7 @@ export const SiteFooter: React.FC = () => {
                 <Link
                   to="/play"
                   onClick={onLinkClick}
-                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
+                  className="inline-flex items-center min-h-11 lg:min-h-0 hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
                 >
                   Lilypad Leap (Kids Mode)
                 </Link>
@@ -71,7 +71,7 @@ export const SiteFooter: React.FC = () => {
                 <Link
                   to="/play"
                   onClick={onLinkClick}
-                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
+                  className="inline-flex items-center min-h-11 lg:min-h-0 hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
                 >
                   Neon Velocity (Arcade)
                 </Link>
@@ -80,7 +80,7 @@ export const SiteFooter: React.FC = () => {
                 <Link
                   to="/typing-test"
                   onClick={onLinkClick}
-                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
+                  className="inline-flex items-center min-h-11 lg:min-h-0 hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
                 >
                   Free Typing Test
                 </Link>
@@ -89,7 +89,7 @@ export const SiteFooter: React.FC = () => {
                 <Link
                   to="/average-typing-speed"
                   onClick={onLinkClick}
-                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
+                  className="inline-flex items-center min-h-11 lg:min-h-0 hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
                 >
                   Average Typing Speed
                 </Link>
@@ -98,7 +98,7 @@ export const SiteFooter: React.FC = () => {
                 <Link
                   to="/practice"
                   onClick={onLinkClick}
-                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
+                  className="inline-flex items-center min-h-11 lg:min-h-0 hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
                 >
                   Timed Practice Arena
                 </Link>
@@ -107,7 +107,7 @@ export const SiteFooter: React.FC = () => {
                 <Link
                   to="/guidelines"
                   onClick={onLinkClick}
-                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
+                  className="inline-flex items-center min-h-11 lg:min-h-0 hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
                 >
                   Finger Placement Guide
                 </Link>
@@ -116,7 +116,7 @@ export const SiteFooter: React.FC = () => {
                 <Link
                   to="/classroom"
                   onClick={onLinkClick}
-                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors flex items-center gap-1.5"
+                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors flex items-center gap-1.5 min-h-11 lg:min-h-0"
                 >
                   <span>Classroom Lab Mode</span>
                   <span className="px-1.5 py-0.5 text-[10.5px] font-black uppercase tracking-wider rounded bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">Free</span>
@@ -135,7 +135,7 @@ export const SiteFooter: React.FC = () => {
               <li>
                 <a
                   href="/#faq-section-title"
-                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
+                  className="inline-flex items-center min-h-11 lg:min-h-0 hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
                 >
                   FAQ & Knowledge Base
                 </a>
@@ -143,7 +143,7 @@ export const SiteFooter: React.FC = () => {
               <li>
                 <a
                   href="/#faq-section-title"
-                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
+                  className="inline-flex items-center min-h-11 lg:min-h-0 hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
                 >
                   WPM Speed Benchmarks
                 </a>
@@ -152,7 +152,7 @@ export const SiteFooter: React.FC = () => {
                 <Link
                   to="/guidelines"
                   onClick={onLinkClick}
-                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
+                  className="inline-flex items-center min-h-11 lg:min-h-0 hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
                 >
                   Ergonomics & Posture
                 </Link>
@@ -161,7 +161,7 @@ export const SiteFooter: React.FC = () => {
                 <Link
                   to="/practice"
                   onClick={onLinkClick}
-                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
+                  className="inline-flex items-center min-h-11 lg:min-h-0 hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
                 >
                   Developer Syntax Drills
                 </Link>
@@ -180,7 +180,7 @@ export const SiteFooter: React.FC = () => {
                 <Link
                   to="/about"
                   onClick={onLinkClick}
-                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors flex items-center gap-1.5"
+                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors flex items-center gap-1.5 min-h-11 lg:min-h-0"
                 >
                   <span>About Us</span>
                 </Link>
@@ -189,7 +189,7 @@ export const SiteFooter: React.FC = () => {
                 <Link
                   to="/contact"
                   onClick={onLinkClick}
-                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors flex items-center gap-1.5"
+                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors flex items-center gap-1.5 min-h-11 lg:min-h-0"
                 >
                   <span>Contact Us</span>
                 </Link>
@@ -198,7 +198,7 @@ export const SiteFooter: React.FC = () => {
                 <Link
                   to="/privacy"
                   onClick={onLinkClick}
-                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors flex items-center gap-1.5"
+                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors flex items-center gap-1.5 min-h-11 lg:min-h-0"
                 >
                   <span>Privacy Policy</span>
                 </Link>
@@ -207,7 +207,7 @@ export const SiteFooter: React.FC = () => {
                 <Link
                   to="/terms"
                   onClick={onLinkClick}
-                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors flex items-center gap-1.5"
+                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors flex items-center gap-1.5 min-h-11 lg:min-h-0"
                 >
                   <span>Terms & Conditions</span>
                 </Link>
@@ -225,19 +225,19 @@ export const SiteFooter: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link to="/privacy" onClick={onLinkClick} className="hover:underline">
+            <Link to="/privacy" onClick={onLinkClick} className="inline-flex items-center min-h-11 px-1 hover:underline">
               Privacy
             </Link>
             <span>•</span>
-            <Link to="/terms" onClick={onLinkClick} className="hover:underline">
+            <Link to="/terms" onClick={onLinkClick} className="inline-flex items-center min-h-11 px-1 hover:underline">
               Terms
             </Link>
             <span>•</span>
-            <Link to="/about" onClick={onLinkClick} className="hover:underline">
+            <Link to="/about" onClick={onLinkClick} className="inline-flex items-center min-h-11 px-1 hover:underline">
               About
             </Link>
             <span>•</span>
-            <Link to="/contact" onClick={onLinkClick} className="hover:underline">
+            <Link to="/contact" onClick={onLinkClick} className="inline-flex items-center min-h-11 px-1 hover:underline">
               Contact
             </Link>
           </div>
