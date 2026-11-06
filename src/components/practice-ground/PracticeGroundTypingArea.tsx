@@ -4,6 +4,7 @@ import { Clock, Zap, Target } from 'lucide-react';
 import { soundEngine } from '../../utils/audio';
 import { useI18n } from '../../context/I18nContext';
 import { PASTE_GUARD_PROPS, isBulkInsert } from '../../utils/typingGuard';
+import { emitKeystroke } from '../../utils/typingEvents';
 
 interface Props {
   targetText: string;
@@ -108,8 +109,10 @@ export const PracticeGroundTypingArea: React.FC<Props> = ({
 
       if (newChar === expected) {
         soundEngine.playClick(newChar === ' ');
+        emitKeystroke(true);
       } else {
         soundEngine.playError();
+        emitKeystroke(false);
         newMistakesCount = mistakesCount + 1;
         setMistakesCount(newMistakesCount);
       }

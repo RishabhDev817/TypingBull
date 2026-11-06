@@ -20,6 +20,7 @@ import { soundEngine } from '../../utils/audio';
 import { Mascot } from '../Mascot';
 import type { MascotMood } from '../Mascot';
 import type { StudentProgressUpdate, StudentFinishPayload, ClassroomAssignment } from '../../types/classroom';
+import { emitKeystroke } from '../../utils/typingEvents';
 
 interface Props {
   lesson: LessonDef;
@@ -144,9 +145,11 @@ export const ClassroomLessonPlayer: React.FC<Props> = ({
     const isMatch = e.key === expected;
     if (isMatch) {
       soundEngine.playClick(e.key === ' ');
+      emitKeystroke(true);
       setConsecutiveErrors(0);
     } else {
       soundEngine.playError();
+      emitKeystroke(false);
       const newErrors = new Set(errors);
       newErrors.add(charIndex);
       setErrors(newErrors);

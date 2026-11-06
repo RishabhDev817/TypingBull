@@ -6,6 +6,7 @@ import { KeyboardDiagram } from '../keyboard/KeyboardDiagram';
 import { getLessonById } from '../../data/lessonData';
 import type { StudentProgressUpdate, StudentFinishPayload, ClassroomSessionType } from '../../types/classroom';
 import { PASTE_GUARD_PROPS, isBulkInsert } from '../../utils/typingGuard';
+import { emitKeystroke } from '../../utils/typingEvents';
 
 interface Props {
   targetText: string;
@@ -160,10 +161,12 @@ export const ClassroomTypingArea: React.FC<Props> = ({
 
       if (typedChar === expectedChar) {
         soundEngine.playClick(typedChar === ' ');
+        emitKeystroke(true);
       } else {
         newMistakesCount += 1;
         setMistakesCount(newMistakesCount);
         soundEngine.playError();
+        emitKeystroke(false);
       }
     }
 

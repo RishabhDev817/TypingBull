@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Keyboard } from 'lucide-react';
 import { soundEngine } from '../utils/audio';
 import { PASTE_GUARD_PROPS, isBulkInsert } from '../utils/typingGuard';
+import { emitKeystroke } from '../utils/typingEvents';
 
 interface TypingArenaProps {
   words: string[];
@@ -104,6 +105,7 @@ export const TypingArena: React.FC<TypingArenaProps> = ({
     if (newChar === expectedChar) {
       // Correct character
       soundEngine.playClick(false);
+      emitKeystroke(true);
       setStreak((prev) => {
         const next = prev + 1;
         // Every 15 streak, trigger a streak effect audio cue
@@ -116,6 +118,7 @@ export const TypingArena: React.FC<TypingArenaProps> = ({
     } else {
       // Incorrect character -> trigger shake and error sound
       soundEngine.playError();
+      emitKeystroke(false);
       setStreak(0); // Break the streak
       setShakeWord(true);
       setTimeout(() => setShakeWord(false), 300);

@@ -17,6 +17,7 @@ import { usePageSEO } from '../hooks/usePageSEO';
 import { PracticeGuideSection } from '../components/educational/PracticeGuideSection';
 import { KeyboardNotice } from '../components/KeyboardNotice';
 import { PASTE_GUARD_PROPS, isBulkInsert } from '../utils/typingGuard';
+import { emitKeystroke } from '../utils/typingEvents';
 
 type PracticeStatus = 'idle' | 'typing' | 'completed' | 'failed';
 
@@ -305,9 +306,11 @@ export const PracticePage: React.FC = () => {
 
       if (newChar === expected) {
         soundEngine.playClick(newChar === ' ');
+        emitKeystroke(true);
         currentWindowCorrectCharsRef.current++;
       } else {
         soundEngine.playError();
+        emitKeystroke(false);
         setMistakesCount((prev) => prev + 1);
         if (lowerExp) {
           errorMapRef.current[lowerExp] = (errorMapRef.current[lowerExp] || 0) + 1;
