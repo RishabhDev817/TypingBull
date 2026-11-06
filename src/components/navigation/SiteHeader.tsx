@@ -55,7 +55,7 @@ export const SiteHeader: React.FC<SiteHeaderProps> = ({ className = '' }) => {
           onClick={() => soundEngine.playPop()}
           className="flex items-center gap-2.5 group cursor-pointer shrink-0"
         >
-          <img src="/typingbull-logo.png" alt="TypingBull logo" width="44" height="44" className="w-10 h-10 object-contain shrink-0 drop-shadow-md group-hover:scale-105 transition-transform" draggable={false} />
+          <img src="/typingbull-logo-96.png" alt="TypingBull logo" width="44" height="44" className="w-10 h-10 object-contain shrink-0 drop-shadow-md group-hover:scale-105 transition-transform" draggable={false} />
           <div className="flex flex-col">
             <span className="font-black text-base sm:text-lg text-slate-900 dark:text-white tracking-tight leading-none">
               Typing<span className="text-purple-600 dark:text-purple-400">Bull</span>

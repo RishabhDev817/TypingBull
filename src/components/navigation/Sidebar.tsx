@@ -65,7 +65,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, 
 
       {/* Logo with mascot */}
       <div className="flex items-center gap-3 px-5 py-4 border-b border-hairline/50 shrink-0">
-        <img src="/typingbull-logo.png" alt="TypingBull logo" width="44" height="44" className="w-11 h-11 object-contain shrink-0 drop-shadow-md" draggable={false} />
+        <img src="/typingbull-logo-96.png" alt="TypingBull logo" width="44" height="44" className="w-11 h-11 object-contain shrink-0 drop-shadow-md" draggable={false} />
         <div className="flex flex-col">
           <span className="font-extrabold text-base tracking-tight leading-none text-ink">
             Typing<span className="text-primary">Bull</span>

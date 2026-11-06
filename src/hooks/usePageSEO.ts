@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import type { SupportedLocale } from '../i18n/ui';
-import { getLocalizedFaqData } from '../i18n/faqData';
 import { PRODUCTION_DOMAIN, normalizeCanonicalPath, buildCanonicalUrl } from '../seo/canonical';
 
 export interface LocalizedSEOMetadata {
@@ -274,32 +273,38 @@ export function usePageSEO(optionsOrLang: SupportedLocale | PageSEOOptions = 'en
     const isHomepage = normalizeCanonicalPath(currentPath) === '/';
     const shouldIncludeFaq = options.includeFaqSchema ?? isHomepage;
 
-    let faqScript = document.getElementById('faq-schema-jsonld') as HTMLScriptElement | null;
+    let cancelled = false;
+    const faqScript = document.getElementById('faq-schema-jsonld') as HTMLScriptElement | null;
     if (shouldIncludeFaq && !isNoIndex) {
-      const localizedFaqItems = getLocalizedFaqData(lang);
-      const faqSchema = {
-        '@context': 'https://schema.org',
-        '@type': 'FAQPage',
-        mainEntity: localizedFaqItems.map((item) => ({
-          '@type': 'Question',
-          name: item.question,
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: item.answer,
-          },
-        })),
-      };
-
-      if (!faqScript) {
-        faqScript = document.createElement('script');
-        faqScript.id = 'faq-schema-jsonld';
-        faqScript.type = 'application/ld+json';
-        document.head.appendChild(faqScript);
-      }
-      faqScript.textContent = JSON.stringify(faqSchema, null, 2);
+      // The FAQ dictionary is large, so it is loaded on demand instead of sitting in the main bundle.
+      // (The prerendered HTML already contains the same schema for crawlers.)
+      void import('../i18n/faqData').then(({ getLocalizedFaqData }) => {
+        if (cancelled) return;
+        const faqSchema = {
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: getLocalizedFaqData(lang).map((item) => ({
+            '@type': 'Question',
+            name: item.question,
+            acceptedAnswer: { '@type': 'Answer', text: item.answer },
+          })),
+        };
+        let el = document.getElementById('faq-schema-jsonld') as HTMLScriptElement | null;
+        if (!el) {
+          el = document.createElement('script');
+          el.id = 'faq-schema-jsonld';
+          el.type = 'application/ld+json';
+          document.head.appendChild(el);
+        }
+        el.textContent = JSON.stringify(faqSchema, null, 2);
+      });
     } else if (faqScript) {
       faqScript.remove();
     }
+
+    return () => {
+      cancelled = true;
+    };
   }, [
     lang,
     options.canonicalPath,
