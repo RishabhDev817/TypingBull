@@ -18,14 +18,20 @@ export const SpeedGauge: React.FC<{ wpm: number; className?: string }> = ({ wpm,
       className={`select-none ${className}`}
     >
       <div className="relative pt-7">
+        {/* The label is kept inside the bar; the little tick below it sits at the true position */}
         <div
-          className="absolute top-0 -translate-x-1/2 flex flex-col items-center transition-[left] duration-700 ease-out motion-reduce:transition-none"
-          style={{ left: `${markerPct}%` }}
+          className="absolute top-0 -translate-x-1/2 transition-[left] duration-700 ease-out motion-reduce:transition-none"
+          style={{ left: `${Math.min(88, Math.max(12, markerPct))}%` }}
         >
-          <span className="px-2 py-0.5 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-black whitespace-nowrap">
+          <span className="block px-2 py-0.5 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-black whitespace-nowrap">
             {wpm} WPM
           </span>
-          <span className="w-0 h-0 border-x-[5px] border-x-transparent border-t-[6px] border-t-slate-900 dark:border-t-white" />
+        </div>
+        <div
+          className="absolute top-[18px] -translate-x-1/2 transition-[left] duration-700 ease-out motion-reduce:transition-none"
+          style={{ left: `${markerPct}%` }}
+        >
+          <span className="block w-0 h-0 border-x-[5px] border-x-transparent border-t-[7px] border-t-slate-900 dark:border-t-white" />
         </div>
         <div className="flex h-3 rounded-full overflow-hidden gap-0.5">
           {SPEED_BANDS.map((b, i) => {

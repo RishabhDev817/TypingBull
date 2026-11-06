@@ -233,6 +233,8 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
   const shownWpm = useCountUp(phase === 'done' && result ? result.wpm : null);
   const chars = useMemo(() => text.split(''), [text]);
   const band = result ? bandForWpm(result.wpm) : null;
+  const lowAccuracy = result !== null && result.accuracy < 50;
+  const canShare = result !== null && result.wpm > 0 && !lowAccuracy;
 
   let progressNote = '';
   if (result) {
@@ -289,7 +291,7 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
               if (i < typed.length) {
                 cls = typed[i] === ch
                   ? 'text-emerald-700 dark:text-emerald-400'
-                  : 'text-rose-700 dark:text-rose-300 bg-rose-500/20 rounded underline decoration-wavy decoration-rose-500';
+                  : 'font-black text-white bg-rose-600/80 rounded underline decoration-wavy decoration-rose-200';
               } else if (isActive) cls = 'bg-purple-500/25 rounded text-slate-900 dark:text-white';
               return (
                 <span key={i} ref={isActive ? activeRef : undefined} className={cls}>
@@ -311,7 +313,7 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
             {...PASTE_GUARD_PROPS}
             className="absolute inset-0 w-full h-full opacity-0 cursor-text"
           />
-          <p className="mt-3 text-sm font-bold text-slate-600 dark:text-slate-300">
+          <p className="mt-3 min-h-[2.75rem] text-sm font-bold text-slate-600 dark:text-slate-300">
             {phase === 'idle'
               ? 'Start typing to begin. The timer starts on your first key. Tap the box first on a phone.'
               : 'Esc restarts the test.'}
@@ -332,7 +334,9 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
               </h2>
               <p className="text-lg font-black text-purple-700 dark:text-purple-300">{band.title}</p>
               <p className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200 max-w-md">
-                {band.encourage}
+                {lowAccuracy
+                  ? 'That one did not go to plan, and that is fine. Try again slowly and aim for correct keys, not speed.'
+                  : band.encourage}
               </p>
               {progressNote && (
                 <p className="text-sm font-black text-emerald-700 dark:text-emerald-400">{progressNote}</p>
@@ -348,19 +352,22 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
             >
               Learn to type faster, free <ArrowRight className="w-5 h-5" aria-hidden="true" />
             </Link>
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => setShareOpen(true)}
-                className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 min-h-12 px-5 rounded-full border border-slate-300 dark:border-slate-600 text-sm font-black text-slate-800 dark:text-slate-100 hover:border-purple-500 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500"
-              >
-                <Share2 className="w-4 h-4" aria-hidden="true" />
-                Share result
-              </button>
+            <div className={`grid gap-3 ${canShare ? 'grid-cols-2' : 'grid-cols-1'} sm:flex`}>
+              {canShare && (
+                <button
+                  type="button"
+                  aria-label="Share result"
+                  onClick={() => setShareOpen(true)}
+                  className="inline-flex items-center justify-center gap-2 min-h-12 px-5 rounded-full border border-slate-300 dark:border-slate-600 text-sm font-black whitespace-nowrap text-slate-800 dark:text-slate-100 hover:border-purple-500 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500"
+                >
+                  <Share2 className="w-4 h-4" aria-hidden="true" />
+                  Share
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => reset()}
-                className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 min-h-12 px-5 rounded-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-black transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500"
+                className="inline-flex items-center justify-center gap-2 min-h-12 px-5 rounded-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-black whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500"
               >
                 <RotateCcw className="w-4 h-4" aria-hidden="true" />
                 Try again
@@ -387,10 +394,15 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
           )}
 
           <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">
-            Saved on this device.{' '}
-            <Link to="/average-typing-speed" className="font-black text-purple-700 dark:text-purple-300 underline underline-offset-2">
-              See how {result.wpm} WPM compares
-            </Link>
+            Saved on this device.
+            {result.wpm > 0 && (
+              <>
+                {' '}
+                <Link to="/average-typing-speed" className="font-black text-purple-700 dark:text-purple-300 underline underline-offset-2">
+                  See how {result.wpm} WPM compares
+                </Link>
+              </>
+            )}
           </p>
         </div>
       )}

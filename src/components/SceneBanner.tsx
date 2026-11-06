@@ -55,7 +55,7 @@ export const SceneBanner: React.FC<SceneBannerProps> = ({ title, children, mood 
       />
     </svg>
 
-    <div className={`relative px-5 py-6 sm:px-8 sm:py-9 space-y-2 ${hideMascot ? '' : 'sm:pr-52'}`}>
+    <div className={`relative px-5 pt-6 pb-12 sm:px-8 sm:py-9 space-y-2 ${hideMascot ? '' : 'sm:pr-52'}`}>
       <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white text-balance">{title}</h1>
       <p className="text-base sm:text-lg font-semibold text-slate-200 max-w-2xl">{children}</p>
     </div>
