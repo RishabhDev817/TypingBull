@@ -31,6 +31,12 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
     else setMode('auto');
   };
 
+  const SKY_LABELS = {
+    day: { title: 'Sky: Day (click for Night)', aria: 'Sky mode: Day. Switch to Night' },
+    night: { title: 'Sky: Night (click for Live sky that follows your clock)', aria: 'Sky mode: Night. Switch to Live sky' },
+    auto: { title: 'Sky: Live, follows your clock (click for Day)', aria: 'Sky mode: Live, follows your clock. Switch to Day' },
+  } as const;
+
   return (
     <div
       className={`relative z-[100] inline-flex items-center gap-1.5 p-1.5 rounded-full bg-white/40 dark:bg-slate-900/40 backdrop-blur-md border border-white/50 dark:border-white/10 shadow-sm ${className}`.trim()}
@@ -55,8 +61,8 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
         type="button"
         onClick={cycleTheme}
         className="h-9 w-9 pointer-coarse:h-11 pointer-coarse:w-11 rounded-full bg-transparent hover:bg-white/25 dark:hover:bg-white/10 active:scale-95 transition-all cursor-pointer flex items-center justify-center shrink-0"
-        title={`Theme / Zen: ${mode.toUpperCase()} mode (Click to switch Day/Night/Auto)`}
-        aria-label={`Toggle Theme Mode (Current: ${mode})`}
+        title={SKY_LABELS[mode].title}
+        aria-label={SKY_LABELS[mode].aria}
       >
         {mode === 'day' && <Sun className="w-4 h-4 text-amber-500" />}
         {mode === 'night' && <Moon className="w-4 h-4 text-indigo-400" />}

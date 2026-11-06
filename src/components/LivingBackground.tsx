@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { gsap } from 'gsap';
 import { soundEngine } from '../utils/audio';
 import { useTheme } from '../context/ThemeContext';
+import { KEYSTROKE_EVENT, type KeystrokeDetail } from '../utils/typingEvents';
 
 interface ThemeKeyframe {
   hour: number;
@@ -1052,7 +1053,7 @@ export const LivingBackground: React.FC = () => {
     let birdFlockTimer = setTimeout(triggerBirdFlock, 5000);
 
     // ─── Periodic wind gusts bending foliage deeper ──────────────────
-    const triggerGust = () => {
+    const gust = () => {
       // Wind gust timeline
       treesRef.current.forEach((tree) => {
         const leaves = tree.children[tree.children.length - 1] as THREE.Group;
@@ -1076,11 +1077,91 @@ export const LivingBackground: React.FC = () => {
           ease: 'power1.inOut',
         });
       });
-
+    };
+    const triggerGust = () => {
+      gust();
       const nextGust = 18000 + Math.random() * 15000;
       gustTimer = setTimeout(triggerGust, nextGust);
     };
     let gustTimer = setTimeout(triggerGust, 12000);
+
+    // ─── Typing reacts: correct keys release glowing motes, mistakes stir the wind ──
+    // Motes are a small pool of additive spheres reused for every keystroke (no allocation while typing).
+    const MOTE_COUNT = 24;
+    const moteGeo = new THREE.SphereGeometry(0.09, 6, 6);
+    const motes = Array.from({ length: MOTE_COUNT }, () => {
+      const mat = new THREE.MeshBasicMaterial({ color: 0xccff00, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+      const mesh = new THREE.Mesh(moteGeo, mat);
+      mesh.visible = false;
+      scene.add(mesh);
+      return { mesh, mat, busy: false };
+    });
+    // Exposes how many motes are glowing right now (handy for tests and debugging).
+    const reportMotes = () => { container.dataset.motes = String(motes.filter((m) => m.busy).length); };
+    let moteCursor = 0;
+    let lastMoteAt = 0;
+    let lastGustAt = 0;
+
+    const spawnMote = (streak: number) => {
+      const now = performance.now();
+      if (now - lastMoteAt < 55) return; // very fast typing: skip some motes, keep the frame rate
+      lastMoteAt = now;
+      let slot = null;
+      for (let i = 0; i < MOTE_COUNT; i++) {
+        const m = motes[(moteCursor + i) % MOTE_COUNT];
+        if (!m.busy) { slot = m; moteCursor = (moteCursor + i + 1) % MOTE_COUNT; break; }
+      }
+      if (!slot) return;
+      const { mesh, mat } = slot;
+      slot.busy = true;
+      reportMotes();
+      const hour = getDecimalHour();
+      const isNight = hour < 6 || hour >= 18;
+      // Night: glowing firefly-green (additive). Day: warm golden pollen with normal blending, so it still shows on a bright sky.
+      const blending = isNight ? THREE.AdditiveBlending : THREE.NormalBlending;
+      if (mat.blending !== blending) { mat.blending = blending; mat.needsUpdate = true; }
+      mat.color.setHex(isNight ? 0xccff00 : 0xffa000);
+      const big = streak > 0 && streak % 10 === 0; // a brighter, larger mote on every 10th correct key in a row
+      const startX = (Math.random() - 0.5) * 16;
+      const startY = -8 + Math.random() * 3;
+      mesh.position.set(startX, startY, -2 - Math.random());
+      mesh.scale.setScalar(big ? 2.4 : 0.8 + Math.min(streak, 40) * 0.015);
+      mesh.visible = true;
+      mat.opacity = 0;
+      gsap.killTweensOf(mesh.position);
+      gsap.killTweensOf(mat);
+      gsap.to(mesh.position, {
+        x: startX + (Math.random() - 0.5) * 3,
+        y: startY + 3.5 + Math.random() * 2,
+        duration: 2.2,
+        ease: 'sine.out',
+      });
+      gsap.to(mat, { opacity: big ? 1 : 0.85, duration: 0.35, ease: 'power1.out' });
+      gsap.to(mat, {
+        opacity: 0,
+        duration: 1.5,
+        delay: 0.5,
+        ease: 'power1.in',
+        onComplete: () => { mesh.visible = false; slot!.busy = false; reportMotes(); },
+      });
+      if (big) {
+        // Every 10 in a row, the resident fireflies flare briefly.
+        firefliesRef.current.forEach((f) => {
+          gsap.fromTo(f.scale, { x: 1, y: 1, z: 1 }, { x: 2.4, y: 2.4, z: 2.4, duration: 0.3, yoyo: true, repeat: 1, ease: 'power2.out' });
+        });
+      }
+    };
+
+    const handleKeystroke = (e: Event) => {
+      const { correct, streak } = (e as CustomEvent<KeystrokeDetail>).detail;
+      if (correct) {
+        spawnMote(streak);
+      } else {
+        const now = performance.now();
+        if (now - lastGustAt > 1200) { lastGustAt = now; gust(); }
+      }
+    };
+    window.addEventListener(KEYSTROKE_EVENT, handleKeystroke);
 
     // ─── Animation Loop ──────────────────────────────────────────────
     let clock = new THREE.Clock();
@@ -1108,7 +1189,7 @@ export const LivingBackground: React.FC = () => {
       dirLight.color.set(theme.lightColor);
       dirLight.intensity = theme.lightIntensity;
       pondMat.color.set(theme.pondColor);
-      scene.fog = new THREE.FogExp2(theme.fogColor, 0.012);
+      if (scene.fog) (scene.fog as THREE.FogExp2).color.set(theme.fogColor);
 
       // 3. Tree leaves color interpolation with visual shade multiplier
       treesRef.current.forEach((t) => {
@@ -1210,6 +1291,9 @@ export const LivingBackground: React.FC = () => {
     return () => {
       cancelAnimationFrame(animFrameId);
       document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener(KEYSTROKE_EVENT, handleKeystroke);
+      motes.forEach(({ mat }) => mat.dispose());
+      moteGeo.dispose();
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('mousemove', handleMouseMove);

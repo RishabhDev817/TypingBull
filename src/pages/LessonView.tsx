@@ -19,6 +19,7 @@ import type { SessionResult } from '../engine/typingEngine';
 import { useI18n } from '../context/I18nContext';
 import { KeyboardNotice } from '../components/KeyboardNotice';
 import { getLocalizedLesson, getLocalizedChapter } from '../data/curriculumI18n';
+import { emitKeystroke } from '../utils/typingEvents';
 
 type LessonState = 'ready' | 'typing' | 'completed';
 
@@ -121,9 +122,11 @@ export const LessonView: React.FC = () => {
 
     if (e.key === expected) {
       soundEngine.playClick(e.key === ' ');
+      emitKeystroke(true);
       setConsecutiveErrors(0);
     } else {
       soundEngine.playError();
+      emitKeystroke(false);
       const newErrors = new Set(errors);
       newErrors.add(charIndex);
       setErrors(newErrors);
