@@ -22,6 +22,10 @@ import { CHAPTERS } from '../../data/curriculum';
 import { getLessonsForChapter, getLessonById, type LessonDef } from '../../data/lessonData';
 import type { ClassroomSettings, ClassroomAssignment } from '../../types/classroom';
 import { DurationSelector } from './DurationSelector';
+import { useI18n } from '../../context/I18nContext';
+import { CLASSROOM_PICKER } from '../../i18n/classroomPickerI18n';
+import { fill } from '../../i18n/classroomEntryI18n';
+import { CLASSROOM_SESSION, LESSON_TYPE_KEYS } from '../../i18n/classroomSessionI18n';
 
 export interface PassageOption {
   id: string;
@@ -77,6 +81,9 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
   onAssignPassage,
   onAssignGame,
 }) => {
+  const { currentLang } = useI18n();
+  const pp = CLASSROOM_PICKER[currentLang] ?? CLASSROOM_PICKER.en;
+  const ss = CLASSROOM_SESSION[currentLang] ?? CLASSROOM_SESSION.en;
   const [activeCategory, setActiveCategory] = useState<ModalCategory>('curriculum');
   const [selectedChapterId, setSelectedChapterId] = useState<string>('home-row');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -264,12 +271,12 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 font-mono text-[11px] font-black uppercase tracking-wider">
-                  Lesson & Target Selector
+                  {pp.selectorTag}
                 </span>
-                <span className="text-xs text-slate-500 dark:text-slate-400">• Multi-Lesson Queue Enabled</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">{pp.multiQueue}</span>
               </div>
               <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                Assign Classroom Activity
+                {pp.assignActivity}
               </h3>
             </div>
 
@@ -277,7 +284,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
               type="button"
               id="close-target-selector-modal"
               onClick={onClose}
-              aria-label="Close modal"
+              aria-label={pp.closeModal}
               className="p-2 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition cursor-pointer"
             >
               <X className="w-5 h-5" />
@@ -303,7 +310,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                 }`}
               >
                 <BookOpen className="w-4 h-4" />
-                <span>Learn Curriculum</span>
+                <span>{pp.tabCurriculum}</span>
                 <span
                   className={`text-[11px] font-mono px-2 py-0.5 rounded-full font-black ${
                     activeCategory === 'curriculum'
@@ -311,7 +318,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                       : 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300'
                   }`}
                 >
-                  {TOTAL_LESSONS} Steps
+                  {fill(pp.badgeSteps, { n: TOTAL_LESSONS })}
                 </span>
               </button>
 
@@ -331,7 +338,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                 }`}
               >
                 <FileText className="w-4 h-4" />
-                <span>Practice Passages</span>
+                <span>{pp.tabPassages}</span>
                 <span
                   className={`text-[11px] font-mono px-2 py-0.5 rounded-full font-black ${
                     activeCategory === 'passages'
@@ -339,7 +346,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                       : 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'
                   }`}
                 >
-                  Standard
+                  {pp.badgeStandard}
                 </span>
               </button>
 
@@ -359,7 +366,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                 }`}
               >
                 <Gamepad2 className="w-4 h-4" />
-                <span>Arcade Games</span>
+                <span>{pp.tabGames}</span>
                 <span
                   className={`text-[11px] font-mono px-2 py-0.5 rounded-full font-black ${
                     activeCategory === 'games'
@@ -367,7 +374,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                       : 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
                   }`}
                 >
-                  2 Games
+                  {pp.badgeGames}
                 </span>
               </button>
             </div>
@@ -386,10 +393,10 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                     </div>
                     <div>
                       <h4 className="text-sm font-black text-slate-900 dark:text-white">
-                        Learn Curriculum ({TOTAL_LESSONS} Steps)
+                        {fill(pp.curriculumTitle, { n: TOTAL_LESSONS })}
                       </h4>
                       <p className="text-xs text-slate-600 dark:text-slate-300 font-medium">
-                        Click &ldquo;+ Add to Queue&rdquo; on any lesson to build a multi-lesson sequence for your class.
+                        {pp.curriculumHint}
                       </p>
                     </div>
                   </div>
@@ -399,7 +406,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                     <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
                       type="text"
-                      placeholder="Search steps, keys (e.g. F, J)..."
+                      placeholder={pp.searchSteps}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-semibold text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-blue-500"
@@ -414,14 +421,14 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                       <div className="flex items-center gap-2">
                         <span className="px-2.5 py-0.5 rounded-md bg-emerald-600 text-white font-mono text-[11px] font-black uppercase tracking-wider shadow-xs flex items-center gap-1">
                           <Sparkles className="w-3 h-3" />
-                          <span>Recommended Next Lesson</span>
+                          <span>{pp.recommended}</span>
                         </span>
                         <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
                           {recommendedNextChapter?.icon} {recommendedNextChapter?.title}
                         </span>
                       </div>
                       <h4 className="text-base font-black text-slate-900 dark:text-white truncate">
-                        Step {recommendedNextLesson.id}: {recommendedNextLesson.title}
+                        {fill(pp.step, { id: recommendedNextLesson.id })}: {recommendedNextLesson.title}
                       </h4>
                       <p className="text-xs text-slate-600 dark:text-slate-300 font-medium line-clamp-1">
                         {recommendedNextLesson.description}
@@ -440,8 +447,8 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                         <Plus className="w-4 h-4" />
                         <span>
                           {queuedAssignments.some((a) => a.lessonId === recommendedNextLesson.id)
-                            ? 'In Queue (Click to Remove)'
-                            : '+ Add Step to Queue'}
+                            ? pp.inQueue
+                            : pp.addStepToQueue}
                         </span>
                       </button>
                     </div>
@@ -452,10 +459,14 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                      Curriculum Categories ({CHAPTERS.length} Chapters)
+                      {fill(pp.categories, { n: CHAPTERS.length })}
                     </span>
                     <span className="text-xs text-slate-500 dark:text-slate-400">
-                      Active: <strong className="text-blue-600 dark:text-blue-400">{currentChapter.title}</strong>
+                      {pp.activeChapter.split('{title}').flatMap((part, i, arr) =>
+                        i < arr.length - 1
+                          ? [part, <strong key={i} className="text-blue-600 dark:text-blue-400">{currentChapter.title}</strong>]
+                          : [part]
+                      )}
                     </span>
                   </div>
 
@@ -501,9 +512,9 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                   <div className="flex items-center justify-between">
                     <h5 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
                       <span>{currentChapter.icon}</span>
-                      <span>{currentChapter.title} Steps</span>
+                      <span>{fill(pp.chapterSteps, { title: currentChapter.title })}</span>
                       <span className="text-xs font-normal text-slate-500 dark:text-slate-400">
-                        ({filteredCurriculumLessons.length} available)
+                        {fill(pp.available, { n: filteredCurriculumLessons.length })}
                       </span>
                     </h5>
                   </div>
@@ -532,22 +543,22 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                           <div>
                             <div className="flex items-center justify-between mb-2">
                               <span className="px-2.5 py-0.5 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono text-xs font-black">
-                                Step {lesson.id}
+                                {fill(pp.step, { id: lesson.id })}
                               </span>
 
                               {/* Status Tag */}
                               <div>
                                 {isQueued ? (
                                   <span className="px-2 py-0.5 rounded-md bg-emerald-600 text-white text-[11px] font-black uppercase">
-                                    ✓ Queued (#{queueIndex + 1})
+                                    {fill(pp.queued, { n: queueIndex + 1 })}
                                   </span>
                                 ) : isCurrentlyActive ? (
                                   <span className="px-2 py-0.5 rounded-md bg-blue-600 text-white text-[11px] font-black uppercase">
-                                    → Active
+                                    {pp.activeTag}
                                   </span>
                                 ) : (
                                   <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase">
-                                    {lesson.type}
+                                    {LESSON_TYPE_KEYS[lesson.type] ? ss[LESSON_TYPE_KEYS[lesson.type]] : lesson.type}
                                   </span>
                                 )}
                               </div>
@@ -563,13 +574,13 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                             {/* Target Keys */}
                             {lesson.targetKeys && lesson.targetKeys.length > 0 && (
                               <div className="flex items-center gap-1 flex-wrap mb-2.5">
-                                <span className="text-[11px] font-bold text-slate-400">Keys:</span>
+                                <span className="text-[11px] font-bold text-slate-400">{pp.keys}</span>
                                 {lesson.targetKeys.map((k) => (
                                   <span
                                     key={k}
                                     className="px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/60 font-mono text-[11px] font-black text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
                                   >
-                                    {k === ' ' ? 'Space' : k.toUpperCase()}
+                                    {k === ' ' ? ss.space : k.toUpperCase()}
                                   </span>
                                 ))}
                               </div>
@@ -585,7 +596,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
 
                           <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
                             <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-                              Pass: {lesson.passingAccuracy || 90}%
+                              {fill(pp.pass, { n: lesson.passingAccuracy || 90 })}
                             </span>
 
                             <div className="flex items-center gap-1.5 shrink-0">
@@ -595,7 +606,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                                   onClick={() => handleRemoveQueued(lesson.id)}
                                   className="py-1 px-2.5 rounded-xl text-xs font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 border border-rose-200 dark:border-rose-900 transition cursor-pointer"
                                 >
-                                  Remove
+                                  {pp.remove}
                                 </button>
                               ) : (
                                 <button
@@ -605,7 +616,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                                   className="py-1 px-2.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-800 dark:text-slate-200 transition cursor-pointer flex items-center gap-1 border border-slate-200 dark:border-slate-700"
                                 >
                                   <Plus className="w-3.5 h-3.5" />
-                                  <span>+ Queue</span>
+                                  <span>{pp.queue}</span>
                                 </button>
                               )}
 
@@ -614,10 +625,10 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                                 id={`modal-assign-step-${lesson.id}`}
                                 onClick={() => handleInitiateCurriculumAssign(lesson, currentChapter.title)}
                                 className="py-1 px-2.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white shadow-xs"
-                                title="Assign and start this single lesson right away"
+                                title={pp.assignNowTitle}
                               >
                                 <Check className="w-3.5 h-3.5" />
-                                <span>Assign Now</span>
+                                <span>{pp.assignNow}</span>
                               </button>
                             </div>
                           </div>
@@ -654,7 +665,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                     <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
                       type="text"
-                      placeholder="Search passages..."
+                      placeholder={pp.searchPassages}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-semibold text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-amber-500"
@@ -680,7 +691,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                               {passage.category}
                             </span>
                             <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
-                              Target: {passage.wpm}
+                              {fill(pp.target, { wpm: passage.wpm })}
                             </span>
                           </div>
                           <h4 className="text-base font-black text-slate-900 dark:text-white mb-2">
@@ -693,7 +704,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
 
                         <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                           <span className="text-xs font-bold text-slate-500">
-                            {passage.text.length} characters
+                            {fill(pp.characters, { n: passage.text.length })}
                           </span>
                           <button
                             type="button"
@@ -709,7 +720,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                             }`}
                           >
                             <Check className="w-3.5 h-3.5" />
-                            <span>{isSelected ? 'Currently Assigned' : 'Assign to Classroom'}</span>
+                            <span>{isSelected ? pp.currentlyAssigned : pp.assignToClassroom}</span>
                           </button>
                         </div>
                       </div>
@@ -740,7 +751,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                               {game.badge}
                             </span>
                             <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
-                              {game.duration}s Challenge
+                              {fill(pp.challengeSecs, { n: game.duration })}
                             </span>
                           </div>
 
@@ -771,7 +782,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                             }`}
                           >
                             <Gamepad2 className="w-3.5 h-3.5" />
-                            <span>{isSelected ? 'Currently Assigned' : 'Assign to Classroom'}</span>
+                            <span>{isSelected ? pp.currentlyAssigned : pp.assignToClassroom}</span>
                           </button>
                         </div>
                       </div>
@@ -791,7 +802,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                   <div className="flex items-center gap-2">
                     <ListOrdered className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                      Assignment Queue ({queuedAssignments.length} Lessons Selected):
+                      {fill(pp.queueTitle, { n: queuedAssignments.length })}
                     </span>
                   </div>
                   <button
@@ -799,7 +810,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                     onClick={() => setShowQueueDrawer((prev) => !prev)}
                     className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer flex items-center gap-1"
                   >
-                    <span>{showQueueDrawer ? 'Hide Details' : 'Reorder / View Details'}</span>
+                    <span>{showQueueDrawer ? pp.hideDetails : pp.reorderDetails}</span>
                     {showQueueDrawer ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                   </button>
                 </div>
@@ -816,7 +827,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                       <button
                         type="button"
                         onClick={() => handleRemoveQueued(assignment.lessonId)}
-                        aria-label={`Remove ${assignment.title}`}
+                        aria-label={fill(pp.removeNamed, { title: assignment.title })}
                         className="ml-1 text-slate-400 hover:text-rose-500 cursor-pointer"
                       >
                         <X className="w-3 h-3" />
@@ -841,7 +852,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                             type="button"
                             disabled={idx === 0}
                             onClick={() => handleReorderQueued(idx, 'up')}
-                            aria-label="Move lesson up"
+                            aria-label={pp.moveUp}
                             className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-30 cursor-pointer"
                           >
                             <ChevronUp className="w-3.5 h-3.5" />
@@ -850,7 +861,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                             type="button"
                             disabled={idx === queuedAssignments.length - 1}
                             onClick={() => handleReorderQueued(idx, 'down')}
-                            aria-label="Move lesson down"
+                            aria-label={pp.moveDown}
                             className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-30 cursor-pointer"
                           >
                             <ChevronDown className="w-3.5 h-3.5" />
@@ -858,7 +869,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                           <button
                             type="button"
                             onClick={() => handleRemoveQueued(a.lessonId)}
-                            aria-label="Delete lesson from queue"
+                            aria-label={pp.deleteLesson}
                             className="p-1 rounded hover:bg-rose-100 dark:hover:bg-rose-950/60 text-rose-500 cursor-pointer ml-1"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -875,7 +886,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
               <div>
                 <DurationSelector
-                  label="Session Duration"
+                  label={pp.sessionDuration}
                   durationSeconds={assignDurationSeconds}
                   onChange={setAssignDurationSeconds}
                 />
@@ -885,14 +896,14 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
               <div>
                 <label htmlFor="modal-teacher-note-input" className="flex items-center gap-1 text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                   <MessageSquare className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                  <span>Teacher Note / Daily Focus (Optional):</span>
+                  <span>{pp.noteLabel}</span>
                 </label>
                 <input
                   id="modal-teacher-note-input"
                   type="text"
                   value={teacherNote}
                   onChange={(e) => setTeacherNote(e.target.value)}
-                  placeholder="e.g. Focus on F and J tactile bumps..."
+                  placeholder={pp.notePlaceholder}
                   maxLength={100}
                   className="w-full text-xs font-semibold py-2 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -903,8 +914,8 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
             <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-800 flex-wrap gap-2">
               <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                 {queuedAssignments.length > 0
-                  ? `${queuedAssignments.length} lessons ready to assign in order.`
-                  : 'Select lessons above or pick a passage/game.'}
+                  ? fill(pp.ready, { n: queuedAssignments.length })
+                  : pp.selectHint}
               </span>
 
               <div className="flex items-center gap-2">
@@ -913,7 +924,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                   onClick={onClose}
                   className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition cursor-pointer"
                 >
-                  Cancel
+                  {pp.cancel}
                 </button>
 
                 {queuedAssignments.length > 0 && (
@@ -924,7 +935,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                     className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black shadow-lg shadow-blue-600/30 transition cursor-pointer flex items-center gap-1.5"
                   >
                     <Check className="w-4 h-4" />
-                    <span>Confirm &amp; Assign ({queuedAssignments.length} Lessons)</span>
+                    <span>{fill(pp.confirmBatch, { n: queuedAssignments.length })}</span>
                   </button>
                 )}
               </div>
@@ -950,12 +961,12 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                     <AlertTriangle className="w-6 h-6" />
                   </div>
                   <h4 className="text-lg font-black text-slate-900 dark:text-white">
-                    Replace Classroom Assignment?
+                    {pp.replaceTitle}
                   </h4>
                   <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 text-left text-xs font-semibold space-y-2 border border-slate-200 dark:border-slate-700">
                     <div>
                       <span className="text-slate-500 text-[11px] uppercase font-bold block">
-                        Current assignment:
+                        {pp.currentAssignment}
                       </span>
                       <span className="text-slate-700 dark:text-slate-200 font-bold block truncate">
                         {currentSettings.passageTitle}
@@ -963,15 +974,15 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                     </div>
                     <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
                       <span className="text-slate-500 text-[11px] uppercase font-bold block">
-                        Replace with:
+                        {pp.replaceWith}
                       </span>
                       <span className="text-blue-600 dark:text-blue-400 font-black block">
-                        Step {replacementConfirmation.lesson.id}: {replacementConfirmation.lesson.title} ({replacementConfirmation.chapterTitle})
+                        {fill(pp.step, { id: replacementConfirmation.lesson.id })}: {replacementConfirmation.lesson.title} ({replacementConfirmation.chapterTitle})
                       </span>
                     </div>
                   </div>
                   <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                    This lesson will be assigned to all students in this classroom.
+                    {pp.replaceBody}
                   </p>
                   <div className="flex items-center gap-2 pt-2">
                     <button
@@ -979,7 +990,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                       onClick={() => setReplacementConfirmation(null)}
                       className="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer"
                     >
-                      Cancel
+                      {pp.cancel}
                     </button>
                     <button
                       type="button"
@@ -994,7 +1005,7 @@ export const ClassroomTargetSelectorModal: React.FC<Props> = ({
                       }}
                       className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-600/25 transition cursor-pointer"
                     >
-                      Confirm &amp; Assign
+                      {pp.confirmAssign}
                     </button>
                   </div>
                 </motion.div>

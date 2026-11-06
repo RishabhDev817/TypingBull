@@ -75,8 +75,9 @@ export class ClassroomManager {
   /** Sanitize student display names to prevent XSS and layout issues */
   public sanitizeName(raw: string): string {
     if (!raw) return 'Student';
-    // Remove HTML tags, special control chars, collapse spaces
-    const clean = raw.replace(/<[^>]*>?/gm, '').replace(/[^\p{L}\p{N}\s_\-]/gu, '').trim();
+    // Remove HTML tags and special characters. Keep letters, combining marks (needed for Hindi, Thai, Arabic
+    // and other scripts), digits, spaces, underscore and hyphen.
+    const clean = raw.replace(/<[^>]*>?/gm, '').replace(/[^\p{L}\p{M}\p{N}\s_\-]/gu, '').trim();
     if (!clean || clean.length < 2) return 'Student';
     const truncated = clean.slice(0, 20);
 

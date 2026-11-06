@@ -16,6 +16,10 @@ import {
 import type { ClassroomLesson } from '../../data/classroom/classroomLessons';
 import { soundEngine } from '../../utils/audio';
 import { PASTE_GUARD_PROPS, isBulkInsert } from '../../utils/typingGuard';
+import { useI18n } from '../../context/I18nContext';
+import { CLASSROOM_PICKER } from '../../i18n/classroomPickerI18n';
+import { fill } from '../../i18n/classroomEntryI18n';
+import { CLASSROOM_TEACHER } from '../../i18n/classroomTeacherI18n';
 
 interface Props {
   lesson: ClassroomLesson;
@@ -32,6 +36,9 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
   isTeacher = false,
   onAssignToClassroom,
 }) => {
+  const { currentLang } = useI18n();
+  const pp = CLASSROOM_PICKER[currentLang] ?? CLASSROOM_PICKER.en;
+  const tt = CLASSROOM_TEACHER[currentLang] ?? CLASSROOM_TEACHER.en;
   const [currentStep, setCurrentStep] = useState<Step>('overview');
   const [guidedIndex, setGuidedIndex] = useState<number>(0);
 
@@ -101,11 +108,11 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
   };
 
   const stepsList: { key: Step; label: string }[] = [
-    { key: 'overview', label: '1. Objective' },
-    { key: 'concept', label: '2. Finger Guide' },
-    { key: 'guided', label: '3. Guided Practice' },
-    { key: 'exercise', label: '4. Practice Drill' },
-    { key: 'completed', label: '5. Summary' },
+    { key: 'overview', label: pp.stepObjective },
+    { key: 'concept', label: pp.stepFinger },
+    { key: 'guided', label: pp.stepGuided },
+    { key: 'exercise', label: pp.stepDrill },
+    { key: 'completed', label: pp.stepSummary },
   ];
 
   return (
@@ -117,14 +124,14 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
             type="button"
             onClick={onBack}
             className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer"
-            title="Return to lesson catalog"
+            title={pp.backCatalogTitle}
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <div>
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-[11px] font-black uppercase tracking-wider">
-                Lesson {lesson.lessonNumber}
+                {fill(pp.lessonNum, { n: lesson.lessonNumber })}
               </span>
               <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
                 {lesson.category}
@@ -147,7 +154,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
             className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-extrabold text-xs shadow-md shadow-blue-500/20 hover:brightness-110 active:scale-95 transition cursor-pointer flex items-center gap-2 shrink-0"
           >
             <GraduationCap className="w-4 h-4" />
-            <span>Set as Classroom Session</span>
+            <span>{pp.setSession}</span>
           </button>
         )}
       </div>
@@ -188,7 +195,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
               <div className="flex items-center gap-2 mb-3 text-primary">
                 <Target className="w-5 h-5" />
                 <span className="text-xs font-black uppercase tracking-wider">
-                  Learning Objective
+                  {pp.learningObjective}
                 </span>
               </div>
               <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mb-3">
@@ -202,7 +209,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                 <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
                 <div>
                   <div className="text-xs font-black text-blue-900 dark:text-blue-200 uppercase tracking-wider mb-0.5">
-                    Pro Coach Tip
+                    {pp.proTip}
                   </div>
                   <div className="text-xs sm:text-sm font-semibold text-blue-800 dark:text-blue-300">
                     {lesson.example.tip}
@@ -217,7 +224,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                 onClick={() => setCurrentStep('concept')}
                 className="px-6 py-3 rounded-2xl bg-primary text-white font-black text-sm shadow-lg shadow-primary/25 hover:bg-primary-dark transition cursor-pointer flex items-center gap-2"
               >
-                <span>Continue to Finger Guide</span>
+                <span>{pp.continueFinger}</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
@@ -237,7 +244,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
               <div className="flex items-center gap-2 mb-3 text-emerald-600 dark:text-emerald-400">
                 <BookOpen className="w-5 h-5" />
                 <span className="text-xs font-black uppercase tracking-wider">
-                  Ergonomic Concept
+                  {pp.ergonomic}
                 </span>
               </div>
               <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mb-2">
@@ -250,7 +257,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
               {/* Finger Assignment Grid */}
               <div className="mb-6">
                 <h4 className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
-                  Finger & Key Allocations
+                  {pp.fingerAlloc}
                 </h4>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {lesson.typingConcept.fingerGuide.map((fg, idx) => (
@@ -280,7 +287,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
               <div className="p-4 rounded-2xl bg-slate-900 text-white font-mono text-sm sm:text-base flex items-center justify-between">
                 <div>
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-1">
-                    Visual Example
+                    {pp.visualExample}
                   </span>
                   <span className="font-bold text-emerald-400">{lesson.example.demonstration}</span>
                 </div>
@@ -295,7 +302,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                 className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer flex items-center gap-1.5"
               >
                 <ChevronLeft className="w-4 h-4" />
-                <span>Back</span>
+                <span>{pp.back}</span>
               </button>
 
               <button
@@ -303,7 +310,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                 onClick={() => setCurrentStep('guided')}
                 className="px-6 py-3 rounded-2xl bg-primary text-white font-black text-sm shadow-lg shadow-primary/25 hover:bg-primary-dark transition cursor-pointer flex items-center gap-2"
               >
-                <span>Start Guided Practice</span>
+                <span>{pp.startGuided}</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
@@ -324,7 +331,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                 <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
                   <Zap className="w-5 h-5" />
                   <span className="text-xs font-black uppercase tracking-wider">
-                    Drill {guidedIndex + 1} of {lesson.guidedPractice.length}
+                    {fill(pp.drillOf, { i: guidedIndex + 1, n: lesson.guidedPractice.length })}
                   </span>
                 </div>
 
@@ -353,7 +360,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
 
                   <div className="flex items-center gap-2 pt-2">
                     <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
-                      Target Focus Keys:
+                      {pp.focusKeys}
                     </span>
                     <div className="flex gap-1.5">
                       {lesson.guidedPractice[guidedIndex].focusKeys.map((k) => (
@@ -372,7 +379,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                       <div className="flex items-center gap-2">
                         <Zap className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
                         <span className="text-xs font-bold text-indigo-900 dark:text-indigo-200">
-                          Teach this Homerow pattern to your classroom
+                          {pp.teachPattern}
                         </span>
                       </div>
                       <button
@@ -390,7 +397,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                         className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black transition cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/20 shrink-0"
                       >
                         <GraduationCap className="w-4 h-4" />
-                        <span>Assign This Drill</span>
+                        <span>{pp.assignDrill}</span>
                       </button>
                     </div>
                   )}
@@ -411,7 +418,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                 className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer flex items-center gap-1.5"
               >
                 <ChevronLeft className="w-4 h-4" />
-                <span>Previous Drill</span>
+                <span>{pp.prevDrill}</span>
               </button>
 
               {guidedIndex < lesson.guidedPractice.length - 1 ? (
@@ -420,7 +427,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                   onClick={() => setGuidedIndex(guidedIndex + 1)}
                   className="px-6 py-3 rounded-2xl bg-indigo-600 text-white font-black text-sm shadow-lg shadow-indigo-600/25 hover:bg-indigo-700 transition cursor-pointer flex items-center gap-2"
                 >
-                  <span>Next Drill</span>
+                  <span>{pp.nextDrill}</span>
                   <ChevronRight className="w-4 h-4" />
                 </button>
               ) : (
@@ -429,7 +436,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                   onClick={() => setCurrentStep('exercise')}
                   className="px-6 py-3 rounded-2xl bg-primary text-white font-black text-sm shadow-lg shadow-primary/25 hover:bg-primary-dark transition cursor-pointer flex items-center gap-2"
                 >
-                  <span>Advance to Practice Drill</span>
+                  <span>{pp.advance}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               )}
@@ -461,16 +468,16 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                 <div className="flex items-center gap-3">
                   <div className="px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-center">
                     <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 block uppercase">
-                      Speed
+                      {pp.speed}
                     </span>
                     <span className="text-sm font-black text-blue-600 dark:text-blue-400">
-                      {wpm} WPM
+                      {fill(tt.wpmValue, { n: wpm })}
                     </span>
                   </div>
 
                   <div className="px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-center">
                     <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 block uppercase">
-                      Accuracy
+                      {pp.accuracy}
                     </span>
                     <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">
                       {accuracy}%
@@ -516,7 +523,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                 {...PASTE_GUARD_PROPS}
                 onChange={handleInputChange}
                 disabled={isExerciseDone}
-                placeholder={isExerciseDone ? 'Exercise Complete!' : 'Type the text above...'}
+                placeholder={isExerciseDone ? pp.exComplete : pp.typeAbove}
                 className="w-full px-4 py-3 rounded-xl border-2 border-primary/30 focus:border-primary focus:outline-hidden font-mono text-base bg-white dark:bg-slate-800 text-slate-900 dark:text-white mb-4"
               />
 
@@ -531,10 +538,10 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                     <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                     <div>
                       <div className="text-sm font-black text-emerald-900 dark:text-emerald-200">
-                        Exercise Completed!
+                        {pp.exCompleted}
                       </div>
                       <div className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">
-                        Speed: {wpm} WPM • Accuracy: {accuracy}%
+                        {fill(pp.speedAcc, { wpm, acc: accuracy })}
                       </div>
                     </div>
                   </div>
@@ -545,7 +552,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                     className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-emerald-300 dark:border-emerald-700 text-xs font-bold text-emerald-700 dark:text-emerald-300 flex items-center gap-1 cursor-pointer hover:bg-emerald-50 transition"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
-                    <span>Try Again</span>
+                    <span>{pp.tryAgain}</span>
                   </button>
                 </motion.div>
               )}
@@ -558,7 +565,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                 className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer flex items-center gap-1.5"
               >
                 <ChevronLeft className="w-4 h-4" />
-                <span>Back</span>
+                <span>{pp.back}</span>
               </button>
 
               <button
@@ -566,7 +573,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                 onClick={() => setCurrentStep('completed')}
                 className="px-6 py-3 rounded-2xl bg-primary text-white font-black text-sm shadow-lg shadow-primary/25 hover:bg-primary-dark transition cursor-pointer flex items-center gap-2"
               >
-                <span>View Lesson Summary</span>
+                <span>{pp.viewSummary}</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
@@ -588,11 +595,14 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
               </div>
 
               <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">
-                Lesson {lesson.lessonNumber} Complete!
+                {fill(pp.lessonCompleteTitle, { n: lesson.lessonNumber })}
               </h3>
               <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-6">
-                You have reviewed the ergonomics, guided drills, and typing exercises for{' '}
-                <strong className="text-slate-900 dark:text-white">{lesson.title}</strong>.
+                {pp.reviewed.split('{title}').flatMap((part, i, arr) =>
+                  i < arr.length - 1
+                    ? [part, <strong key={i} className="text-slate-900 dark:text-white">{lesson.title}</strong>]
+                    : [part]
+                )}
               </p>
 
               {/* Connected Passage Option */}
@@ -600,10 +610,10 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                 <div className="text-left p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 mb-6">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-black uppercase tracking-wider text-primary">
-                      Recommended Passage: {lesson.passage.title}
+                      {fill(pp.recPassage, { title: lesson.passage.title })}
                     </span>
                     <span className="text-xs font-bold text-slate-500">
-                      Target: {lesson.passage.targetWpm} WPM
+                      {fill(pp.passTarget, { n: lesson.passage.targetWpm })}
                     </span>
                   </div>
                   <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium italic leading-relaxed">
@@ -625,7 +635,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                         className="px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-black transition cursor-pointer flex items-center gap-1.5 shadow-sm"
                       >
                         <GraduationCap className="w-4 h-4" />
-                        <span>Assign Passage to Classroom</span>
+                        <span>{pp.assignPassage}</span>
                       </button>
                     </div>
                   )}
@@ -638,7 +648,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                   onClick={onBack}
                   className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-primary text-white font-black text-sm shadow-lg shadow-primary/25 hover:bg-primary-dark transition cursor-pointer"
                 >
-                  Return to Lesson Catalog
+                  {pp.returnCatalog}
                 </button>
 
                 <button
@@ -650,7 +660,7 @@ export const ClassroomLessonViewer: React.FC<Props> = ({
                   className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-extrabold text-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer flex items-center justify-center gap-2"
                 >
                   <RotateCcw className="w-4 h-4" />
-                  <span>Repeat Exercise</span>
+                  <span>{pp.repeat}</span>
                 </button>
               </div>
             </div>

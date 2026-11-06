@@ -18,8 +18,12 @@ import { ClassroomTargetSelectorModal } from '../components/classroom/ClassroomT
 import { PASSAGE_OPTIONS, CLASSROOM_GAMES } from '../components/classroom/TeacherClassroomLobby';
 import { getLessonById, type LessonDef } from '../data/lessonData';
 import type { ClassroomAssignment } from '../types/classroom';
+import { useI18n } from '../context/I18nContext';
+import { CLASSROOM_LANDING_A } from '../i18n/classroomLandingAI18n';
 
 export const ClassroomPage: React.FC = () => {
+  const { currentLang } = useI18n();
+  const seo = CLASSROOM_LANDING_A[currentLang] ?? CLASSROOM_LANDING_A.en;
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -57,9 +61,8 @@ export const ClassroomPage: React.FC = () => {
 
   usePageSEO({
     canonicalPath: '/classroom/',
-    title: 'TypingBull Classroom — Real-Time Typing Lab for Schools & Computer Labs',
-    description:
-      'Zero-login real-time typing lab for teachers and students. Create custom passages, synchronized typing drills, and live progress monitoring with zero student accounts.',
+    title: seo.seoTitle,
+    description: seo.seoDesc,
     noindex: isPrivateSession,
   });
 
