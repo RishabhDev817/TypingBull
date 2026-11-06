@@ -1,11 +1,38 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
-import { RotateCcw, Timer, Target, Zap, Share2, Check, ArrowRight, Flame } from 'lucide-react';
+import { RotateCcw, Timer, Target, Zap, Share2, ArrowRight, Flame } from 'lucide-react';
 import { Mascot } from './Mascot';
+import { SpeedGauge } from './SpeedGauge';
 import { STANDARD_WORDS, getRandomWords } from '../utils/words';
 import { PASTE_GUARD_PROPS, isBulkInsert } from '../utils/typingGuard';
 import { calcAccuracy, calcWpm, bandForWpm } from '../seo/typingStats';
 import { getSessions, getStreakData, saveSession } from '../engine/sessionStore';
+
+// The share dialog (image card, X / WhatsApp / LinkedIn, download) loads only when someone opens it
+const ShareScoreModal = lazy(() => import('./social/ShareScoreModal').then((m) => ({ default: m.ShareScoreModal })));
+
+/** Counts up to `target` over `ms`, or jumps straight there when the visitor prefers reduced motion. */
+function useCountUp(target: number | null, ms = 900): number {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    if (target === null) return;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || target === 0) {
+      setValue(target);
+      return;
+    }
+    let raf = 0;
+    const t0 = performance.now();
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - t0) / ms);
+      setValue(Math.round(target * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, ms]);
+  return target === null ? 0 : value;
+}
 
 const DURATIONS = [
   { seconds: 30, label: '30 sec' },
@@ -30,7 +57,6 @@ interface Result {
 }
 
 const makeText = (words = 120) => getRandomWords(STANDARD_WORDS, words).join(' ') + ' ';
-const SITE_URL = 'https://typingbull.com/typing-test/';
 
 /** A self-contained timed typing test. Net WPM = correct characters / 5 per minute. */
 export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = ({ onPhaseChange }) => {
@@ -43,7 +69,8 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
   const [liveWpm, setLiveWpm] = useState<number | null>(null);
   const [liveAcc, setLiveAcc] = useState(100);
   const [result, setResult] = useState<Result | null>(null);
-  const [shareNote, setShareNote] = useState('');
+  const [shareOpen, setShareOpen] = useState(false);
+  const doneAtRef = useRef(0);
 
   useEffect(() => {
     onPhaseChange?.(phase);
@@ -158,7 +185,7 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
     setLiveWpm(null);
     setLiveAcc(100);
     setResult(null);
-    setShareNote('');
+    setShareOpen(false);
     keystrokesRef.current = 0;
     correctKeystrokesRef.current = 0;
     window.setTimeout(() => inputRef.current?.focus(), 0);
@@ -188,25 +215,22 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
     }
   };
 
-  const share = async () => {
-    if (!result) return;
-    const line = `I typed ${result.wpm} WPM with ${result.accuracy}% accuracy on TypingBull. Can you beat it?`;
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: 'My TypingBull result', text: line, url: SITE_URL });
-        return;
-      }
-    } catch (err) {
-      if ((err as Error)?.name === 'AbortError') return;
-    }
-    try {
-      await navigator.clipboard.writeText(`${line} ${SITE_URL}`);
-      setShareNote('Copied! Paste it anywhere.');
-    } catch {
-      setShareNote(`${line} ${SITE_URL}`);
-    }
-  };
+  // Enter on the result screen starts another test (short delay so a stray key at the buzzer does not skip the result)
+  useEffect(() => {
+    if (phase !== 'done') return;
+    doneAtRef.current = Date.now();
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (e.key !== 'Enter' || Date.now() - doneAtRef.current < 700) return;
+      if (t && (t.closest('a, button, input, textarea, [role=dialog]'))) return;
+      e.preventDefault();
+      reset();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [phase, reset]);
 
+  const shownWpm = useCountUp(phase === 'done' && result ? result.wpm : null);
   const chars = useMemo(() => text.split(''), [text]);
   const band = result ? bandForWpm(result.wpm) : null;
 
@@ -219,6 +243,7 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
   }
 
   return (
+    <>
     <section aria-label="Typing speed test" className="card-game card-static card-halo-purple p-5 sm:p-8 space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div role="group" aria-label="Test length" className="flex flex-nowrap gap-1.5 sm:gap-2 overflow-x-auto">
@@ -297,13 +322,13 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
       {phase === 'done' && result && band && (
         <div role="status" aria-live="polite" className="space-y-6">
           <p className="sr-only">
-            Time is up. You typed {result.wpm} words per minute with {result.accuracy} percent accuracy.
+            Time is up. You typed {result.wpm} words per minute with {result.accuracy} percent accuracy. {band.title}.
           </p>
           <div className="flex flex-col sm:flex-row items-center gap-5 sm:gap-7">
             <div className="shrink-0"><Mascot mood={band.mood} size="md" /></div>
             <div className="text-center sm:text-left space-y-1.5 min-w-0">
-              <h2 className="text-5xl sm:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-none">
-                {result.wpm}<span className="text-xl sm:text-2xl ml-2 text-slate-500 dark:text-slate-300">WPM</span>
+              <h2 aria-hidden="true" className="text-5xl sm:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-none tabular-nums">
+                {shownWpm}<span className="text-xl sm:text-2xl ml-2 text-slate-500 dark:text-slate-300">WPM</span>
               </h2>
               <p className="text-lg font-black text-purple-700 dark:text-purple-300">{band.title}</p>
               <p className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200 max-w-md">
@@ -314,6 +339,37 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
               )}
             </div>
           </div>
+
+          {/* Actions sit right under the number so they stay above the fold on phones */}
+          <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3">
+            <Link
+              to="/learn"
+              className="inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 text-base font-black shadow-lg hover:brightness-110 active:scale-[0.98] transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300"
+            >
+              Learn to type faster, free <ArrowRight className="w-5 h-5" aria-hidden="true" />
+            </Link>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShareOpen(true)}
+                className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 min-h-12 px-5 rounded-full border border-slate-300 dark:border-slate-600 text-sm font-black text-slate-800 dark:text-slate-100 hover:border-purple-500 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500"
+              >
+                <Share2 className="w-4 h-4" aria-hidden="true" />
+                Share result
+              </button>
+              <button
+                type="button"
+                onClick={() => reset()}
+                className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 min-h-12 px-5 rounded-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-black transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500"
+              >
+                <RotateCcw className="w-4 h-4" aria-hidden="true" />
+                Try again
+              </button>
+            </div>
+          </div>
+          <p className="hidden sm:block text-xs font-bold text-slate-500 dark:text-slate-400 -mt-3">Press Enter to try again.</p>
+
+          <SpeedGauge wpm={result.wpm} />
 
           <div className="flex flex-row flex-wrap items-center justify-center sm:justify-start gap-3">
             <Orb halo="card-halo-green" label="Accuracy" value={`${result.accuracy}%`} />
@@ -330,24 +386,6 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
             </p>
           )}
 
-          <div className="flex flex-wrap items-center gap-3">
-            <Link
-              to="/learn"
-              className="inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 text-base font-black shadow-lg hover:brightness-110 active:scale-[0.98] transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300"
-            >
-              Learn to type faster, free <ArrowRight className="w-5 h-5" aria-hidden="true" />
-            </Link>
-            <button
-              type="button"
-              onClick={share}
-              className="inline-flex items-center gap-2 min-h-12 px-5 rounded-full border border-slate-300 dark:border-slate-600 text-sm font-black text-slate-800 dark:text-slate-100 hover:border-purple-500 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500"
-            >
-              {shareNote.startsWith('Copied') ? <Check className="w-4 h-4" aria-hidden="true" /> : <Share2 className="w-4 h-4" aria-hidden="true" />}
-              Share result
-            </button>
-          </div>
-          {shareNote && <p aria-live="polite" className="text-sm font-bold text-slate-700 dark:text-slate-200 break-words">{shareNote}</p>}
-
           <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">
             Saved on this device.{' '}
             <Link to="/average-typing-speed" className="font-black text-purple-700 dark:text-purple-300 underline underline-offset-2">
@@ -357,17 +395,34 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
         </div>
       )}
 
-      <div className="flex flex-wrap gap-3">
-        <button
-          type="button"
-          onClick={() => reset()}
-          className="inline-flex items-center gap-2 min-h-11 px-5 rounded-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-black transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500"
-        >
-          <RotateCcw className="w-4 h-4" aria-hidden="true" />
-          {phase === 'done' ? 'Try again' : 'Restart'}
-        </button>
-      </div>
+      {phase !== 'done' && (
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => reset()}
+            className="inline-flex items-center gap-2 min-h-11 px-5 rounded-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-black transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500"
+          >
+            <RotateCcw className="w-4 h-4" aria-hidden="true" />
+            Restart
+          </button>
+        </div>
+      )}
     </section>
+    {shareOpen && result && band &&
+      createPortal(
+        <Suspense fallback={null}>
+          <ShareScoreModal
+            isOpen={shareOpen}
+            onClose={() => setShareOpen(false)}
+            wpm={result.wpm}
+            accuracy={result.accuracy}
+            modeName={`${duration}s typing test`}
+            rankTitle={band.title}
+          />
+        </Suspense>,
+        document.body,
+      )}
+    </>
   );
 };
 
