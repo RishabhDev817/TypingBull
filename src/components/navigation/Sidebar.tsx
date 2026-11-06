@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, BookOpen, Gamepad2, Keyboard, Info, ChevronLeft, ChevronRight, Sparkles, MessageSquareHeart, School } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Gamepad2, Keyboard, Info, ChevronLeft, ChevronRight, Sparkles, MessageSquareHeart, School, Timer } from 'lucide-react';
 import { soundEngine } from '../../utils/audio';
 import { useI18n } from '../../context/I18nContext';
 import { useFeedback } from '../../context/FeedbackContext';
@@ -26,6 +26,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, 
     { to: '/learn', icon: BookOpen, label: t('nav.learn'), color: '#4CAF50' },
     { to: '/play', icon: Gamepad2, label: t('nav.play'), color: '#FF4081', badge: 'LIVE', isLive: true },
     { to: '/practice', icon: Keyboard, label: t('nav.practice'), color: '#FF9800' },
+    { to: '/typing-test', icon: Timer, label: t('nav.typingTest'), color: '#10B981' },
     { to: '/classroom', icon: School, label: t('nav.classroom') || 'Classroom', color: '#3B82F6' },
     { to: '/roadmap', icon: Sparkles, label: t('nav.roadmap'), color: '#06B6D4' },
   ];
