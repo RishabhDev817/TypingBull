@@ -1,7 +1,7 @@
 import React, { Suspense, lazy, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { Mascot } from '../components/Mascot';
+import { SceneBanner } from '../components/SceneBanner';
 import { SiteFooter } from '../components/navigation/SiteFooter';
 import { usePageSEO } from '../hooks/usePageSEO';
 import { useI18n } from '../context/I18nContext';
@@ -23,19 +23,10 @@ export const TypingTestPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col font-sans">
       <main className="flex-1 max-w-4xl mx-auto px-4 pt-8 pb-24 w-full space-y-10">
-        <header className="flex flex-col sm:flex-row items-center gap-5 sm:gap-8 text-center sm:text-left">
-          {/* The result screen has its own mascot, so the header one steps aside */}
-          {!showingResult && <div className="hidden sm:block shrink-0"><Mascot mood="typing" size="lg" /></div>}
-          <div className="space-y-3">
-            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white text-balance">
-              Free typing test
-            </h1>
-            <p className="text-base sm:text-lg font-semibold text-slate-700 dark:text-slate-200 max-w-2xl">
-              Check your typing speed in words per minute (WPM) and your accuracy.
-              <span className="hidden sm:inline"> Pick a length, type the words, and see your result the moment the timer ends.</span>
-            </p>
-          </div>
-        </header>
+        <SceneBanner title="Free typing test" mood="typing" hideMascot={showingResult}>
+          Check your typing speed in words per minute (WPM) and your accuracy.
+          <span className="hidden sm:inline"> Pick a length, type the words, and see your result the moment the timer ends.</span>
+        </SceneBanner>
 
         <Suspense fallback={<div className="card-game card-static h-72 animate-pulse" aria-hidden="true" />}>
           <TypingTest onPhaseChange={(p) => setShowingResult(p === 'done')} />

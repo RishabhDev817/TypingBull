@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Flame, Star, BookOpen, ArrowRight, Trophy, TrendingUp, Brain, Save, School } from 'lucide-react';
+import { Flame, Star, BookOpen, ArrowRight, Trophy, TrendingUp, Save, School, Timer, Gamepad2, Keyboard, Bot } from 'lucide-react';
 import { getSessions, getStreakData, getTotalStars, getCompletedLessonCount } from '../engine/sessionStore';
 import { LESSONS } from '../data/lessonData';
 import { WeakKeyPanel } from '../components/WeakKeyPanel';
@@ -16,8 +16,6 @@ import {
   StarsIllustration,
   LessonsIllustration,
   SessionsIllustration,
-  PlayGameIllustration,
-  QuickPracticeIllustration,
 } from '../components/patterns/CardWatermarks';
 import { TypingFAQ } from '../components/TypingFAQ';
 import { SiteFooter } from '../components/navigation/SiteFooter';
@@ -159,18 +157,15 @@ export const DashboardPage: React.FC = () => {
                 onClick={() => { soundEngine.playPop(); navigate('/typing-test'); }}
                 className="card-game card-halo-green relative flex items-center gap-2.5 px-3 py-2.5 text-left cursor-pointer h-full"
               >
-                <div className="w-8.5 h-8.5 rounded-xl flex items-center justify-center text-base shrink-0"
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                   style={{ background: 'var(--color-badge-bg-emerald)', border: '1px solid var(--color-badge-border-emerald)' }}
-                >⏱️</div>
+                aria-hidden="true"
+                ><Timer className="w-[18px] h-[18px] text-primary" /></div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-sm font-extrabold text-ink leading-tight">{t('nav.typingTest')}</h3>
                   <p className="text-xs text-body font-semibold leading-snug mt-0.5">{t('dash.freeTypingTest')}</p>
                 </div>
                 <ArrowRight className="w-3.5 h-3.5 text-primary shrink-0" />
-                {/* Watermark illustration */}
-                <div className="absolute -bottom-2 -right-2 w-12 h-12 opacity-[0.08] pointer-events-none">
-                  <QuickPracticeIllustration />
-                </div>
               </motion.button>
 
               {/* Play Multiplayer Card with Floating Cloud Notification */}
@@ -181,9 +176,10 @@ export const DashboardPage: React.FC = () => {
                   onClick={() => { soundEngine.playPop(); navigate('/play'); }}
                   className="card-game card-halo-pink relative flex items-center gap-2.5 px-3 py-2.5 text-left cursor-pointer h-full w-full"
                 >
-                  <div className="w-8.5 h-8.5 rounded-xl flex items-center justify-center text-base shrink-0"
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                     style={{ background: 'var(--color-badge-bg-pink)', border: '1px solid var(--color-badge-border-pink)' }}
-                  >🏎️</div>
+                  aria-hidden="true"
+                  ><Gamepad2 className="w-[18px] h-[18px] text-highlight-pink" /></div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
                       <h3 className="text-sm font-extrabold text-ink leading-tight">{t('dash.playGame')}</h3>
@@ -197,10 +193,6 @@ export const DashboardPage: React.FC = () => {
                     <p className="text-xs text-body font-semibold leading-snug mt-0.5">Race real typists live</p>
                   </div>
                   <ArrowRight className="w-3.5 h-3.5 text-highlight-pink shrink-0" />
-                  {/* Watermark illustration */}
-                  <div className="absolute -bottom-2 -right-2 w-12 h-12 opacity-[0.08] pointer-events-none">
-                    <PlayGameIllustration />
-                  </div>
                 </motion.button>
               </div>
 
@@ -211,18 +203,15 @@ export const DashboardPage: React.FC = () => {
                 onClick={() => { soundEngine.playPop(); navigate('/practice'); }}
                 className="card-game card-halo-orange relative flex items-center gap-2.5 px-3 py-2.5 text-left cursor-pointer h-full"
               >
-                <div className="w-8.5 h-8.5 rounded-xl flex items-center justify-center text-base shrink-0"
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                   style={{ background: 'var(--color-badge-bg-orange)', border: '1px solid var(--color-badge-border-orange)' }}
-                >⌨️</div>
+                aria-hidden="true"
+                ><Keyboard className="w-[18px] h-[18px] text-orange" /></div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-sm font-extrabold text-ink leading-tight">{t('dash.quickPractice')}</h3>
                   <p className="text-xs text-body font-semibold leading-snug mt-0.5">{t('dash.timedLevels')}</p>
                 </div>
                 <ArrowRight className="w-3.5 h-3.5 text-orange shrink-0" />
-                {/* Watermark illustration */}
-                <div className="absolute -bottom-2 -right-2 w-12 h-12 opacity-[0.08] pointer-events-none">
-                  <QuickPracticeIllustration />
-                </div>
               </motion.button>
 
               {/* AI Tutor Card */}
@@ -232,14 +221,15 @@ export const DashboardPage: React.FC = () => {
                 onClick={() => { soundEngine.playPop(); setTutorOpen(true); }}
                 className="card-game card-halo-purple relative flex items-center gap-2.5 px-3 py-2.5 text-left cursor-pointer h-full"
               >
-                <div className="w-8.5 h-8.5 rounded-xl flex items-center justify-center text-base shrink-0"
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                   style={{ background: 'var(--color-badge-bg-purple)', border: '1px solid var(--color-badge-border-purple)' }}
-                >🤖</div>
+                aria-hidden="true"
+                ><Bot className="w-[18px] h-[18px] text-violet" /></div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-sm font-extrabold text-ink leading-tight">{t('dash.aiTutor')}</h3>
                   <p className="text-xs text-body font-semibold leading-snug mt-0.5">{t('dash.diagnoseWeak')}</p>
                 </div>
-                <Brain className="w-3.5 h-3.5 text-violet shrink-0" />
+                <ArrowRight className="w-3.5 h-3.5 text-violet shrink-0" />
               </motion.button>
             </motion.div>
 

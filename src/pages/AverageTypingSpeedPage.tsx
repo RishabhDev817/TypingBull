@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { Mascot } from '../components/Mascot';
+import { SceneBanner } from '../components/SceneBanner';
 import { SpeedGauge } from '../components/SpeedGauge';
 import { SiteFooter } from '../components/navigation/SiteFooter';
 import { usePageSEO } from '../hooks/usePageSEO';
@@ -29,18 +29,10 @@ export const AverageTypingSpeedPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col font-sans">
       <main className="flex-1 max-w-4xl mx-auto px-4 pt-8 pb-24 w-full space-y-10">
-        <header className="flex flex-col sm:flex-row items-center gap-5 sm:gap-8 text-center sm:text-left">
-          <div className="shrink-0"><Mascot mood={band && band.min >= 55 ? 'cheering' : 'happy'} size="lg" /></div>
-          <div className="space-y-3">
-            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white text-balance">
-              Average typing speed: what is a good WPM?
-            </h1>
-            <p className="text-base sm:text-lg font-semibold text-slate-700 dark:text-slate-200 max-w-2xl">
-              Most adults type around 40 words per minute. Professional jobs usually expect 50 to 70, and fast typists
-              reach 80 or more. Here is how each speed compares, and what to aim for.
-            </p>
-          </div>
-        </header>
+        <SceneBanner title="Average typing speed: what is a good WPM?" mood={band && band.min >= 55 ? 'cheering' : 'happy'}>
+          Most adults type around 40 words per minute. Professional jobs usually expect 50 to 70, and fast typists
+          reach 80 or more. Here is how each speed compares, and what to aim for.
+        </SceneBanner>
 
         <section className="card-game card-static p-6 sm:p-8 space-y-4" aria-labelledby="check-heading">
           <h2 id="check-heading" className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
