@@ -6,6 +6,9 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { soundEngine } from '../utils/audio';
+import { useI18n } from '../context/I18nContext';
+import { CLASSROOM_STUDENT, ERROR_CODE_KEYS } from '../i18n/classroomStudentI18n';
+import { fill } from '../i18n/classroomEntryI18n';
 import type {
   ClassroomRoomView,
   ClassroomRole,
@@ -53,6 +56,12 @@ export function useClassroomSocket(initialRoomCode?: string) {
   const [sessionResults, setSessionResults] = useState<ClassroomResultsView | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<ToastNotification[]>([]);
+
+  // Pop-up messages are written in the learner's language; the socket callback reads the latest one.
+  const { currentLang } = useI18n();
+  const langRef = useRef(currentLang);
+  useEffect(() => { langRef.current = currentLang; }, [currentLang]);
+  const str = () => CLASSROOM_STUDENT[langRef.current] ?? CLASSROOM_STUDENT.en;
 
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectAttemptsRef = useRef<number>(0);
@@ -137,7 +146,7 @@ export function useClassroomSocket(initialRoomCode?: string) {
           sessionStorage.setItem(ROOM_CODE_KEY, code);
           sessionStorage.setItem(ROLE_KEY, 'teacher');
           sessionStorage.setItem(TEACHER_TOKEN_KEY, tToken);
-          addNotification('success', `Classroom ${code} created!`);
+          addNotification('success', fill(str().toastCreated, { code }));
           break;
         }
 
@@ -151,7 +160,7 @@ export function useClassroomSocket(initialRoomCode?: string) {
 
           sessionStorage.setItem(ROOM_CODE_KEY, roomView.code);
           sessionStorage.setItem(ROLE_KEY, 'student');
-          addNotification('success', `Joined Classroom ${roomView.code}!`);
+          addNotification('success', fill(str().toastJoined, { code: roomView.code }));
           break;
         }
 
@@ -166,7 +175,7 @@ export function useClassroomSocket(initialRoomCode?: string) {
                 const latestAdded = nextAssignments[nextAssignments.length - 1];
                 addNotification(
                   'info',
-                  `New lesson added: ${latestAdded.title}. It will become available after you finish your current lesson.`
+                  fill(str().toastLessonAdded, { title: latestAdded.title })
                 );
                 soundEngine.playPop();
               } else if (
@@ -174,7 +183,7 @@ export function useClassroomSocket(initialRoomCode?: string) {
                 updatedRoom.settings?.passageTitle &&
                 prev.settings.passageTitle !== updatedRoom.settings.passageTitle
               ) {
-                addNotification('info', `New lesson assigned: ${updatedRoom.settings.passageTitle}`);
+                addNotification('info', fill(str().toastLessonAssigned, { title: updatedRoom.settings.passageTitle }));
                 soundEngine.playPop();
               }
             }
@@ -252,7 +261,7 @@ export function useClassroomSocket(initialRoomCode?: string) {
 
         case 'STUDENT_FINISHED_BROADCAST': {
           const { studentName: name, rank, wpm } = msg.payload;
-          addNotification('info', `🏁 ${name} finished! (${wpm} WPM • Rank #${rank})`);
+          addNotification('info', fill(str().toastFinished, { name, wpm, rank }));
           break;
         }
 
@@ -270,7 +279,7 @@ export function useClassroomSocket(initialRoomCode?: string) {
             if (!prev) return null;
             return { ...prev, status: 'ENDED' };
           });
-          addNotification('warning', msg.payload.reason || 'Classroom session has ended.');
+          addNotification('warning', msg.payload.reason || str().toastEnded);
           break;
         }
 
@@ -281,7 +290,7 @@ export function useClassroomSocket(initialRoomCode?: string) {
           setRoomCode(roomView.code);
           if (studentId) setMyStudentId(studentId);
           setErrorMessage(null);
-          addNotification('success', 'Classroom session restored!');
+          addNotification('success', str().toastRestored);
           break;
         }
 
@@ -292,8 +301,11 @@ export function useClassroomSocket(initialRoomCode?: string) {
             sessionStorage.removeItem(ROLE_KEY);
             sessionStorage.removeItem(TEACHER_TOKEN_KEY);
           }
-          setErrorMessage(msg.payload.message);
-          addNotification('error', msg.payload.message);
+          // Known errors are shown in the learner's language; anything else keeps the server's text.
+          const key = ERROR_CODE_KEYS[msg.payload.code];
+          const text = key ? str()[key] : msg.payload.message;
+          setErrorMessage(text);
+          addNotification('error', text);
           break;
         }
 

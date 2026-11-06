@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { soundEngine } from '../../utils/audio';
+import { useI18n } from '../../context/I18nContext';
+import { CLASSROOM_STUDENT } from '../../i18n/classroomStudentI18n';
 
 interface Props {
   sessionStartAt: number;
 }
 
 export const ClassroomCountdown: React.FC<Props> = ({ sessionStartAt }) => {
+  const { currentLang } = useI18n();
+  const s = CLASSROOM_STUDENT[currentLang] ?? CLASSROOM_STUDENT.en;
   const [secondsRemaining, setSecondsRemaining] = useState<number>(() => {
     return Math.max(0, Math.ceil((sessionStartAt - Date.now()) / 1000));
   });
@@ -32,7 +36,7 @@ export const ClassroomCountdown: React.FC<Props> = ({ sessionStartAt }) => {
     }
   }, [secondsRemaining]);
 
-  const displayLabel = secondsRemaining > 0 ? String(secondsRemaining) : 'GO!';
+  const displayLabel = secondsRemaining > 0 ? String(secondsRemaining) : s.go;
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950/75 backdrop-blur-md select-none">
@@ -42,9 +46,9 @@ export const ClassroomCountdown: React.FC<Props> = ({ sessionStartAt }) => {
         className="text-center mb-6"
       >
         <span className="px-4 py-1.5 rounded-full bg-primary/20 text-primary-light border border-primary/40 font-black text-xs uppercase tracking-widest">
-          Synchronized Classroom Start
+          {s.syncStart}
         </span>
-        <h2 className="text-2xl sm:text-3xl font-black text-white mt-3">Get Ready!</h2>
+        <h2 className="text-2xl sm:text-3xl font-black text-white mt-3">{s.getReady}</h2>
       </motion.div>
 
       <AnimatePresence mode="wait">
@@ -65,7 +69,7 @@ export const ClassroomCountdown: React.FC<Props> = ({ sessionStartAt }) => {
       </AnimatePresence>
 
       <p className="text-xs sm:text-sm font-bold text-slate-400 mt-8">
-        Starting simultaneously on all student computers...
+        {s.startingAll}
       </p>
     </div>
   );

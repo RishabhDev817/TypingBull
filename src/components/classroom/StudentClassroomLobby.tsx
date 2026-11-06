@@ -19,6 +19,9 @@ import { getLessonById, getLessonsForChapter, type LessonDef } from '../../data/
 import { CHAPTERS, getChapterByLessonId } from '../../data/curriculum';
 import { ClassroomLessonPlayer } from './ClassroomLessonPlayer';
 import { StudentAvatarBadge } from './StudentAvatar';
+import { useI18n } from '../../context/I18nContext';
+import { CLASSROOM_STUDENT } from '../../i18n/classroomStudentI18n';
+import { fill } from '../../i18n/classroomEntryI18n';
 
 interface Props {
   room: ClassroomRoomView;
@@ -41,6 +44,8 @@ export const StudentClassroomLobby: React.FC<Props> = ({
   onProgressUpdate,
   onFinish,
 }) => {
+  const { currentLang } = useI18n();
+  const s = CLASSROOM_STUDENT[currentLang] ?? CLASSROOM_STUDENT.en;
   const [activeTab, setActiveTab] = useState<StudentTab>('lobby');
   const [selectedLesson, setSelectedLesson] = useState<LessonDef | null>(null);
 
@@ -112,15 +117,15 @@ export const StudentClassroomLobby: React.FC<Props> = ({
 
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-950/60 border border-blue-300 dark:border-blue-800 text-blue-800 dark:text-blue-300 text-xs font-black uppercase tracking-wider mb-2">
           <School className="w-3.5 h-3.5" />
-          <span>Classroom Code: {room.code}</span>
+          <span>{fill(s.codeBadge, { code: room.code })}</span>
         </div>
 
         <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-          <span>Welcome, {studentName}!</span>
+          <span>{fill(s.welcome, { name: studentName })}</span>
           <StudentAvatarBadge avatar={myEmoji} size="sm" />
         </h1>
         <p className="text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 mt-1">
-          Connected to {room.teacherName}'s classroom session.
+          {fill(s.connectedTo, { teacher: room.teacherName })}
         </p>
       </motion.div>
 
@@ -136,7 +141,7 @@ export const StudentClassroomLobby: React.FC<Props> = ({
           }`}
         >
           <Target className="w-3.5 h-3.5" />
-          <span>Lobby</span>
+          <span>{s.tabLobby}</span>
         </button>
 
         <button
@@ -149,7 +154,7 @@ export const StudentClassroomLobby: React.FC<Props> = ({
           }`}
         >
           <GraduationCap className="w-3.5 h-3.5" />
-          <span>Curriculum</span>
+          <span>{s.tabCurriculum}</span>
         </button>
 
         <button
@@ -162,7 +167,7 @@ export const StudentClassroomLobby: React.FC<Props> = ({
           }`}
         >
           <Users className="w-3.5 h-3.5" />
-          <span>Classmates ({room.studentCount})</span>
+          <span>{fill(s.tabClassmates, { n: room.studentCount })}</span>
         </button>
       </div>
 
@@ -177,24 +182,24 @@ export const StudentClassroomLobby: React.FC<Props> = ({
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
               <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
-                Teacher Status
+                {s.teacherStatus}
               </span>
               <div className="flex items-center gap-1.5 mt-1">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
-                  Teacher Connected
+                  {s.teacherConnected}
                 </span>
               </div>
             </div>
 
             <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
               <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
-                Classmates
+                {s.classmates}
               </span>
               <div className="flex items-center gap-1.5 mt-1">
                 <Users className="w-4 h-4 text-primary" />
                 <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
-                  {room.studentCount} in room
+                  {fill(s.inRoom, { n: room.studentCount })}
                 </span>
               </div>
             </div>
@@ -206,7 +211,7 @@ export const StudentClassroomLobby: React.FC<Props> = ({
               <span className="text-lg leading-none shrink-0 mt-0.5">📌</span>
               <div>
                 <span className="text-[11px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400 block">
-                  Note from {room.teacherName}:
+                  {fill(s.noteFrom, { teacher: room.teacherName })}
                 </span>
                 <p className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 mt-0.5 leading-relaxed">
                   &ldquo;{room.settings.teacherNote}&rdquo;
@@ -221,11 +226,11 @@ export const StudentClassroomLobby: React.FC<Props> = ({
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2">
                   <span className="px-3 py-1 rounded-full bg-blue-600 text-white font-mono text-[11px] font-black uppercase tracking-wider shadow-sm shadow-blue-500/20">
-                    Classroom Tasks ({(me?.completedLessonIds || []).filter((id) => room.settings.assignments?.some((a) => a.lessonId === id)).length}/{room.settings.assignments.length} Completed)
+                    {fill(s.tasksTitle, { done: (me?.completedLessonIds || []).filter((id) => room.settings.assignments?.some((a) => a.lessonId === id)).length, total: room.settings.assignments.length })}
                   </span>
                 </div>
                 <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
-                  Assigned by {room.teacherName}
+                  {fill(s.assignedBy, { teacher: room.teacherName })}
                 </span>
               </div>
 
@@ -249,10 +254,10 @@ export const StudentClassroomLobby: React.FC<Props> = ({
               {room.settings.assignments.every((a) => (me?.completedLessonIds || []).includes(a.lessonId)) && (
                 <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 text-center space-y-1">
                   <div className="text-sm font-black text-emerald-800 dark:text-emerald-300 flex items-center justify-center gap-1.5">
-                    <span>🎉 All Assigned Lessons Completed!</span>
+                    <span>🎉 {s.allDone}</span>
                   </div>
                   <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">
-                    Awesome job! You can practice any lesson again while waiting for your teacher to assign the next step.
+                    {s.allDoneBody}
                   </p>
                 </div>
               )}
@@ -304,17 +309,17 @@ export const StudentClassroomLobby: React.FC<Props> = ({
                             </span>
                             {isCompleted && (
                               <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold text-[11px] uppercase">
-                                ✅ Completed
+                                ✅ {s.completed}
                               </span>
                             )}
                             {isNext && (
                               <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 font-bold text-[11px] uppercase animate-pulse">
-                                ▶ Available
+                                ▶ {s.available}
                               </span>
                             )}
                             {isLocked && (
                               <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-400 font-semibold text-[11px]">
-                                🔒 Complete previous lesson first
+                                🔒 {s.lockedHint}
                               </span>
                             )}
                           </div>
@@ -327,13 +332,13 @@ export const StudentClassroomLobby: React.FC<Props> = ({
 
                           {assignment.targetKeys && assignment.targetKeys.length > 0 && (
                             <div className="flex items-center gap-1 mt-1">
-                              <span className="text-[11px] font-bold text-slate-400">Keys:</span>
+                              <span className="text-[11px] font-bold text-slate-400">{s.keys}</span>
                               {assignment.targetKeys.map((k) => (
                                 <span
                                   key={k}
                                   className="px-1.5 py-0.2 rounded bg-white dark:bg-slate-800 font-mono text-[11px] font-bold text-blue-600 dark:text-blue-300 border border-slate-200 dark:border-slate-700"
                                 >
-                                  {k === ' ' ? 'Space' : k.toUpperCase()}
+                                  {k === ' ' ? s.space : k.toUpperCase()}
                                 </span>
                               ))}
                             </div>
@@ -351,7 +356,7 @@ export const StudentClassroomLobby: React.FC<Props> = ({
                             }}
                             className="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition cursor-pointer"
                           >
-                            Practice Again
+                            {s.practiceAgain}
                           </button>
                         ) : isNext ? (
                           <motion.button
@@ -364,7 +369,7 @@ export const StudentClassroomLobby: React.FC<Props> = ({
                             }}
                             className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black shadow-md shadow-blue-500/25 flex items-center gap-1.5 transition cursor-pointer"
                           >
-                            <span>Start Lesson</span>
+                            <span>{s.startLesson}</span>
                             <ArrowRight className="w-3.5 h-3.5" />
                           </motion.button>
                         ) : (
@@ -373,7 +378,7 @@ export const StudentClassroomLobby: React.FC<Props> = ({
                             disabled
                             className="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 text-xs font-semibold cursor-not-allowed"
                           >
-                            Locked 🔒
+                            {s.locked} 🔒
                           </button>
                         )}
                       </div>
@@ -387,14 +392,14 @@ export const StudentClassroomLobby: React.FC<Props> = ({
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2">
                   <span className="px-3 py-1 rounded-full bg-blue-600 text-white font-mono text-[11px] font-black uppercase tracking-wider shadow-sm shadow-blue-500/20">
-                    Today&apos;s Classroom Lesson
+                    {s.todaysLesson}
                   </span>
                   <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
-                    Step {assignedLesson.id} • {assignedChapter?.title || 'Learn Curriculum'}
+                    {fill(s.stepChapter, { id: assignedLesson.id, chapter: assignedChapter?.title || s.learnCurriculum })}
                   </span>
                 </div>
                 <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                  Assigned by {room.teacherName}
+                  {fill(s.assignedBy, { teacher: room.teacherName })}
                 </span>
               </div>
 
@@ -411,14 +416,14 @@ export const StudentClassroomLobby: React.FC<Props> = ({
               {assignedLesson.targetKeys && assignedLesson.targetKeys.length > 0 && (
                 <div className="flex items-center gap-1.5 flex-wrap pt-1">
                   <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-                    Focus Keys:
+                    {s.focusKeys}
                   </span>
                   {assignedLesson.targetKeys.map((k) => (
                     <span
                       key={k}
                       className="px-2.5 py-0.5 rounded-lg bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-300 font-mono text-xs font-black border border-blue-300 dark:border-blue-700 shadow-xs"
                     >
-                      {k === ' ' ? 'Space' : k.toUpperCase()}
+                      {k === ' ' ? s.space : k.toUpperCase()}
                     </span>
                   ))}
                 </div>
@@ -427,7 +432,7 @@ export const StudentClassroomLobby: React.FC<Props> = ({
               <div className="pt-2 border-t border-blue-200/60 dark:border-blue-800/60 flex items-center justify-between gap-3 flex-wrap">
                 <div className="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
                   <Sparkles className="w-3.5 h-3.5 text-blue-500" />
-                  <span>Passing Accuracy: {assignedLesson.passingAccuracy}%</span>
+                  <span>{fill(s.passingAccuracy, { pct: assignedLesson.passingAccuracy })}</span>
                 </div>
 
                 <motion.button
@@ -437,7 +442,7 @@ export const StudentClassroomLobby: React.FC<Props> = ({
                   onClick={() => setSelectedLesson(assignedLesson)}
                   className="px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs sm:text-sm shadow-lg shadow-blue-600/30 flex items-center gap-2 cursor-pointer transition"
                 >
-                  <span>Start Lesson</span>
+                  <span>{s.startLesson}</span>
                   <ArrowRight className="w-4 h-4" />
                 </motion.button>
               </div>
@@ -447,17 +452,17 @@ export const StudentClassroomLobby: React.FC<Props> = ({
             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
               <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                 <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Assigned Activity
+                  {s.assignedActivity}
                 </span>
                 {room.settings.activityType === 'game' ? (
                   <span className="px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-mono text-[10.5px] font-black uppercase flex items-center gap-1">
                     <Gamepad2 className="w-3 h-3" />
-                    <span>Arcade Game Challenge</span>
+                    <span>{s.arcadeChallenge}</span>
                   </span>
                 ) : (
                   <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 font-mono text-[10.5px] font-black uppercase flex items-center gap-1">
                     <Keyboard className="w-3 h-3" />
-                    <span>Practice Passage</span>
+                    <span>{s.practicePassage}</span>
                   </span>
                 )}
               </div>
@@ -469,8 +474,8 @@ export const StudentClassroomLobby: React.FC<Props> = ({
                   </div>
                   <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                     {room.settings.activityType === 'game'
-                      ? 'Synchronous classroom multiplayer game challenge'
-                      : 'Everyone types the same synchronized text'}
+                      ? s.gameDesc
+                      : s.sameText}
                   </div>
                 </div>
                 <div className="flex items-center gap-1 text-xs font-black text-primary px-2.5 py-1 rounded-full bg-primary/10">
@@ -495,13 +500,13 @@ export const StudentClassroomLobby: React.FC<Props> = ({
               }`}
             >
               <CheckCircle2 className="w-5 h-5" />
-              <span>{isReady ? "YOU'RE READY! (Click to cancel)" : "I'M READY FOR SESSION"}</span>
+              <span>{isReady ? s.readyOn : s.readyOff}</span>
             </motion.button>
 
             <p className="text-center text-xs font-bold text-slate-500 dark:text-slate-400 mt-3">
               {isReady
-                ? 'Great job! Wait for your teacher to initiate the countdown or practice above.'
-                : 'Click the button above to let your teacher know you are ready.'}
+                ? s.readyHintOn
+                : s.readyHintOff}
             </p>
           </div>
 
@@ -513,7 +518,7 @@ export const StudentClassroomLobby: React.FC<Props> = ({
               className="text-xs font-bold text-slate-400 hover:text-rose-500 transition flex items-center gap-1 cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Leave this classroom</span>
+              <span>{s.leave}</span>
             </button>
           </div>
         </motion.div>
@@ -529,7 +534,7 @@ export const StudentClassroomLobby: React.FC<Props> = ({
           <div className="p-4 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 text-xs font-semibold text-blue-800 dark:text-blue-300 flex items-center gap-2">
             <Sparkles className="w-4 h-4 shrink-0" />
             <span>
-              Follow the Learn curriculum progression. Practice any lesson to sharpen your keys!
+              {s.curriculumHint}
             </span>
           </div>
 
@@ -596,11 +601,11 @@ export const StudentClassroomLobby: React.FC<Props> = ({
                     <div>
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono text-[11px] font-black">
-                          Step {lesson.id}
+                          {fill(s.step, { id: lesson.id })}
                         </span>
                         {isCurrentAssignment && (
                           <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-[11px] font-black uppercase">
-                            Teacher Assignment
+                            {s.teacherAssignment}
                           </span>
                         )}
                         <span className="text-[11px] font-bold text-slate-400 uppercase">
@@ -625,7 +630,7 @@ export const StudentClassroomLobby: React.FC<Props> = ({
                         : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200'
                     }`}
                   >
-                    {isCurrentAssignment ? 'Start Lesson' : 'Practice'}
+                    {isCurrentAssignment ? s.startLesson : s.practice}
                   </button>
                 </div>
               );
@@ -643,10 +648,10 @@ export const StudentClassroomLobby: React.FC<Props> = ({
         >
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
             <span className="text-xs font-black uppercase tracking-wider text-slate-500">
-              Students Connected ({room.studentCount})
+              {fill(s.studentsConnected, { n: room.studentCount })}
             </span>
             <span className="text-xs font-black text-emerald-600">
-              {room.readyCount} / {room.studentCount} Ready
+              {fill(s.readyCount, { ready: room.readyCount, total: room.studentCount })}
             </span>
           </div>
 
@@ -666,12 +671,12 @@ export const StudentClassroomLobby: React.FC<Props> = ({
                         <span>{student.name}</span>
                         {isMe && (
                           <span className="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-[11px] font-black">
-                            You
+                            {s.you}
                           </span>
                         )}
                       </div>
                       <span className="text-[11px] font-bold text-slate-400">
-                        {student.isReady ? 'Ready for Session' : 'Warming Up'}
+                        {student.isReady ? s.readyForSession : s.warmingUp}
                       </span>
                     </div>
                   </div>
@@ -680,11 +685,11 @@ export const StudentClassroomLobby: React.FC<Props> = ({
                     {student.isReady ? (
                       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-[11px] font-black uppercase">
                         <CheckCircle2 className="w-3 h-3" />
-                        <span>Ready</span>
+                        <span>{s.ready}</span>
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 text-[11px] font-black uppercase">
-                        <span>Waiting</span>
+                        <span>{s.waiting}</span>
                       </span>
                     )}
                   </div>
