@@ -4,6 +4,9 @@ import { Clock, Users, Zap, Target, CheckCircle2, LogOut, Gamepad2, GraduationCa
 import type { ClassroomRoomView } from '../../types/classroom';
 import { ClassroomEndModal } from './ClassroomEndModal';
 import { StudentAvatarBadge } from './StudentAvatar';
+import { useI18n } from '../../context/I18nContext';
+import { CLASSROOM_TEACHER } from '../../i18n/classroomTeacherI18n';
+import { fill } from '../../i18n/classroomEntryI18n';
 
 interface Props {
   room: ClassroomRoomView;
@@ -16,6 +19,8 @@ export const TeacherLiveMonitoring: React.FC<Props> = ({
   sessionEndAt,
   onEndClassroom,
 }) => {
+  const { currentLang } = useI18n();
+  const tt = CLASSROOM_TEACHER[currentLang] ?? CLASSROOM_TEACHER.en;
   const [timeRemainingSec, setTimeRemainingSec] = useState<number>(() => {
     return Math.max(0, Math.ceil((sessionEndAt - Date.now()) / 1000));
   });
@@ -55,22 +60,22 @@ export const TeacherLiveMonitoring: React.FC<Props> = ({
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="text-[11px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Live Classroom Session Active</span>
+              <span>{tt.liveActive}</span>
             </span>
             {room.settings.activityType === 'game' ? (
               <span className="px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-mono text-[10.5px] font-black uppercase flex items-center gap-1">
                 <Gamepad2 className="w-3 h-3" />
-                <span>Arcade Game Challenge</span>
+                <span>{tt.arcade}</span>
               </span>
             ) : room.settings.activityType === 'lesson' ? (
               <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono text-[10.5px] font-black uppercase flex items-center gap-1">
                 <GraduationCap className="w-3 h-3" />
-                <span>Curriculum Lesson</span>
+                <span>{tt.curriculumLesson}</span>
               </span>
             ) : (
               <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-mono text-[10.5px] font-black uppercase flex items-center gap-1">
                 <Keyboard className="w-3 h-3" />
-                <span>Practice Drill</span>
+                <span>{tt.practiceDrill}</span>
               </span>
             )}
           </div>
@@ -79,7 +84,7 @@ export const TeacherLiveMonitoring: React.FC<Props> = ({
           </h2>
           {room.settings.teacherNote && (
             <p className="text-xs text-blue-600 dark:text-blue-400 font-semibold mt-1">
-              📌 Teacher Note: &ldquo;{room.settings.teacherNote}&rdquo;
+              📌 {fill(tt.teacherNoteLine, { note: room.settings.teacherNote })}
             </p>
           )}
         </div>
@@ -96,7 +101,7 @@ export const TeacherLiveMonitoring: React.FC<Props> = ({
             className="px-3.5 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center gap-1.5 border border-rose-200 dark:border-rose-900 transition cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
-            <span>End Session</span>
+            <span>{tt.endSession}</span>
           </button>
         </div>
       </div>
@@ -105,7 +110,7 @@ export const TeacherLiveMonitoring: React.FC<Props> = ({
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         <div className="p-4 rounded-3xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 shadow-md">
           <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
-            Class Average WPM
+            {tt.avgWpm}
           </span>
           <div className="flex items-center gap-2 mt-1">
             <Zap className="w-5 h-5 text-blue-500" />
@@ -115,7 +120,7 @@ export const TeacherLiveMonitoring: React.FC<Props> = ({
 
         <div className="p-4 rounded-3xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 shadow-md">
           <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
-            Class Average Acc
+            {tt.avgAcc}
           </span>
           <div className="flex items-center gap-2 mt-1">
             <Target className="w-5 h-5 text-emerald-500" />
@@ -125,7 +130,7 @@ export const TeacherLiveMonitoring: React.FC<Props> = ({
 
         <div className="p-4 rounded-3xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 shadow-md">
           <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
-            Completed
+            {tt.completed}
           </span>
           <div className="flex items-center gap-2 mt-1">
             <CheckCircle2 className="w-5 h-5 text-indigo-500" />
@@ -137,7 +142,7 @@ export const TeacherLiveMonitoring: React.FC<Props> = ({
 
         <div className="p-4 rounded-3xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 shadow-md">
           <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
-            Active Typists
+            {tt.activeTypists}
           </span>
           <div className="flex items-center gap-2 mt-1">
             <Users className="w-5 h-5 text-primary" />
@@ -152,10 +157,10 @@ export const TeacherLiveMonitoring: React.FC<Props> = ({
       <div className="rounded-3xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
         <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
           <h3 className="text-base font-black text-slate-900 dark:text-white">
-            Student Telemetry
+            {tt.telemetry}
           </h3>
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-            Real-time live telemetry stream
+            {tt.liveStream}
           </span>
         </div>
 
@@ -180,14 +185,14 @@ export const TeacherLiveMonitoring: React.FC<Props> = ({
                     </span>
                     <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
                       {room.settings.assignments && room.settings.assignments.length > 0
-                        ? `${(student.completedLessonIds || []).length}/${room.settings.assignments.length} tasks completed`
+                        ? fill(tt.tasksDone, { done: (student.completedLessonIds || []).length, total: room.settings.assignments.length })
                         : isCompleted
-                        ? '✓ 100% Completed'
+                        ? tt.st100
                         : isTimeExpired
-                        ? '⏱ Time Expired'
+                        ? tt.stExpired
                         : isInProgress
-                        ? '⌨️ Practicing'
-                        : '○ Waiting to start'}
+                        ? tt.stPracticing
+                        : tt.stWaiting}
                     </span>
                   </div>
                 </div>
@@ -196,7 +201,7 @@ export const TeacherLiveMonitoring: React.FC<Props> = ({
                 <div className="flex-1 sm:px-6">
                   <div className="flex items-center justify-between text-xs font-mono font-bold text-slate-700 dark:text-slate-200 mb-1.5">
                     <span className="font-black text-blue-600 dark:text-blue-400">
-                      {student.wpm > 0 ? `${student.wpm} WPM` : '— WPM'}
+                      {student.wpm > 0 ? fill(tt.wpmValue, { n: student.wpm }) : tt.wpmNone}
                     </span>
                     <span className="font-black text-emerald-600 dark:text-emerald-400">
                       {student.progress > 0 ? `${student.accuracy}%` : '— %'}
@@ -224,21 +229,21 @@ export const TeacherLiveMonitoring: React.FC<Props> = ({
                   {isCompleted ? (
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-[11px] font-black uppercase">
                       <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Completed</span>
+                      <span>{tt.badgeCompleted}</span>
                     </span>
                   ) : isTimeExpired ? (
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-[11px] font-black uppercase">
                       <AlertCircle className="w-3.5 h-3.5" />
-                      <span>Time Expired</span>
+                      <span>{tt.badgeExpired}</span>
                     </span>
                   ) : isInProgress ? (
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-[11px] font-black uppercase">
                       <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping" />
-                      <span>In Progress</span>
+                      <span>{tt.badgeInProgress}</span>
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[11px] font-black uppercase">
-                      <span>Not Started</span>
+                      <span>{tt.badgeNotStarted}</span>
                     </span>
                   )}
                 </div>

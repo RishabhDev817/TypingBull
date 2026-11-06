@@ -4,6 +4,9 @@ import type { ClassroomResultsView, ClassroomRoomView, ClassroomAssignment } fro
 import { Mascot } from '../Mascot';
 import { ClassroomEndModal } from './ClassroomEndModal';
 import { StudentAvatarBadge } from './StudentAvatar';
+import { useI18n } from '../../context/I18nContext';
+import { CLASSROOM_TEACHER } from '../../i18n/classroomTeacherI18n';
+import { fill } from '../../i18n/classroomEntryI18n';
 
 interface Props {
   results: ClassroomResultsView;
@@ -22,6 +25,8 @@ export const TeacherClassroomResults: React.FC<Props> = ({
   onOpenAssignModal,
   onActivateAssignment,
 }) => {
+  const { currentLang } = useI18n();
+  const tt = CLASSROOM_TEACHER[currentLang] ?? CLASSROOM_TEACHER.en;
   const [showEndModal, setShowEndModal] = useState(false);
 
   const currentAssignmentIndex = room?.settings.assignments?.findIndex(
@@ -46,14 +51,14 @@ export const TeacherClassroomResults: React.FC<Props> = ({
           <div>
             <div className="flex items-center gap-2 justify-center sm:justify-start">
               <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                Lesson Complete 🎉
+                {tt.lessonComplete}
               </h2>
               <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-[11px] font-black uppercase">
-                {results.completedCount}/{results.totalStudents} Completed
+                {fill(tt.completedBadge, { done: results.completedCount, total: results.totalStudents })}
               </span>
             </div>
             <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 mt-0.5">
-              Activity: <strong className="text-slate-900 dark:text-white">{results.passageTitle}</strong>
+              {tt.activity} <strong className="text-slate-900 dark:text-white">{results.passageTitle}</strong>
             </p>
           </div>
         </div>
@@ -67,7 +72,7 @@ export const TeacherClassroomResults: React.FC<Props> = ({
               className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black flex items-center gap-1.5 transition cursor-pointer shadow-md shadow-blue-600/25"
             >
               <Plus className="w-4 h-4" />
-              <span>Assign Next Lesson</span>
+              <span>{tt.assignNext}</span>
             </button>
           )}
 
@@ -77,7 +82,7 @@ export const TeacherClassroomResults: React.FC<Props> = ({
             className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer border border-slate-200 dark:border-slate-700"
           >
             <RotateCcw className="w-4 h-4" />
-            <span>Return to Lobby</span>
+            <span>{tt.returnLobby}</span>
           </button>
 
           <button
@@ -86,7 +91,7 @@ export const TeacherClassroomResults: React.FC<Props> = ({
             className="px-4 py-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center gap-1.5 border border-rose-200 dark:border-rose-900 transition cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
-            <span>End Classroom</span>
+            <span>{tt.endClassroom}</span>
           </button>
         </div>
       </div>
@@ -95,21 +100,21 @@ export const TeacherClassroomResults: React.FC<Props> = ({
       <div className="p-6 rounded-3xl bg-gradient-to-r from-blue-500/15 via-indigo-500/10 to-teal-500/10 border-2 border-blue-400/50 dark:border-blue-500/40 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <span className="text-[11px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400 block mb-1">
-            Next Lesson Recommendation
+            {tt.nextRec}
           </span>
           <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
             <span>{results.passageTitle}</span>
             <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
-              ✓ {results.completedCount}/{results.totalStudents} students completed
+              {fill(tt.studentsCompleted, { done: results.completedCount, total: results.totalStudents })}
             </span>
           </h3>
           {nextAssignment ? (
             <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-medium mt-1">
-              Next Queued Lesson: <strong className="text-blue-600 dark:text-blue-400">{nextAssignment.title}</strong>
+              {tt.nextQueued} <strong className="text-blue-600 dark:text-blue-400">{nextAssignment.title}</strong>
             </p>
           ) : (
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium mt-1">
-              All currently assigned lessons have concluded. You can select the next lesson from the curriculum below.
+              {tt.allConcluded}
             </p>
           )}
         </div>
@@ -123,7 +128,7 @@ export const TeacherClassroomResults: React.FC<Props> = ({
               className="px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-black shadow-lg shadow-emerald-600/30 flex items-center gap-2 transition cursor-pointer"
             >
               <RotateCcw className="w-4 h-4" />
-              <span>Activate Next: Step {nextAssignment.lessonId}</span>
+              <span>{fill(tt.activateNext, { id: nextAssignment.lessonId })}</span>
             </button>
           )}
 
@@ -135,7 +140,7 @@ export const TeacherClassroomResults: React.FC<Props> = ({
               className="px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-black shadow-md shadow-blue-600/25 flex items-center gap-2 transition cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              <span>Assign Next Lesson</span>
+              <span>{tt.assignNext}</span>
             </button>
           )}
         </div>
@@ -145,19 +150,19 @@ export const TeacherClassroomResults: React.FC<Props> = ({
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 shadow-md text-center">
           <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
-            Class Average Speed
+            {tt.avgSpeed}
           </span>
           <div className="flex items-center justify-center gap-2">
             <Zap className="w-6 h-6 text-blue-500" />
             <span className="font-mono text-3xl font-black text-slate-900 dark:text-white">
-              {results.classAverageWpm} WPM
+              {fill(tt.wpmValue, { n: results.classAverageWpm })}
             </span>
           </div>
         </div>
 
         <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 shadow-md text-center">
           <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
-            Class Average Accuracy
+            {tt.avgAccuracy}
           </span>
           <div className="flex items-center justify-center gap-2">
             <Target className="w-6 h-6 text-emerald-500" />
@@ -169,7 +174,7 @@ export const TeacherClassroomResults: React.FC<Props> = ({
 
         <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 shadow-md text-center">
           <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
-            Classroom Completion
+            {tt.completion}
           </span>
           <div className="flex items-center justify-center gap-2">
             <CheckCircle2 className="w-6 h-6 text-indigo-500" />
@@ -184,7 +189,7 @@ export const TeacherClassroomResults: React.FC<Props> = ({
       <div className="p-5 rounded-3xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
         <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
           <Sparkles className="w-4 h-4 text-amber-500" />
-          <span>Classroom Learning Insights &amp; Pedagogical Feedback</span>
+          <span>{tt.insights}</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
@@ -192,12 +197,12 @@ export const TeacherClassroomResults: React.FC<Props> = ({
           <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5">
             <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
               <AlertCircle className="w-4 h-4 text-amber-500" />
-              <span>Needs More Practice:</span>
+              <span>{tt.needsPractice}</span>
             </div>
             {studentsNeedingPractice.length > 0 ? (
               <div>
                 <p className="text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
-                  The following learners had accuracy under 85% and would benefit from extra home row anchor drills:
+                  {tt.needsBody}
                 </p>
                 <div className="flex flex-wrap gap-1.5 mt-2">
                   {studentsNeedingPractice.map((s) => (
@@ -212,7 +217,7 @@ export const TeacherClassroomResults: React.FC<Props> = ({
               </div>
             ) : (
               <p className="text-emerald-700 dark:text-emerald-400 font-medium">
-                🎉 Wonderful! All students met or exceeded the 85% accuracy benchmark.
+                {tt.wonderful}
               </p>
             )}
           </div>
@@ -221,12 +226,12 @@ export const TeacherClassroomResults: React.FC<Props> = ({
           <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5">
             <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
               <Trophy className="w-4 h-4 text-emerald-500" />
-              <span>High Precision Commendations:</span>
+              <span>{tt.commend}</span>
             </div>
             {topPerformers.length > 0 ? (
               <div>
                 <p className="text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
-                  {topPerformers.length} student{topPerformers.length === 1 ? '' : 's'} achieved 95%+ precision:
+                  {fill(topPerformers.length === 1 ? tt.achievedOne : tt.achievedMany, { n: topPerformers.length })}
                 </p>
                 <div className="flex flex-wrap gap-1.5 mt-2">
                   {topPerformers.slice(0, 5).map((s) => (
@@ -239,14 +244,14 @@ export const TeacherClassroomResults: React.FC<Props> = ({
                   ))}
                   {topPerformers.length > 5 && (
                     <span className="text-[11px] font-bold text-slate-500 self-center">
-                      +{topPerformers.length - 5} more
+                      {fill(tt.more, { n: topPerformers.length - 5 })}
                     </span>
                   )}
                 </div>
               </div>
             ) : (
               <p className="text-slate-500 dark:text-slate-400 font-medium">
-                Encourage students to focus on relaxed shoulders and rhythm over raw speed.
+                {tt.encourage}
               </p>
             )}
           </div>
@@ -259,11 +264,11 @@ export const TeacherClassroomResults: React.FC<Props> = ({
           <div className="flex items-center gap-2">
             <Trophy className="w-5 h-5 text-amber-500" />
             <h3 className="text-base font-black text-slate-900 dark:text-white">
-              Student Leaderboard &amp; Results
+              {tt.leaderboard}
             </h3>
           </div>
           <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
-            {results.results.length} Students Ranked
+            {fill(tt.ranked, { n: results.results.length })}
           </span>
         </div>
 
@@ -294,11 +299,11 @@ export const TeacherClassroomResults: React.FC<Props> = ({
                     <span className="text-[11px] font-semibold">
                       {student.finished ? (
                         <span className="text-emerald-600 dark:text-emerald-400 font-bold">
-                          ✓ Completed ({student.timeSpentSec}s)
+                          {fill(tt.completedTime, { sec: student.timeSpentSec })}
                         </span>
                       ) : (
                         <span className="text-amber-600 dark:text-amber-400 font-bold">
-                          ⏱ Time Expired ({student.wpm} WPM)
+                          {fill(tt.expiredWpm, { wpm: student.wpm })}
                         </span>
                       )}
                     </span>
@@ -308,16 +313,16 @@ export const TeacherClassroomResults: React.FC<Props> = ({
                 <div className="flex items-center gap-6 text-right">
                   <div>
                     <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
-                      Speed
+                      {tt.speed}
                     </span>
                     <span className="font-mono text-base font-black text-blue-600 dark:text-blue-400">
-                      {student.wpm} WPM
+                      {fill(tt.wpmValue, { n: student.wpm })}
                     </span>
                   </div>
 
                   <div>
                     <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
-                      Accuracy
+                      {tt.accuracy}
                     </span>
                     <span className="font-mono text-base font-black text-emerald-600 dark:text-emerald-400">
                       {student.accuracy}%
