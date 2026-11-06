@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Flame, Star, BookOpen, ArrowRight, Trophy, TrendingUp, Brain } from 'lucide-react';
+import { Flame, Star, BookOpen, ArrowRight, Trophy, TrendingUp, Brain, Save, School } from 'lucide-react';
 import { getSessions, getStreakData, getTotalStars, getCompletedLessonCount } from '../engine/sessionStore';
 import { LESSONS } from '../data/lessonData';
 import { WeakKeyPanel } from '../components/WeakKeyPanel';
@@ -26,6 +26,7 @@ import { FloatingControls } from '../components/navigation/FloatingControls';
 import { useI18n } from '../context/I18nContext';
 import { HomeSEOContent } from '../components/HomeSEOContent';
 import { usePageSEO } from '../hooks/usePageSEO';
+import { ProgressBackup } from '../components/ProgressBackup';
 
 const FIRST_TEST_CTA: Record<string, string> = {
   en: 'Take a 60-second test',
@@ -39,6 +40,32 @@ const FIRST_TEST_CTA: Record<string, string> = {
   hi: '60 सेकंड का टेस्ट दें',
 };
 
+type Copy = Record<string, string>;
+const START_LESSON: Copy = {
+  en: 'Start Lesson 1', es: 'Empezar la lección 1', ja: 'レッスン1を始める', fr: 'Commencer la leçon 1', de: 'Lektion 1 starten',
+  pt: 'Começar a lição 1', ko: '레슨 1 시작', it: 'Inizia la lezione 1', hi: 'पाठ 1 शुरू करें',
+};
+const START_HINT: Copy = {
+  en: 'About 3 minutes. No sign-up needed.', es: 'Unos 3 minutos. Sin registro.', ja: '約3分。登録は不要です。', fr: 'Environ 3 minutes. Sans inscription.',
+  de: 'Etwa 3 Minuten. Ohne Anmeldung.', pt: 'Cerca de 3 minutos. Sem cadastro.', ko: '약 3분. 가입이 필요 없습니다.', it: 'Circa 3 minuti. Senza registrazione.',
+  hi: 'लगभग 3 मिनट। साइन-अप की ज़रूरत नहीं।',
+};
+const CONTINUE_LESSON: Copy = {
+  en: 'Continue where you left off', es: 'Continúa donde lo dejaste', ja: '続きから再開', fr: 'Reprendre là où vous en étiez', de: 'Dort weitermachen, wo du warst',
+  pt: 'Continue de onde parou', ko: '이어서 학습하기', it: 'Riprendi da dove eri rimasto', hi: 'जहाँ छोड़ा था वहीं से जारी रखें',
+};
+const CLASSROOM_CARD: Record<string, { title: string; body: string; create: string; join: string }> = {
+  en: { title: 'Teaching a class?', body: 'Run a live typing lesson or race with a 6-character code. Students need no account.', create: 'Create a classroom', join: 'Join with a code' },
+  es: { title: '¿Das clase?', body: 'Dirige una lección o carrera en vivo con un código de 6 caracteres. Los alumnos no necesitan cuenta.', create: 'Crear un aula', join: 'Unirse con un código' },
+  ja: { title: '授業で使いますか？', body: '6文字のコードでライブのタイピング授業やレースを開始。生徒のアカウントは不要です。', create: 'クラスを作成', join: 'コードで参加' },
+  fr: { title: 'Vous enseignez ?', body: 'Lancez une leçon ou une course en direct avec un code à 6 caractères. Les élèves n’ont pas besoin de compte.', create: 'Créer une classe', join: 'Rejoindre avec un code' },
+  de: { title: 'Du unterrichtest?', body: 'Starte eine Live-Lektion oder ein Rennen mit einem 6-stelligen Code. Schüler brauchen kein Konto.', create: 'Klasse erstellen', join: 'Mit Code beitreten' },
+  pt: { title: 'Você ensina uma turma?', body: 'Inicie uma aula ou corrida ao vivo com um código de 6 caracteres. Os alunos não precisam de conta.', create: 'Criar uma sala', join: 'Entrar com um código' },
+  ko: { title: '수업에 사용하시나요?', body: '6자리 코드로 실시간 타자 수업이나 레이스를 시작하세요. 학생 계정이 필요 없습니다.', create: '교실 만들기', join: '코드로 참여' },
+  it: { title: 'Insegni a una classe?', body: 'Avvia una lezione o una gara dal vivo con un codice di 6 caratteri. Gli studenti non hanno bisogno di un account.', create: 'Crea una classe', join: 'Entra con un codice' },
+  hi: { title: 'क्या आप कक्षा पढ़ाते हैं?', body: '6 अक्षरों के कोड से लाइव टाइपिंग पाठ या रेस शुरू करें। छात्रों को खाता नहीं चाहिए।', create: 'क्लासरूम बनाएँ', join: 'कोड से जुड़ें' },
+};
+
 export const DashboardPage: React.FC = () => {
   const { currentLang, t } = useI18n();
   usePageSEO(currentLang);
@@ -49,8 +76,13 @@ export const DashboardPage: React.FC = () => {
   const completedLessons = getCompletedLessonCount();
   const recentSessions = sessions.slice(0, 4);
   const [tutorOpen, setTutorOpen] = useState(false);
+  const [backupOpen, setBackupOpen] = useState(false);
 
   const nextLesson = LESSONS.find(l => isLessonUnlocked(l.id) && !sessions.some(s => s.modeDetail === `lesson-${l.id}` && s.accuracy >= l.passingAccuracy));
+  const isNewLearner = completedLessons === 0 && sessions.length === 0;
+  const lang = currentLang in START_LESSON ? currentLang : 'en';
+  const heroTarget = nextLesson ? `/learn/${nextLesson.id}` : '/learn';
+  const classroomCopy = CLASSROOM_CARD[currentLang] || CLASSROOM_CARD.en;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -79,7 +111,7 @@ export const DashboardPage: React.FC = () => {
             {/* 1. Hero / Welcome Banner */}
             <motion.div
               variants={itemVariants}
-              className="card-game card-halo-orange relative p-4 sm:p-5 flex items-center justify-between gap-4 mb-3.5 min-w-0"
+              className="card-game card-halo-orange relative p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3.5 min-w-0"
             >
               <div className="flex items-center gap-4 z-10 min-w-0">
                 <Mascot mood={streak.currentStreak > 0 ? 'happy' : 'idle'} size="md" />
@@ -96,6 +128,22 @@ export const DashboardPage: React.FC = () => {
                     <CoinCounter />
                   </div>
                 </div>
+              </div>
+              {/* The one primary action: start (new learners) or continue (returning learners) */}
+              <div className="z-10 flex flex-col items-stretch sm:items-end gap-1.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => { soundEngine.playPop(); navigate(heroTarget); }}
+                  className="inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 text-base font-black shadow-lg cursor-pointer hover:brightness-110 active:scale-[0.98] transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300"
+                >
+                  {isNewLearner ? START_LESSON[lang] : CONTINUE_LESSON[lang]}
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+                <span className="text-xs text-body font-semibold text-center sm:text-right">
+                  {isNewLearner
+                    ? START_HINT[lang]
+                    : nextLesson ? `${t('dash.station')} ${nextLesson.id}: ${nextLesson.title}` : t('dash.allDone')}
+                </span>
               </div>
               <WelcomeBannerIllustration className="hidden 2xl:flex" />
             </motion.div>
@@ -196,6 +244,41 @@ export const DashboardPage: React.FC = () => {
                 </div>
                 <Brain className="w-3.5 h-3.5 text-violet shrink-0" />
               </motion.button>
+            </motion.div>
+
+            {/* 2b. Classroom: the feature teachers come for */}
+            <motion.div
+              variants={itemVariants}
+              className="card-game card-halo-blue relative px-4 py-3 sm:px-5 sm:py-3.5 mb-3.5 flex flex-col md:flex-row md:items-center gap-3 md:gap-4"
+            >
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ background: 'var(--color-badge-bg-blue)', border: '1px solid var(--color-badge-border-blue)' }}
+                  aria-hidden="true"
+                >
+                  <School className="w-5 h-5 text-sky-blue" />
+                </div>
+                <div className="min-w-0">
+                  <h2 className="text-sm font-extrabold text-ink leading-tight">{classroomCopy.title}</h2>
+                  <p className="text-xs text-body font-semibold leading-snug mt-0.5">{classroomCopy.body}</p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => { soundEngine.playPop(); navigate('/classroom/create'); }}
+                  className="min-h-11 px-4 inline-flex items-center gap-2 rounded-full bg-sky-500 text-slate-950 text-sm font-black cursor-pointer hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                >
+                  <School className="w-4 h-4" /> {classroomCopy.create}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { soundEngine.playPop(); navigate('/classroom/join'); }}
+                  className="min-h-11 px-4 inline-flex items-center gap-2 rounded-full border border-hairline-strong text-ink text-sm font-extrabold cursor-pointer hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                >
+                  {classroomCopy.join}
+                </button>
+              </div>
             </motion.div>
 
             {/* 3. Bottom Analytics Row: Recent Sessions (Left) & Weak-Key Analysis (Right) */}
@@ -356,6 +439,15 @@ export const DashboardPage: React.FC = () => {
                 </div>
               </motion.div>
             </div>
+
+            <button
+              type="button"
+              onClick={() => { soundEngine.playPop(); setBackupOpen(true); }}
+              className="mt-4 min-h-11 px-3 inline-flex items-center justify-center gap-1.5 rounded-full border border-hairline text-[12px] font-extrabold text-body hover:text-ink hover:bg-white/10 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300"
+              title="Save your progress as a code, or restore it on this device"
+            >
+              <Save className="w-3.5 h-3.5" /> Save / restore progress
+            </button>
           </motion.div>
         </div>
       </div>
@@ -374,6 +466,8 @@ export const DashboardPage: React.FC = () => {
       <motion.div variants={itemVariants} className="mt-14 max-w-6xl mx-auto w-full">
         <SiteFooter />
       </motion.div>
+
+      <ProgressBackup open={backupOpen} onClose={() => setBackupOpen(false)} />
 
       {/* AI Tutor Report Modal (Lifetime Analysis) */}
       <AITutorReport
