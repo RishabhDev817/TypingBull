@@ -403,6 +403,12 @@ canvas, .cloud, .confetti-piece {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
+/* Content containers (text, tables, the typing box) should not lift or press like buttons. */
+.card-game.card-static:hover,
+.card-game.card-static:active {
+  transform: none;
+}
+
 /* ─── Front-Lit 3D Tactile Panel ─── */
 .card-frontlit {
   position: relative;

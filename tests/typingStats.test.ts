@@ -22,3 +22,11 @@ test('bands are contiguous and every WPM maps to one band', () => {
   assert.equal(bandForWpm(55).id, 'good');
   assert.equal(bandForWpm(300).id, 'expert');
 });
+
+test('every band has a friendly result title and a mascot mood', () => {
+  for (const b of SPEED_BANDS) {
+    assert.ok(b.title.length > 0 && b.title !== b.label || b.id === 'average' || b.id === 'beginner', b.id);
+    assert.ok(b.mood === 'happy' || b.mood === 'cheering', b.id);
+  }
+  assert.equal(bandForWpm(10).title, 'Warming up');
+});

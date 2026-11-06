@@ -16,7 +16,6 @@ import {
   StarsIllustration,
   LessonsIllustration,
   SessionsIllustration,
-  ContinueLearningIllustration,
   PlayGameIllustration,
   QuickPracticeIllustration,
 } from '../components/patterns/CardWatermarks';
@@ -134,7 +133,7 @@ export const DashboardPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => { soundEngine.playPop(); navigate(heroTarget); }}
-                  className="inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 text-base font-black shadow-lg cursor-pointer hover:brightness-110 active:scale-[0.98] transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300"
+                  className="inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 text-base font-black text-balance leading-tight shadow-lg cursor-pointer hover:brightness-110 active:scale-[0.98] transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300"
                 >
                   {isNewLearner ? START_LESSON[lang] : CONTINUE_LESSON[lang]}
                   <ArrowRight className="w-5 h-5" />
@@ -153,26 +152,24 @@ export const DashboardPage: React.FC = () => {
               variants={itemVariants}
               className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-3 mb-3.5 items-stretch"
             >
-              {/* Continue Learning Card */}
+              {/* Typing Test Card (the hero button already covers "continue learning") */}
               <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.96 }}
-                onClick={() => { soundEngine.playPop(); navigate(nextLesson ? `/learn/${nextLesson.id}` : '/learn'); }}
+                onClick={() => { soundEngine.playPop(); navigate('/typing-test'); }}
                 className="card-game card-halo-green relative flex items-center gap-2.5 px-3 py-2.5 text-left cursor-pointer h-full"
               >
                 <div className="w-8.5 h-8.5 rounded-xl flex items-center justify-center text-base shrink-0"
                   style={{ background: 'var(--color-badge-bg-emerald)', border: '1px solid var(--color-badge-border-emerald)' }}
-                >📚</div>
+                >⏱️</div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-extrabold text-ink leading-tight">{t('dash.continueLearning')}</h3>
-                  <p className="text-xs text-body font-semibold leading-snug mt-0.5">
-                    {nextLesson ? `${t('dash.station')} ${nextLesson.id}: ${nextLesson.title}` : t('dash.allDone')}
-                  </p>
+                  <h3 className="text-sm font-extrabold text-ink leading-tight">{t('nav.typingTest')}</h3>
+                  <p className="text-xs text-body font-semibold leading-snug mt-0.5">{t('dash.freeTypingTest')}</p>
                 </div>
                 <ArrowRight className="w-3.5 h-3.5 text-primary shrink-0" />
                 {/* Watermark illustration */}
                 <div className="absolute -bottom-2 -right-2 w-12 h-12 opacity-[0.08] pointer-events-none">
-                  <ContinueLearningIllustration />
+                  <QuickPracticeIllustration />
                 </div>
               </motion.button>
 
@@ -219,7 +216,7 @@ export const DashboardPage: React.FC = () => {
                 >⌨️</div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-sm font-extrabold text-ink leading-tight">{t('dash.quickPractice')}</h3>
-                  <p className="text-xs text-body font-semibold leading-snug mt-0.5">{t('dash.freeTypingTest')}</p>
+                  <p className="text-xs text-body font-semibold leading-snug mt-0.5">{t('dash.timedLevels')}</p>
                 </div>
                 <ArrowRight className="w-3.5 h-3.5 text-orange shrink-0" />
                 {/* Watermark illustration */}

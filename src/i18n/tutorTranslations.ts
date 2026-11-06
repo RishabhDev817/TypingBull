@@ -830,10 +830,12 @@ export function getLocalizedWeakKeyMessage(
     significantBigrams: { bigram: string; errorRate: number }[];
     hesitationKeys: { key: string; avgDelayMs: number }[];
     hasSessions: boolean;
+    /** Accuracy (0-100) of the latest session, used so we never say "looking good" after a poor run. */
+    latestAccuracy?: number;
   },
   lang: SupportedLocale = 'en'
 ): string {
-  const { significantWeakKeys, significantBigrams, hesitationKeys, hasSessions } = data;
+  const { significantWeakKeys, significantBigrams, hesitationKeys, hasSessions, latestAccuracy } = data;
 
   if (significantWeakKeys.length > 0) {
     const keyList = significantWeakKeys.map((k) => k.key.toUpperCase()).join(', ');
@@ -893,6 +895,19 @@ export function getLocalizedWeakKeyMessage(
     if (lang === 'it') return `Esiti prima di premere [${keyList}]. Gli esercizi di memoria muscolare per questi tasti ti daranno sicurezza.`;
     if (lang === 'hi') return `आप [${keyList}] दबाने से पहले झिझकते हैं। इन कुंजियों के मांसपेशी स्मृति अभ्यास से आत्मविश्वास बढ़ेगा।`;
     return `You hesitate before pressing ${keyList}. Muscle memory drills for these keys will help build confidence.`;
+  }
+
+  if (hasSessions && latestAccuracy !== undefined && latestAccuracy < 92) {
+    const a = Math.round(latestAccuracy);
+    if (lang === 'es') return `Tu última sesión tuvo ${a}% de precisión. Ve un poco más despacio y repite una lección inicial para escribir con más seguridad.`;
+    if (lang === 'ja') return `前回のセッションの正確性は${a}%でした。少しゆっくり、初級のレッスンを繰り返して安定した入力を身につけましょう。`;
+    if (lang === 'fr') return `Votre dernière session avait ${a}% de précision. Ralentissez un peu et refaites une leçon de début pour gagner en régularité.`;
+    if (lang === 'de') return `Deine letzte Sitzung hatte ${a}% Genauigkeit. Tippe etwas langsamer und wiederhole eine frühe Lektion für mehr Sicherheit.`;
+    if (lang === 'pt') return `Sua última sessão teve ${a}% de precisão. Vá um pouco mais devagar e repita uma lição inicial para digitar com mais segurança.`;
+    if (lang === 'ko') return `지난 세션의 정확도는 ${a}%였습니다. 조금 천천히, 초반 레슨을 반복해 안정적으로 입력해 보세요.`;
+    if (lang === 'it') return `L'ultima sessione aveva il ${a}% di precisione. Rallenta un po' e ripeti una lezione iniziale per digitare con più sicurezza.`;
+    if (lang === 'hi') return `आपके पिछले सत्र की सटीकता ${a}% थी। थोड़ा धीमे टाइप करें और शुरुआती पाठ दोहराएँ।`;
+    return `Your last session had ${a}% accuracy. Slow down a little and repeat an early lesson to build steady, accurate typing.`;
   }
 
   if (hasSessions) {

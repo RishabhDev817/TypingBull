@@ -127,6 +127,7 @@ export function analyzeWeakKeys(lang: SupportedLocale = 'en'): WeakKeyRecommenda
       significantBigrams,
       hesitationKeys,
       hasSessions: sessions.length > 0,
+      latestAccuracy: sessions[0]?.accuracy,
     },
     lang
   );

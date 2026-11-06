@@ -103,6 +103,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, 
                 className="flex items-center gap-3 w-full"
                 whileHover={{ x: 6, scale: 1.02 }}
                 whileTap={{ scale: 0.93, rotate: -1 }}
+            tabIndex={-1}
               >
                 <Icon
                   className="w-5 h-5 transition-colors duration-200 shrink-0"
@@ -143,6 +144,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed: externalCollapsed, 
             className="flex items-center gap-3 w-full"
             whileHover={{ x: 6, scale: 1.02 }}
             whileTap={{ scale: 0.93, rotate: -1 }}
+            tabIndex={-1}
           >
             <MessageSquareHeart
               className="w-5 h-5 transition-colors duration-200 shrink-0 group-hover:text-purple-500"
