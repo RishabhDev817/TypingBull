@@ -62,4 +62,22 @@ export const ROUTE_META = {
     intro:
       'Rest your fingers on the home row (ASDF and JKL;), feel the bumps on F and J, and let each finger own its keys. An interactive map shows the correct finger for every key.',
   },
+  typingTest: {
+    path: '/typing-test/',
+    title: 'Free Typing Test: Check Your WPM in 1 Minute | TypingBull',
+    description:
+      'Take a free online typing test. Choose 30 seconds to 5 minutes, see your words per minute and accuracy instantly, and find out how you compare. No signup.',
+    h1: 'Free typing test: check your WPM and accuracy',
+    intro:
+      'Pick a test length, type the words shown, and get your net words per minute and accuracy as soon as the timer ends. No account is needed and nothing leaves your device.',
+  },
+  averageTypingSpeed: {
+    path: '/average-typing-speed/',
+    title: 'Average Typing Speed: What Is a Good WPM? | TypingBull',
+    description:
+      'What is a good typing speed? See average WPM for beginners to experts, targets for jobs like data entry, and how to improve. Check your own speed free.',
+    h1: 'Average typing speed: what is a good WPM?',
+    intro:
+      'Most adults type around 40 words per minute, while professional roles often expect 50 to 70. See where each speed band sits, what jobs usually ask for, and how to get faster.',
+  },
 } satisfies Record<string, RouteMeta>;
