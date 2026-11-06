@@ -18,6 +18,8 @@ import { CHAPTERS } from '../../data/curriculum';
 import { getLessonsForChapter, getLessonById, type LessonDef } from '../../data/lessonData';
 import type { ClassroomAssignment, ClassroomSettings } from '../../types/classroom';
 import { DurationSelector } from './DurationSelector';
+import { useI18n } from '../../context/I18nContext';
+import { CLASSROOM_ENTRY, fill } from '../../i18n/classroomEntryI18n';
 
 interface Props {
   initialCode?: string;
@@ -40,12 +42,14 @@ export const ClassroomEntry: React.FC<Props> = ({
   isLoading = false,
   onBackToLanding,
 }) => {
+  const { currentLang } = useI18n();
+  const s = CLASSROOM_ENTRY[currentLang] ?? CLASSROOM_ENTRY.en;
   const [tab, setTab] = useState<'student' | 'teacher'>(
     initialTab || (initialCode ? 'student' : 'student')
   );
   const [code, setCode] = useState<string>(initialCode.toUpperCase());
   const [studentName, setStudentName] = useState<string>('');
-  const [teacherName, setTeacherName] = useState<string>('Teacher');
+  const [teacherName, setTeacherName] = useState<string>(s.teacherDefault);
   const [selectedAvatarId, setSelectedAvatarId] = useState<string>(STUDENT_AVATARS[0].id);
   const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -80,12 +84,12 @@ export const ClassroomEntry: React.FC<Props> = ({
     const cleanName = studentName.trim();
 
     if (!cleanCode || cleanCode.length < 4) {
-      setValidationError('Please enter a valid 6-character classroom code.');
+      setValidationError(s.errCode);
       soundEngine.playError?.();
       return;
     }
     if (!cleanName) {
-      setValidationError('Please enter your name or nickname.');
+      setValidationError(s.errName);
       soundEngine.playError?.();
       return;
     }
@@ -99,7 +103,7 @@ export const ClassroomEntry: React.FC<Props> = ({
   const handleTeacherSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     soundEngine.playPop();
-    const moderatedTeacher = sanitizeAndModerateName(teacherName.trim() || 'Teacher', 'Teacher');
+    const moderatedTeacher = sanitizeAndModerateName(teacherName.trim() || s.teacherDefault, 'Teacher');
 
     // Build ordered ClassroomAssignment[] with full Learn drill content
     const assignments: ClassroomAssignment[] = selectedLessons.map((l, index) => {
@@ -217,7 +221,7 @@ export const ClassroomEntry: React.FC<Props> = ({
           <button
             type="button"
             onClick={onBackToLanding}
-            aria-label="Close modal"
+            aria-label={s.close}
             className="absolute top-4 sm:top-5 right-4 sm:right-5 z-30 w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700/80 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center justify-center transition cursor-pointer backdrop-blur-md shadow-xs"
           >
             <X className="w-5 h-5" />
@@ -232,7 +236,7 @@ export const ClassroomEntry: React.FC<Props> = ({
               {/* Tagline Pill */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-gradient-to-r from-teal-500/15 to-amber-500/15 border border-teal-500/30 dark:border-teal-400/30 text-teal-800 dark:text-teal-300 text-xs font-black uppercase tracking-wider mb-3 shadow-xs backdrop-blur-md">
                 <span className="text-amber-500">⚡</span>
-                <span>REAL-TIME CLASSROOM ARENA</span>
+                <span>{s.tag}</span>
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
@@ -241,12 +245,12 @@ export const ClassroomEntry: React.FC<Props> = ({
 
               {/* Headline */}
               <h2 className="text-2xl sm:text-3xl font-black tracking-tight leading-[1.15] mb-3 bg-gradient-to-r from-orange-500 via-amber-500 to-indigo-600 bg-clip-text text-transparent">
-                Level Up Your Typing, Together
+                {s.headline}
               </h2>
 
               {/* Informational Copy (>= 16px font scale) */}
               <p className="text-base text-slate-700 dark:text-slate-200 font-semibold leading-relaxed mb-4">
-                Built from the ground up for school computer labs, coding clubs, and live student typing battles. No student sign-ups, no passwords, zero friction — enter your name, pick your avatar, and race in real time.
+                {s.intro}
               </p>
             </div>
 
@@ -259,10 +263,10 @@ export const ClassroomEntry: React.FC<Props> = ({
                 </div>
                 <div>
                   <h4 className="text-sm font-extrabold text-slate-900 dark:text-white leading-tight">
-                    6-Letter Quick Access
+                    {s.card1Title}
                   </h4>
                   <p className="text-xs text-slate-600 dark:text-slate-300 font-medium leading-relaxed mt-0.5">
-                    Instant teacher-generated room codes. No emails or child personal data stored.
+                    {s.card1Body}
                   </p>
                 </div>
               </div>
@@ -274,10 +278,10 @@ export const ClassroomEntry: React.FC<Props> = ({
                 </div>
                 <div>
                   <h4 className="text-sm font-extrabold text-slate-900 dark:text-white leading-tight">
-                    Synchronized Multi-Track
+                    {s.card2Title}
                   </h4>
                   <p className="text-xs text-slate-600 dark:text-slate-300 font-medium leading-relaxed mt-0.5">
-                    Real-time speedometers, live lane racing, and dynamic WPM leaderboards.
+                    {s.card2Body}
                   </p>
                 </div>
               </div>
@@ -289,10 +293,10 @@ export const ClassroomEntry: React.FC<Props> = ({
                 </div>
                 <div>
                   <h4 className="text-sm font-extrabold text-slate-900 dark:text-white leading-tight">
-                    Clean Ephemeral Sessions
+                    {s.card3Title}
                   </h4>
                   <p className="text-xs text-slate-600 dark:text-slate-300 font-medium leading-relaxed mt-0.5">
-                    All student session data clears automatically once the period ends.
+                    {s.card3Body}
                   </p>
                 </div>
               </div>
@@ -301,7 +305,7 @@ export const ClassroomEntry: React.FC<Props> = ({
             {/* Privacy Trust Badge */}
             <div className="pt-1 flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400">
               <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
-              <span>FERPA & COPPA friendly • 100% in-memory lab sessions</span>
+              <span>{s.privacy}</span>
             </div>
           </div>
 
@@ -323,7 +327,7 @@ export const ClassroomEntry: React.FC<Props> = ({
                 }`}
               >
                 <span className="text-base sm:text-lg">🎓</span>
-                <span>Join as Student</span>
+                <span>{s.joinTab}</span>
               </button>
 
               <button
@@ -340,7 +344,7 @@ export const ClassroomEntry: React.FC<Props> = ({
                 }`}
               >
                 <span className="text-base sm:text-lg">👨‍🏫</span>
-                <span>Teacher / Host Mode</span>
+                <span>{s.hostTab}</span>
               </button>
             </div>
 
@@ -358,37 +362,37 @@ export const ClassroomEntry: React.FC<Props> = ({
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label htmlFor="student-classroom-code-input" className="block text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
-                      Classroom Invite Code <span className="text-rose-500 font-bold" aria-hidden="true">*</span>
+                      {s.codeLabel} <span className="text-rose-500 font-bold" aria-hidden="true">*</span>
                     </label>
-                    <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">6 characters</span>
+                    <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">{s.codeLength}</span>
                   </div>
                   <input
                     type="text"
                     id="student-classroom-code-input"
                     value={code}
                     onChange={(e) => setCode(e.target.value.toUpperCase())}
-                    placeholder="e.g. TB-4821"
+                    placeholder={s.codePlaceholder}
                     maxLength={8}
                     required
                     autoFocus={!initialCode}
                     className="w-full font-mono text-xl sm:text-2xl font-bold tracking-[0.3em] uppercase text-center py-3 bg-slate-50 dark:bg-slate-800/80 border-2 border-indigo-200 dark:border-indigo-800 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 rounded-2xl text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition"
                   />
                   <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 font-medium">
-                    Ask your teacher for the 6-character room code.
+                    {s.codeHelp}
                   </p>
                 </div>
 
                 {/* Display Name Input (>=16px font size) */}
                 <div>
                   <label htmlFor="student-name-input" className="block text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 mb-1">
-                    Your Name or Nickname <span className="text-rose-500 font-bold" aria-hidden="true">*</span>
+                    {s.nameLabel} <span className="text-rose-500 font-bold" aria-hidden="true">*</span>
                   </label>
                   <input
                     type="text"
                     id="student-name-input"
                     value={studentName}
                     onChange={(e) => setStudentName(e.target.value)}
-                    placeholder="e.g., Alex, Priya, Marcus, Maya..."
+                    placeholder={s.namePlaceholder}
                     maxLength={24}
                     required
                     className="w-full text-base py-3 px-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-semibold focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 outline-none transition"
@@ -399,11 +403,11 @@ export const ClassroomEntry: React.FC<Props> = ({
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
-                      Choose your Avatar
+                      {s.avatarLabel}
                     </label>
                     <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                      <span>Avatar Selected</span>
+                      <span>{s.avatarSelected}</span>
                     </span>
                   </div>
 
@@ -417,7 +421,7 @@ export const ClassroomEntry: React.FC<Props> = ({
                           id={`avatar-select-${avatar.id}`}
                           type="button"
                           onClick={() => handleAvatarSelect(avatar.id)}
-                          aria-label={`Select avatar ${avatar.id}`}
+                          aria-label={fill(s.selectAvatar, { id: avatar.id })}
                           className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full p-0.5 transition-all duration-200 cursor-pointer relative flex items-center justify-center shrink-0 ${
                             isSelected
                               ? 'ring-4 ring-indigo-500/40 border-2 border-indigo-600 dark:border-amber-400 bg-indigo-50 dark:bg-indigo-950/60 scale-105 shadow-md'
@@ -437,7 +441,7 @@ export const ClassroomEntry: React.FC<Props> = ({
                           >
                             <img
                               src={avatar.avatarUrl}
-                              alt="Student Avatar"
+                              alt={s.avatarAlt}
                               className="w-full h-full object-cover"
                               loading="lazy"
                             />
@@ -457,7 +461,7 @@ export const ClassroomEntry: React.FC<Props> = ({
                   disabled={isLoading}
                   className="w-full py-3.5 text-base sm:text-lg font-bold text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:from-indigo-500 hover:to-purple-500 shadow-xl shadow-indigo-500/30 rounded-2xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer mt-1"
                 >
-                  <span>Enter Classroom Arena</span>
+                  <span>{s.enter}</span>
                   <ArrowRight className="w-5 h-5" />
                 </motion.button>
               </form>
@@ -469,20 +473,20 @@ export const ClassroomEntry: React.FC<Props> = ({
                 {/* Teacher Display Name Input (>= 16px font size) */}
                 <div>
                   <label htmlFor="teacher-name-input" className="block text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 mb-1">
-                    Teacher or Room Host Name <span className="text-rose-500 font-bold" aria-hidden="true">*</span>
+                    {s.teacherLabel} <span className="text-rose-500 font-bold" aria-hidden="true">*</span>
                   </label>
                   <input
                     type="text"
                     id="teacher-name-input"
                     value={teacherName}
                     onChange={(e) => setTeacherName(e.target.value)}
-                    placeholder="e.g., Mrs. Harper, Prof. Roy, Computer Lab 2..."
+                    placeholder={s.teacherPlaceholder}
                     maxLength={32}
                     required
                     className="w-full text-base py-3 px-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-semibold focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 outline-none transition"
                   />
                   <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 font-medium">
-                    This name will appear on student monitors when they connect.
+                    {s.teacherHelp}
                   </p>
                 </div>
 
@@ -492,17 +496,17 @@ export const ClassroomEntry: React.FC<Props> = ({
                     <div className="flex items-center gap-2">
                       <GraduationCap className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                       <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
-                        Assign Lessons from Learn Curriculum
+                        {s.assignTitle}
                       </span>
                     </div>
                     <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
-                      {selectedLessons.length} Lesson{selectedLessons.length === 1 ? '' : 's'} Selected
+                      {fill(selectedLessons.length === 1 ? s.lessonsSelectedOne : s.lessonsSelectedMany, { n: selectedLessons.length })}
                     </span>
                   </div>
 
                   {/* Chapter Selector Dropdown */}
                   <div className="flex items-center gap-2">
-                    <label htmlFor="teacher-chapter-select" className="text-xs font-bold text-slate-700 dark:text-slate-300 shrink-0">Chapter:</label>
+                    <label htmlFor="teacher-chapter-select" className="text-xs font-bold text-slate-700 dark:text-slate-300 shrink-0">{s.chapter}:</label>
                     <select
                       id="teacher-chapter-select"
                       value={selectedChapterId}
@@ -511,7 +515,7 @@ export const ClassroomEntry: React.FC<Props> = ({
                     >
                       {CHAPTERS.map((ch) => (
                         <option key={ch.id} value={ch.id}>
-                          {ch.icon} {ch.title} ({getLessonsForChapter(ch.id).length} lessons)
+                          {ch.icon} {ch.title} ({fill(s.chapterLessons, { n: getLessonsForChapter(ch.id).length })})
                         </option>
                       ))}
                     </select>
@@ -527,7 +531,7 @@ export const ClassroomEntry: React.FC<Props> = ({
                       }}
                       className="px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 text-[11px] font-bold hover:bg-emerald-200 transition cursor-pointer"
                     >
-                      First 3 Lessons
+                      {s.first3}
                     </button>
                     <button
                       type="button"
@@ -537,7 +541,7 @@ export const ClassroomEntry: React.FC<Props> = ({
                       }}
                       className="px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-bold hover:bg-slate-300 transition cursor-pointer"
                     >
-                      First 5 Lessons
+                      {s.first5}
                     </button>
                     <button
                       type="button"
@@ -547,7 +551,7 @@ export const ClassroomEntry: React.FC<Props> = ({
                       }}
                       className="px-2 py-1 rounded-lg text-slate-400 hover:text-slate-600 text-[11px] font-semibold transition ml-auto cursor-pointer"
                     >
-                      Clear
+                      {s.clear}
                     </button>
                   </div>
 
@@ -572,7 +576,7 @@ export const ClassroomEntry: React.FC<Props> = ({
                               className="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer"
                             />
                             <span>
-                              <strong>Step {lesson.id}:</strong> {lesson.title}
+                              <strong>{s.step} {lesson.id}:</strong> {lesson.title}
                             </span>
                           </div>
                           {lesson.targetKeys && lesson.targetKeys.length > 0 && (
@@ -589,7 +593,7 @@ export const ClassroomEntry: React.FC<Props> = ({
                   {selectedLessons.length > 0 && (
                     <div className="pt-2 border-t border-slate-200 dark:border-slate-700/60">
                       <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-2">
-                        Assigned Sequence (Students will complete sequentially):
+                        {s.sequence}
                       </div>
                       <div className="space-y-1.5 max-h-32 overflow-y-auto">
                         {selectedLessons.map((l, idx) => (
@@ -601,14 +605,14 @@ export const ClassroomEntry: React.FC<Props> = ({
                               <span className="text-emerald-600 dark:text-emerald-400 mr-1.5 font-mono">
                                 #{idx + 1}
                               </span>
-                              Step {l.id}: {l.title}
+                              {s.step} {l.id}: {l.title}
                             </span>
                             <div className="flex items-center gap-1 shrink-0">
                               <button
                                 type="button"
                                 disabled={idx === 0}
                                 onClick={() => handleMoveLessonUp(idx)}
-                                title="Move up"
+                                title={s.moveUp}
                                 className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 text-slate-500 cursor-pointer"
                               >
                                 <ChevronUp className="w-3.5 h-3.5" />
@@ -617,7 +621,7 @@ export const ClassroomEntry: React.FC<Props> = ({
                                 type="button"
                                 disabled={idx === selectedLessons.length - 1}
                                 onClick={() => handleMoveLessonDown(idx)}
-                                title="Move down"
+                                title={s.moveDown}
                                 className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 text-slate-500 cursor-pointer"
                               >
                                 <ChevronDown className="w-3.5 h-3.5" />
@@ -625,7 +629,7 @@ export const ClassroomEntry: React.FC<Props> = ({
                               <button
                                 type="button"
                                 onClick={() => handleRemoveSelectedLesson(l.id)}
-                                title="Remove lesson"
+                                title={s.remove}
                                 className="p-1 rounded hover:bg-rose-50 dark:hover:bg-rose-950/60 text-rose-500 cursor-pointer ml-1"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -641,7 +645,7 @@ export const ClassroomEntry: React.FC<Props> = ({
                 {/* Custom Duration Selector */}
                 <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80">
                   <DurationSelector
-                    label="Lesson Duration"
+                    label={s.duration}
                     durationSeconds={durationSeconds}
                     onChange={setDurationSeconds}
                   />
@@ -651,10 +655,10 @@ export const ClassroomEntry: React.FC<Props> = ({
                 <div className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/30 p-3 sm:p-4 rounded-2xl space-y-2">
                   <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 text-base font-bold">
                     <Zap className="w-5 h-5 text-emerald-500" />
-                    <span>Host Controls Ready</span>
+                    <span>{s.hostReady}</span>
                   </div>
                   <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed font-medium">
-                    Creates an active 6-letter room code. Students receive your assigned curriculum tasks in order and unlock the next task as they complete each one. You can assign additional lessons anytime.
+                    {s.hostBody}
                   </p>
                 </div>
 
@@ -667,7 +671,7 @@ export const ClassroomEntry: React.FC<Props> = ({
                   disabled={isLoading}
                   className="w-full py-3.5 text-base sm:text-lg font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-xl shadow-emerald-500/30 rounded-2xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer mt-2"
                 >
-                  <span>Create Live Classroom & Show Code</span>
+                  <span>{s.create}</span>
                   <ArrowRight className="w-5 h-5" />
                 </motion.button>
               </form>
