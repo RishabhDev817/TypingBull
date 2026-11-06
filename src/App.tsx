@@ -18,6 +18,8 @@ const LessonView = lazy(() => import('./pages/LessonView'));
 const PlayPage = lazy(() => import('./pages/PlayPage'));
 const PracticePage = lazy(() => import('./pages/PracticePage'));
 const ClassroomPage = lazy(() => import('./pages/ClassroomPage'));
+const TypingTestPage = lazy(() => import('./pages/TypingTestPage'));
+const AverageTypingSpeedPage = lazy(() => import('./pages/AverageTypingSpeedPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
@@ -53,6 +55,8 @@ function AnimatedRoutes() {
           <Route path="/practice-ground" element={<PlayPage />} />
           <Route path="/multiplayer" element={<Navigate to="/practice-ground" replace />} />
           <Route path="/practice" element={<PracticePage />} />
+          <Route path="/typing-test" element={<TypingTestPage />} />
+          <Route path="/average-typing-speed" element={<AverageTypingSpeedPage />} />
           <Route path="/classroom" element={<ClassroomPage />} />
           <Route path="/classroom/create" element={<ClassroomPage />} />
           <Route path="/classroom/join" element={<ClassroomPage />} />

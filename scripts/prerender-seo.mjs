@@ -43,6 +43,7 @@ try {
   const { SEO_DATA_BY_LANG } = await vite.ssrLoadModule('/src/hooks/usePageSEO.ts');
   const { getLocalizedFaqData } = await vite.ssrLoadModule('/src/i18n/faqData.ts');
   const { CLASSROOM_LANDING_A } = await vite.ssrLoadModule('/src/i18n/classroomLandingAI18n.ts');
+  const { TYPING_TEST_FAQ, AVERAGE_SPEED_FAQ } = await vite.ssrLoadModule('/src/seo/pageFaqs.ts');
 
   const template = readFileSync(resolve(dist, 'index.html'), 'utf8');
   const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -138,7 +139,9 @@ try {
 
   const navLinks = (lang) => [
     [url(lang, '/learn/'), 'Learn touch typing'],
-    [url(lang, '/practice/'), 'Typing speed test'],
+    [url(lang, '/typing-test/'), 'Free typing test'],
+    [url(lang, '/average-typing-speed/'), 'Average typing speed'],
+    [url(lang, '/practice/'), 'Typing speed practice'],
     [url(lang, '/play/'), 'Typing games'],
     [url(lang, '/practice-ground/'), 'Multiplayer typing races'],
     [url(lang, '/classroom/'), 'Classroom mode for teachers'],
@@ -163,6 +166,10 @@ try {
       { '@type': 'ListItem', position: 2, name, item: `${ORIGIN}${path}` },
     ],
   });
+  const faqSchema = (items) => ({
+    '@context': 'https://schema.org', '@type': 'FAQPage',
+    mainEntity: items.map((i) => ({ '@type': 'Question', name: i.question, acceptedAnswer: { '@type': 'Answer', text: i.answer } })),
+  });
   const classroom = CLASSROOM_LANDING_A.en;
   const pages = [
     { ...ROUTE_META.learn, crumb: 'Learn' },
@@ -170,12 +177,15 @@ try {
     { ...ROUTE_META.practiceGround, crumb: 'Practice Ground' },
     { ...ROUTE_META.practice, crumb: 'Practice' },
     { ...ROUTE_META.guidelines, crumb: 'Guidelines' },
+    { ...ROUTE_META.typingTest, crumb: 'Typing test', faq: TYPING_TEST_FAQ },
+    { ...ROUTE_META.averageTypingSpeed, crumb: 'Average typing speed', faq: AVERAGE_SPEED_FAQ },
     { path: '/classroom/', title: classroom.seoTitle, description: classroom.seoDesc, h1: classroom.seoTitle, intro: classroom.seoDesc, crumb: 'Classroom' },
   ];
   for (const p of pages) {
     write(`${p.path.slice(1)}index.html`, render({
       lang: 'en', path: p.path, title: p.title, description: p.description,
-      h1: p.h1, intro: p.intro, links: navLinks('en'), extraJsonLd: [crumbs(p.crumb, p.path)],
+      h1: p.h1, intro: p.intro, links: navLinks('en'),
+      extraJsonLd: [crumbs(p.crumb, p.path), ...(p.faq ? [faqSchema(p.faq)] : [])],
     }));
   }
 
@@ -204,6 +214,8 @@ try {
   }
   const sitePages = [
     ['/practice-ground/', 'src/pages/PlayPage.tsx'], ['/play/', 'src/pages/PlayPage.tsx'],
+    ['/typing-test/', 'src/pages/TypingTestPage.tsx src/components/TypingTest.tsx'],
+    ['/average-typing-speed/', 'src/pages/AverageTypingSpeedPage.tsx src/seo/typingStats.ts'],
     ['/learn/', 'src/pages/LearnPage.tsx'], ['/practice/', 'src/pages/PracticePage.tsx'],
     ['/classroom/', 'src/pages/ClassroomPage.tsx src/pages/ClassroomLandingPage.tsx'],
     ['/guidelines/', 'src/pages/GuidelinesPage.tsx'], ['/about/', 'about/index.html src/pages/AboutPage.tsx'],

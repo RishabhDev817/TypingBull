@@ -78,6 +78,24 @@ export const SiteFooter: React.FC = () => {
               </li>
               <li>
                 <Link
+                  to="/typing-test"
+                  onClick={onLinkClick}
+                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
+                >
+                  Free Typing Test
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/average-typing-speed"
+                  onClick={onLinkClick}
+                  className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
+                >
+                  Average Typing Speed
+                </Link>
+              </li>
+              <li>
+                <Link
                   to="/practice"
                   onClick={onLinkClick}
                   className="hover:text-purple-600 dark:hover:text-purple-300 transition-colors"

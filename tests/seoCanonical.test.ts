@@ -35,3 +35,14 @@ test('route titles are unique', () => {
   const titles = Object.values(ROUTE_META).map((m) => m.title);
   assert.equal(new Set(titles).size, titles.length);
 });
+
+test('landing page FAQs are complete and non-trivial', async () => {
+  const { TYPING_TEST_FAQ, AVERAGE_SPEED_FAQ } = await import('../src/seo/pageFaqs.ts');
+  for (const list of [TYPING_TEST_FAQ, AVERAGE_SPEED_FAQ]) {
+    assert.ok(list.length >= 5);
+    for (const f of list) {
+      assert.ok(f.question.endsWith('?'), f.question);
+      assert.ok(f.answer.length > 60, f.question);
+    }
+  }
+});
