@@ -14,6 +14,7 @@ import { useI18n } from '../context/I18nContext';
 import { ProductRoadmap } from '../components/ProductRoadmap';
 import { SiteFooter } from '../components/navigation/SiteFooter';
 import { usePageSEO } from '../hooks/usePageSEO';
+import { ROUTE_META } from '../seo/routeMeta';
 import { PracticeGuideSection } from '../components/educational/PracticeGuideSection';
 import { KeyboardNotice } from '../components/KeyboardNotice';
 import { PASTE_GUARD_PROPS, isBulkInsert } from '../utils/typingGuard';
@@ -26,9 +27,8 @@ export const PracticePage: React.FC = () => {
   usePageSEO({
     lang: currentLang,
     canonicalPath: '/practice/',
-    title: 'Typing Speed Practice & WPM Drills — TypingBull | 12-Tier Speed Arena',
-    description:
-      'Improve typing speed and accuracy with timed typing practice tests. 12 difficulty tiers, fables, coding syntax, and essays with real-time WPM analytics.',
+    title: ROUTE_META.practice.title,
+    description: ROUTE_META.practice.description,
   });
   // Level & Passage State (12 Levels)
   const [currentLevelNum, setCurrentLevelNum] = useState<number>(1);

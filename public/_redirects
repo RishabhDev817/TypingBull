@@ -8,6 +8,54 @@
 /contact-us /contact/ 301
 /guide /guidelines/ 301
 /coming-soon /roadmap/ 301
-/sitemap.xml /sitemap.xml 200
-/robots.txt /robots.txt 200
-/* /index.html 200
+
+# Client-side routes that have no static file of their own (lesson pages, classroom join/create,
+# localized sub-pages). Named placeholders are used on purpose: a trailing /* would also match
+# the pre-rendered pages (/learn/, /es/) and replace them with the generic home HTML.
+# Anything that matches nothing here falls through to 404.html, which Cloudflare Pages
+# serves with a genuine 404 status. (Rewrite target is "/" because "/index.html" is rejected
+# by Pages as a redirect loop.)
+/learn/:a / 200
+/learn/:a/ / 200
+/classroom/:a / 200
+/classroom/:a/ / 200
+/practice/:a / 200
+/practice/:a/ / 200
+/play/:a / 200
+/play/:a/ / 200
+/practice-ground/:a / 200
+/practice-ground/:a/ / 200
+/roadmap / 200
+/roadmap/ / 200
+/es/:a / 200
+/es/:a/ / 200
+/es/:a/:b / 200
+/es/:a/:b/ / 200
+/fr/:a / 200
+/fr/:a/ / 200
+/fr/:a/:b / 200
+/fr/:a/:b/ / 200
+/de/:a / 200
+/de/:a/ / 200
+/de/:a/:b / 200
+/de/:a/:b/ / 200
+/pt/:a / 200
+/pt/:a/ / 200
+/pt/:a/:b / 200
+/pt/:a/:b/ / 200
+/it/:a / 200
+/it/:a/ / 200
+/it/:a/:b / 200
+/it/:a/:b/ / 200
+/ja/:a / 200
+/ja/:a/ / 200
+/ja/:a/:b / 200
+/ja/:a/:b/ / 200
+/ko/:a / 200
+/ko/:a/ / 200
+/ko/:a/:b / 200
+/ko/:a/:b/ / 200
+/hi/:a / 200
+/hi/:a/ / 200
+/hi/:a/:b / 200
+/hi/:a/:b/ / 200

@@ -4,5 +4,5 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
 
-https://*.pages.dev/*
+https://:project.pages.dev/*
   X-Robots-Tag: noindex, nofollow

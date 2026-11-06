@@ -8,6 +8,7 @@ import { Mascot } from '../components/Mascot';
 import { soundEngine } from '../utils/audio';
 import { useI18n } from '../context/I18nContext';
 import { usePageSEO } from '../hooks/usePageSEO';
+import { ROUTE_META } from '../seo/routeMeta';
 
 const FINGER_MAP_DATA = [
   {
@@ -74,9 +75,8 @@ export const GuidelinesPage: React.FC = () => {
   usePageSEO({
     lang: currentLang,
     canonicalPath: '/guidelines/',
-    title: 'Touch Typing Guidelines & Ergonomics — TypingBull | Hand Posture & Finger Placement Map',
-    description:
-      'Learn proper touch typing technique, finger coordinates for every key, healthy ergonomic hand posture, and home row anchor guidelines.',
+    title: ROUTE_META.guidelines.title,
+    description: ROUTE_META.guidelines.description,
   });
   const [hoveredFingerIdx, setHoveredFingerIdx] = useState<number | null>(null);
   const [colorblindAssist, setColorblindAssist] = useState(true);

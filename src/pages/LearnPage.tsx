@@ -10,6 +10,7 @@ import { Mascot } from '../components/Mascot';
 import { CoinCounter } from '../components/CoinCounter';
 import { useI18n } from '../context/I18nContext';
 import { usePageSEO } from '../hooks/usePageSEO';
+import { ROUTE_META } from '../seo/routeMeta';
 import { LearnGuideSection } from '../components/educational/LearnGuideSection';
 import { SiteFooter } from '../components/navigation/SiteFooter';
 
@@ -30,9 +31,8 @@ export const LearnPage: React.FC = () => {
   usePageSEO({
     lang: currentLang,
     canonicalPath: '/learn/',
-    title: 'The Great Typing Railway — TypingBull | Structured Touch Typing Curriculum',
-    description:
-      'Learn touch typing step-by-step through The Great Typing Railway. Master home row anchors, upper row reach drills, shift coordination, and numeric keypads.',
+    title: ROUTE_META.learn.title,
+    description: ROUTE_META.learn.description,
   });
   const totalStars = getTotalStars();
   const completedCount = getCompletedLessonCount();
