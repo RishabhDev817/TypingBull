@@ -90,7 +90,7 @@ export const AverageTypingSpeedPage: React.FC = () => {
               <tbody className="font-semibold text-slate-800 dark:text-slate-100">
                 {SPEED_BANDS.map((b) => (
                   <tr key={b.id} aria-current={band?.id === b.id ? 'true' : undefined} className={`border-t border-slate-200/70 dark:border-slate-700/60 ${band?.id === b.id ? 'bg-purple-500/15' : ''}`}>
-                    <th scope="row" className="p-4 font-black">{b.label}</th>
+                    <th scope="row" className="p-4 font-black">{b.title}<span className="block text-xs font-semibold text-slate-500 dark:text-slate-400">{b.label}</span></th>
                     <td className="p-4 whitespace-nowrap">{rangeLabel(b.min, b.max)}</td>
                     <td className="p-4">{b.blurb}</td>
                   </tr>

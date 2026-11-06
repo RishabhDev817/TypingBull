@@ -30,3 +30,10 @@ test('every band has a friendly result title and a mascot mood', () => {
   }
   assert.equal(bandForWpm(10).title, 'Warming up');
 });
+
+test('every band has an encouraging result line and no band reads as a put-down', () => {
+  for (const b of SPEED_BANDS) {
+    assert.ok(b.encourage.length > 20, b.id);
+    assert.ok(!/hunting|poor|bad|slow\b/i.test(b.encourage), b.id);
+  }
+});

@@ -39,7 +39,8 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
   const [typed, setTyped] = useState('');
   const [phase, setPhase] = useState<Phase>('idle');
   const [remaining, setRemaining] = useState<number>(60);
-  const [liveWpm, setLiveWpm] = useState(0);
+  // null until enough time has passed for a meaningful number (early WPM spikes are noise)
+  const [liveWpm, setLiveWpm] = useState<number | null>(null);
   const [liveAcc, setLiveAcc] = useState(100);
   const [result, setResult] = useState<Result | null>(null);
   const [shareNote, setShareNote] = useState('');
@@ -134,7 +135,7 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
     const id = window.setInterval(() => {
       const elapsed = Date.now() - startRef.current;
       setRemaining(Math.max(0, duration - Math.floor(elapsed / 1000)));
-      setLiveWpm(calcWpm(netCorrect(typedRef.current, textRef.current), elapsed));
+      setLiveWpm(elapsed >= 5000 ? calcWpm(netCorrect(typedRef.current, textRef.current), elapsed) : null);
       setLiveAcc(calcAccuracy(correctKeystrokesRef.current, keystrokesRef.current));
       if (elapsed >= duration * 1000) finish();
     }, 200);
@@ -154,7 +155,7 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
     setTyped('');
     setPhase('idle');
     setRemaining(seconds);
-    setLiveWpm(0);
+    setLiveWpm(null);
     setLiveAcc(100);
     setResult(null);
     setShareNote('');
@@ -214,13 +215,13 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
     if (result.bestWpm === null) progressNote = 'Your first result is saved on this device. Test again later to watch it climb.';
     else if (result.wpm > result.bestWpm) progressNote = `New personal best! That is ${result.wpm - result.bestWpm} WPM faster than before.`;
     else if (result.lastWpm !== null && result.wpm > result.lastWpm) progressNote = `${result.wpm - result.lastWpm} WPM faster than your last test.`;
-    else if (result.lastWpm !== null) progressNote = `Your best is ${result.bestWpm} WPM. Another go?`;
+    else if (result.lastWpm !== null) progressNote = `Your best is ${result.bestWpm} WPM. Want to beat it?`;
   }
 
   return (
     <section aria-label="Typing speed test" className="card-game card-static card-halo-purple p-5 sm:p-8 space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div role="group" aria-label="Test length" className="flex flex-wrap gap-2">
+        <div role="group" aria-label="Test length" className="flex flex-nowrap gap-1.5 sm:gap-2 overflow-x-auto">
           {DURATIONS.map((d) => (
             <button
               key={d.seconds}
@@ -228,7 +229,7 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
               disabled={phase === 'running'}
               onClick={() => reset(d.seconds)}
               aria-pressed={duration === d.seconds}
-              className={`min-h-11 px-4 rounded-full text-sm font-black border transition-colors disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500 ${
+              className={`min-h-11 px-3 sm:px-4 shrink-0 rounded-full text-sm font-black border transition-colors disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500 ${
                 duration === d.seconds
                   ? 'bg-purple-600 text-white border-purple-600'
                   : 'bg-white/60 dark:bg-slate-800/60 text-slate-700 dark:text-slate-200 border-slate-300/70 dark:border-slate-600/70 hover:border-purple-500'
@@ -241,7 +242,7 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
         {phase !== 'done' && (
           <div className="flex items-center gap-4 text-sm font-black text-slate-800 dark:text-slate-100">
             <span className="inline-flex items-center gap-1.5"><Timer className="w-4 h-4 text-purple-500" aria-hidden="true" />{remaining}s</span>
-            <span className="inline-flex items-center gap-1.5"><Zap className="w-4 h-4 text-amber-500" aria-hidden="true" />{liveWpm} WPM</span>
+            <span className="inline-flex items-center gap-1.5"><Zap className="w-4 h-4 text-amber-500" aria-hidden="true" />{liveWpm === null ? '--' : liveWpm} WPM</span>
             <span className="inline-flex items-center gap-1.5"><Target className="w-4 h-4 text-emerald-500" aria-hidden="true" />{liveAcc}%</span>
           </div>
         )}
@@ -255,7 +256,7 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
           <div
             ref={boxRef}
             id="typing-test-text"
-            className="relative h-[7.5rem] overflow-hidden font-mono text-lg sm:text-xl leading-9 text-slate-600 dark:text-slate-300 select-none break-words"
+            className="relative h-[6.75rem] overflow-hidden font-mono text-lg sm:text-xl leading-9 text-slate-600 dark:text-slate-300 select-none break-words"
           >
             {chars.map((ch, i) => {
               const isActive = i === typed.length;
@@ -306,7 +307,7 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
               </h2>
               <p className="text-lg font-black text-purple-700 dark:text-purple-300">{band.title}</p>
               <p className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200 max-w-md">
-                {band.blurb}
+                {band.encourage}
               </p>
               {progressNote && (
                 <p className="text-sm font-black text-emerald-700 dark:text-emerald-400">{progressNote}</p>
@@ -317,7 +318,7 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
           <div className="flex flex-row flex-wrap items-center justify-center sm:justify-start gap-3">
             <Orb halo="card-halo-green" label="Accuracy" value={`${result.accuracy}%`} />
             <Orb halo="card-halo-blue" label="Correct" value={`${result.correctChars}`} />
-            <Orb halo="card-halo-pink" label="Mistakes" value={`${result.mistakes}`} />
+            <Orb halo="card-halo-pink" label={result.mistakes === 1 ? 'Mistake' : 'Mistakes'} value={`${result.mistakes}`} />
             {result.streak > 0 && (
               <Orb halo="card-halo-orange" label="Day streak" value={`${result.streak}`} icon={<Flame className="w-3 h-3" aria-hidden="true" />} />
             )}
