@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Check, Copy, Download, RefreshCw, Save, Upload, X } from 'lucide-react';
 import {
@@ -21,10 +22,11 @@ const describe = (s: ProgressSummary) =>
  * Save and restore progress with a text code (or a file). There are no accounts: the code is the data,
  * so a learner can move to another device or browser, or keep a backup.
  * The dialog body mounts only while open, so every opening starts from fresh state.
+ * It renders into document.body: inside the page container (which is animated with a transform) a
+ * "fixed" overlay is sized to that container, not the screen, and the bottom nav draws over it on phones.
  */
-export const ProgressBackup: React.FC<ProgressBackupProps> = ({ open, onClose }) => (
-  <AnimatePresence>{open && <BackupDialog onClose={onClose} />}</AnimatePresence>
-);
+export const ProgressBackup: React.FC<ProgressBackupProps> = ({ open, onClose }) =>
+  createPortal(<AnimatePresence>{open && <BackupDialog onClose={onClose} />}</AnimatePresence>, document.body);
 
 const BackupDialog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [tab, setTab] = useState<Tab>('save');
