@@ -4,7 +4,8 @@
 
 import type { SessionResult } from './typingEngine';
 
-const KEYS = {
+/** localStorage keys that make up a learner's progress (used by the progress code). */
+export const PROGRESS_KEYS = {
   sessions: 'typingbull_sessions',
   lessons: 'typingbull_lessons',
   streak: 'typingbull_streak',
@@ -12,6 +13,7 @@ const KEYS = {
   highScore: 'typing_bull_high_score',
   skipAhead: 'typingbull_skip_ahead',
 } as const;
+const KEYS = PROGRESS_KEYS;
 
 const MAX_SESSIONS = 20;
 
