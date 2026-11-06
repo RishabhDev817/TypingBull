@@ -91,7 +91,7 @@ export const LearnPage: React.FC = () => {
         </div>
 
         {/* Right: Real-time Stats, Progress Meter & Header Controls */}
-        <div className="flex flex-wrap items-center gap-3 md:gap-4 w-full md:w-auto justify-between md:justify-end">
+        <div className="flex flex-wrap items-center gap-2 md:gap-4 w-full md:w-auto justify-between md:justify-end">
           {/* Mobile Chapters Drawer Toggle */}
           <button
             onClick={() => setMobileDrawerOpen(!mobileDrawerOpen)}
@@ -104,22 +104,22 @@ export const LearnPage: React.FC = () => {
           {/* Station Count Chip */}
           <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl border-2 font-extrabold text-xs md:text-sm shadow-sm bg-emerald-500/20 border-emerald-400/50 text-emerald-300">
             <Train className="w-4 h-4 text-emerald-400" />
-            <span>{completedCount}/{LESSONS.length} {t('learn.lessonsCount')}</span>
+            <span>{completedCount}{completedCount > 0 ? `/${LESSONS.length}` : ''} {t('learn.lessonsCount')}</span>
           </div>
 
           {/* Stars Chip */}
           <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl border-2 font-extrabold text-xs md:text-sm shadow-sm bg-amber-500/20 border-amber-400/50 text-amber-300">
             <Star className="w-4 h-4 fill-amber-400 text-amber-500" />
-            <span>{totalStars}/{LESSONS.length * 3} {t('learn.starsCount')}</span>
+            <span>{totalStars}{totalStars > 0 ? `/${LESSONS.length * 3}` : ''} {t('learn.starsCount')}</span>
           </div>
 
           {/* Coin Counter Pill Badge */}
-          <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl border-2 font-extrabold text-xs md:text-sm shadow-sm bg-yellow-500/20 border-yellow-400/50 text-yellow-300">
+          <div className="hidden md:flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl border-2 font-extrabold text-xs md:text-sm shadow-sm bg-yellow-500/20 border-yellow-400/50 text-yellow-300">
             <CoinCounter compact />
           </div>
 
           {/* Quick Progress Bar with High-Visibility Lightened Track */}
-          <div className="w-full md:w-32 lg:w-40 flex flex-col gap-1">
+          <div className="hidden md:flex w-full md:w-32 lg:w-40 flex-col gap-1">
             <div className="flex justify-between text-[11px] font-extrabold text-slate-300">
               <span>{t('learn.curriculum')}</span>
               <span>{Math.round((completedCount / LESSONS.length) * 100)}%</span>

@@ -126,7 +126,8 @@ export function analyzeWeakKeys(lang: SupportedLocale = 'en'): WeakKeyRecommenda
       significantWeakKeys,
       significantBigrams,
       hesitationKeys,
-      hasSessions: sessions.length > 0,
+      // Praise only once there is enough history to mean something
+      hasSessions: sessions.length >= 5,
       latestAccuracy: sessions[0]?.accuracy,
     },
     lang

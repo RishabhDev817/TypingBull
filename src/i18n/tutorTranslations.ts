@@ -897,7 +897,7 @@ export function getLocalizedWeakKeyMessage(
     return `You hesitate before pressing ${keyList}. Muscle memory drills for these keys will help build confidence.`;
   }
 
-  if (hasSessions && latestAccuracy !== undefined && latestAccuracy < 92) {
+  if (latestAccuracy !== undefined && latestAccuracy < 92) {
     const a = Math.round(latestAccuracy);
     if (lang === 'es') return `Tu última sesión tuvo ${a}% de precisión. Ve un poco más despacio y repite una lección inicial para escribir con más seguridad.`;
     if (lang === 'ja') return `前回のセッションの正確性は${a}%でした。少しゆっくり、初級のレッスンを繰り返して安定した入力を身につけましょう。`;

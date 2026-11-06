@@ -123,6 +123,7 @@ export const TrainMap: React.FC<TrainMapProps> = ({ className = '', chapterId = 
 
   // Train position progress state
   const [trainProgress, setTrainProgress] = useState(0);
+  const [aspect, setAspect] = useState(16 / 9);
   const prevIdxRef = useRef(currentStationIdx);
 
   useEffect(() => {
@@ -166,6 +167,28 @@ export const TrainMap: React.FC<TrainMapProps> = ({ className = '', chapterId = 
     return { x: point.x, y: point.y, angle: angleDeg };
   }, [trainProgress, stationPoints]);
 
+  // Keep the container's shape so a tall, narrow phone view can pan to the train instead of the map centre
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const update = () => {
+      if (el.clientHeight > 0) setAspect(el.clientWidth / el.clientHeight);
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // On screens narrower than the 16:9 scene, show a window of the scene centred on the train
+  const view = useMemo(() => {
+    const visW = Math.min(svgW, svgH * aspect);
+    if (visW >= svgW) return { x: 0, w: svgW };
+    const focusX = trainCoords?.x ?? svgW / 2;
+    const x = Math.min(svgW - visW, Math.max(0, focusX - visW / 2));
+    return { x, w: visW };
+  }, [aspect, trainCoords]);
+
   const getRegionForStation = (stationIdx: number) => {
     return REGIONS.find((r) => stationIdx >= r.range[0] && stationIdx <= r.range[1]);
   };
@@ -182,7 +205,7 @@ export const TrainMap: React.FC<TrainMapProps> = ({ className = '', chapterId = 
       }}
     >
       <svg
-        viewBox={`0 0 ${svgW} ${svgH}`}
+        viewBox={`${view.x} 0 ${view.w} ${svgH}`}
         className="w-full h-full object-cover"
         preserveAspectRatio="xMidYMid slice"
       >

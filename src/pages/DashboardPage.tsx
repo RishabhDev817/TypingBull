@@ -83,12 +83,12 @@ export const DashboardPage: React.FC = () => {
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
+    visible: { opacity: 1, transition: { duration: 0.15, staggerChildren: 0.04 } },
   };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 80, damping: 12 } },
+    visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 260, damping: 26 } },
   };
 
   return (
@@ -380,7 +380,7 @@ export const DashboardPage: React.FC = () => {
                 </span>
                 <div className="flex items-baseline gap-0.5">
                   <span className="text-lg font-extrabold text-ink leading-none">{totalStars}</span>
-                  <span className="text-[11px] text-body font-bold">/ {LESSONS.length * 3}</span>
+                  {totalStars > 0 && <span className="text-[11px] text-body font-bold">/ {LESSONS.length * 3}</span>}
                 </div>
               </motion.div>
 
@@ -401,7 +401,7 @@ export const DashboardPage: React.FC = () => {
                 </span>
                 <div className="flex items-baseline gap-0.5">
                   <span className="text-lg font-extrabold text-ink leading-none">{completedLessons}</span>
-                  <span className="text-[11px] text-body font-bold">/ {LESSONS.length}</span>
+                  {completedLessons > 0 && <span className="text-[11px] text-body font-bold">/ {LESSONS.length}</span>}
                 </div>
               </motion.div>
 

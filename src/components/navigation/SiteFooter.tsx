@@ -141,14 +141,6 @@ export const SiteFooter: React.FC = () => {
                 </a>
               </li>
               <li>
-                <a
-                  href="/#faq-section-title"
-                  className="inline-flex items-center min-h-11 lg:min-h-0 hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
-                >
-                  WPM Speed Benchmarks
-                </a>
-              </li>
-              <li>
                 <Link
                   to="/guidelines"
                   onClick={onLinkClick}

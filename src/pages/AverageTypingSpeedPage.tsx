@@ -23,7 +23,10 @@ export const AverageTypingSpeedPage: React.FC = () => {
 
   const [value, setValue] = useState('');
   const wpm = Number.parseInt(value, 10);
-  const band = Number.isFinite(wpm) && wpm >= 0 ? bandForWpm(wpm) : null;
+  // Anything above this is beyond the fastest speeds ever recorded, so it is more likely a typo
+  const MAX_PLAUSIBLE_WPM = 250;
+  const implausible = Number.isFinite(wpm) && wpm > MAX_PLAUSIBLE_WPM;
+  const band = Number.isFinite(wpm) && wpm >= 0 && !implausible ? bandForWpm(wpm) : null;
   const next = band ? SPEED_BANDS[SPEED_BANDS.findIndex((b) => b.id === band.id) + 1] : undefined;
 
   return (
@@ -59,12 +62,23 @@ export const AverageTypingSpeedPage: React.FC = () => {
               Don't know it? Take the free test <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
+          {implausible && (
+            <p role="status" className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm font-semibold text-slate-800 dark:text-slate-100">
+              That is faster than the fastest speeds ever recorded, so it may be a typo. Take the free test to find your real number.
+            </p>
+          )}
           {band && (
             <div className="space-y-4">
               <p role="status" className="rounded-2xl border border-purple-500/25 bg-purple-500/10 p-4 text-sm font-semibold text-slate-800 dark:text-slate-100">
                 <strong>{band.title}.</strong> {band.blurb}{next ? ` Next level: ${next.title}, from ${next.min} WPM (${next.min - wpm} more).` : ''}
               </p>
               <SpeedGauge wpm={wpm} />
+              <Link
+                to="/learn"
+                className="inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 text-base font-black shadow-lg hover:brightness-110 active:scale-[0.98] transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300"
+              >
+                {next ? `Reach ${next.min} WPM: start the free course` : 'Keep your edge: try the free course'} <ArrowRight className="w-5 h-5" aria-hidden="true" />
+              </Link>
             </div>
           )}
         </section>
