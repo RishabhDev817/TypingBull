@@ -487,7 +487,7 @@ export const SocialScoreCard = forwardRef<HTMLDivElement, SocialScoreCardProps>(
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {streak ? 'Streak' : 'Speed Rating'}
+                  {streak ? 'Streak' : 'Characters / min'}
                 </span>
                 <span
                   style={{
@@ -500,7 +500,7 @@ export const SocialScoreCard = forwardRef<HTMLDivElement, SocialScoreCardProps>(
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {streak ? `${streak} keys` : `${Math.round(wpm * 5)} CPM`}
+                  {streak ? `${streak} keys` : `${Math.round(wpm * 5)}`}
                 </span>
               </div>
             </div>

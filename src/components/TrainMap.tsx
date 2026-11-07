@@ -180,6 +180,14 @@ export const TrainMap: React.FC<TrainMapProps> = ({ className = '', chapterId = 
     return () => ro.disconnect();
   }, []);
 
+  // On a phone the scene is taller than the screen: bring it into view once so the start station is visible
+  const scrolledForRef = useRef('');
+  useEffect(() => {
+    if (aspect >= 1 || stationPoints.length === 0 || scrolledForRef.current === chapterId) return;
+    scrolledForRef.current = chapterId;
+    containerRef.current?.scrollIntoView({ block: 'start' });
+  }, [aspect, stationPoints.length, chapterId]);
+
   // On screens narrower than the 16:9 scene, show a window of the scene centred on the train
   const view = useMemo(() => {
     const visW = Math.min(svgW, svgH * aspect);
@@ -199,6 +207,7 @@ export const TrainMap: React.FC<TrainMapProps> = ({ className = '', chapterId = 
       className={`w-full flex-1 flex flex-col relative rounded-3xl overflow-hidden shadow-2xl select-none border-4 border-slate-700/50 bg-[#0F1A36] ${className}`}
       style={{
         minHeight: 'calc(100vh - 180px)',
+        scrollMarginTop: 72,
         backgroundColor: '#0F1A36',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
