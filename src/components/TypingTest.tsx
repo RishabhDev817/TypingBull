@@ -1,7 +1,7 @@
 import React, { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
-import { RotateCcw, Timer, Target, Zap, Share2, ArrowRight, Flame } from 'lucide-react';
+import { RotateCcw, Timer, Target, Zap, Share2, ArrowRight } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { SpeedGauge } from './SpeedGauge';
 import { STANDARD_WORDS, getRandomWords } from '../utils/words';
@@ -54,9 +54,15 @@ interface Result {
   /** Best earlier WPM on this device, if any. */
   bestWpm: number | null;
   streak: number;
+  /** Keys missed most often, worst first (letters only, at most three). */
+  missedKeys: string[];
 }
 
-const makeText = (words = 120) => getRandomWords(STANDARD_WORDS, words).join(' ') + ' ';
+/** Random common words; with `keys`, only words that contain at least one of those keys (for a key drill). */
+const makeText = (words = 120, keys: string[] = []) => {
+  const pool = keys.length ? STANDARD_WORDS.filter((w) => keys.some((k) => w.includes(k))) : STANDARD_WORDS;
+  return getRandomWords(pool.length >= 12 ? pool : STANDARD_WORDS, words).join(' ') + ' ';
+};
 
 /** A self-contained timed typing test. Net WPM = correct characters / 5 per minute. */
 export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = ({ onPhaseChange }) => {
@@ -70,6 +76,10 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
   const [liveAcc, setLiveAcc] = useState(100);
   const [result, setResult] = useState<Result | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
+  const [focusKeys, setFocusKeys] = useState<string[]>([]);
+  const [isTouch] = useState(() => typeof window !== 'undefined' && !!window.matchMedia?.('(pointer: coarse)').matches);
+  const errorsRef = useRef<Record<string, number>>({});
+  const totalsRef = useRef<Record<string, number>>({});
   const doneAtRef = useRef(0);
 
   useEffect(() => {
@@ -123,6 +133,11 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
     const wpm = calcWpm(correct, elapsed);
     const accuracy = calcAccuracy(correctKeystrokesRef.current, total);
     const mistakes = total - correctKeystrokesRef.current;
+    const missedKeys = Object.entries(errorsRef.current)
+      .filter(([k, n]) => n > 0 && /^[a-z]$/i.test(k))
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([k]) => k.toLowerCase());
     let streak = 0;
     try {
       saveSession({
@@ -138,8 +153,8 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
         backspaceCount: 0,
         wpm,
         accuracy,
-        perKeyErrors: {},
-        perKeyTotal: {},
+        perKeyErrors: { ...errorsRef.current },
+        perKeyTotal: { ...totalsRef.current },
         bigramErrors: {},
         bigramTotal: {},
         pauseCount: 0,
@@ -152,7 +167,7 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
     } catch {
       /* storage may be unavailable (private mode); the on-screen result still works */
     }
-    setResult({ wpm, accuracy, correctChars: correct, mistakes, seconds: Math.round(elapsed / 1000), lastWpm, bestWpm, streak });
+    setResult({ wpm, accuracy, correctChars: correct, mistakes, seconds: Math.round(elapsed / 1000), lastWpm, bestWpm, streak, missedKeys });
     setPhase('done');
   }, [duration, netCorrect]);
 
@@ -176,9 +191,12 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
     if (box && el) box.scrollTop = Math.max(0, el.offsetTop - 40);
   }, [typed]);
 
-  const reset = useCallback((seconds = duration) => {
+  const reset = useCallback((seconds = duration, keys: string[] = []) => {
     setDuration(seconds);
-    setText(makeText());
+    setFocusKeys(keys);
+    errorsRef.current = {};
+    totalsRef.current = {};
+    setText(makeText(120, keys));
     setTyped('');
     setPhase('idle');
     setRemaining(seconds);
@@ -201,17 +219,20 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
     }
     if (next.length === typed.length + 1) {
       keystrokesRef.current += 1;
-      if (next[next.length - 1] === text[next.length - 1]) correctKeystrokesRef.current += 1;
+      const expected = text[next.length - 1];
+      totalsRef.current[expected] = (totalsRef.current[expected] ?? 0) + 1;
+      if (next[next.length - 1] === expected) correctKeystrokesRef.current += 1;
+      else errorsRef.current[expected] = (errorsRef.current[expected] ?? 0) + 1;
     }
     setTyped(next);
     // Keep an endless supply of words ahead of the cursor
-    if (next.length > text.length - 150) setText((t) => t + makeText(60));
+    if (next.length > text.length - 150) setText((t) => t + makeText(60, focusKeys));
   };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Escape') {
       e.preventDefault();
-      reset();
+      reset(duration, focusKeys);
     }
   };
 
@@ -224,16 +245,18 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
       if (e.key !== 'Enter' || Date.now() - doneAtRef.current < 700) return;
       if (t && (t.closest('a, button, input, textarea, [role=dialog]'))) return;
       e.preventDefault();
-      reset();
+      reset(duration, focusKeys);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [phase, reset]);
+  }, [phase, reset, duration, focusKeys]);
 
   const shownWpm = useCountUp(phase === 'done' && result ? result.wpm : null);
   const chars = useMemo(() => text.split(''), [text]);
   const band = result ? bandForWpm(result.wpm) : null;
   const lowAccuracy = result !== null && result.accuracy < 50;
+  const shaky = result !== null && result.accuracy >= 50 && result.accuracy < 85;
+  const resultTitle = band ? (shaky ? 'Accuracy first' : band.title) : '';
   const canShare = result !== null && result.wpm > 0 && !lowAccuracy;
 
   let progressNote = '';
@@ -314,8 +337,14 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
             className="absolute inset-0 w-full h-full opacity-0 cursor-text"
           />
           <p className="mt-3 min-h-[2.75rem] text-sm font-bold text-slate-600 dark:text-slate-300">
-            {phase === 'idle'
-              ? 'Start typing to begin. The timer starts on your first key. Tap the box first on a phone.'
+            {focusKeys.length > 0 && phase === 'idle'
+              ? `Key drill: ${focusKeys.map((k) => k.toUpperCase()).join(', ')}. Pick a length above to go back to normal words.`
+              : phase === 'idle'
+              ? isTouch
+                ? 'Tap the box, then start typing. The timer starts on your first key.'
+                : 'Start typing to begin. The timer starts on your first key.'
+              : isTouch
+              ? 'Tap Restart to start over.'
               : 'Esc restarts the test.'}
           </p>
         </div>
@@ -332,10 +361,12 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
               <h2 aria-hidden="true" className="text-5xl sm:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-none tabular-nums">
                 {shownWpm}<span className="text-xl sm:text-2xl ml-2 text-slate-500 dark:text-slate-300">WPM</span>
               </h2>
-              <p className="text-lg font-black text-purple-700 dark:text-purple-300">{band.title}</p>
+              <p className="text-lg font-black text-purple-700 dark:text-purple-300">{resultTitle}</p>
               <p className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200 max-w-md">
                 {lowAccuracy
                   ? 'That one did not go to plan, and that is fine. Try again slowly and aim for correct keys, not speed.'
+                  : shaky
+                  ? 'You have the speed. Slow down a little: accurate typing turns into fast typing.'
                   : band.encourage}
               </p>
               {progressNote && (
@@ -366,7 +397,7 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
               )}
               <button
                 type="button"
-                onClick={() => reset()}
+                onClick={() => reset(duration, focusKeys)}
                 className="inline-flex items-center justify-center gap-2 min-h-12 px-5 rounded-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-black whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500"
               >
                 <RotateCcw className="w-4 h-4" aria-hidden="true" />
@@ -382,14 +413,31 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
             <Orb halo="card-halo-green" label="Accuracy" value={`${result.accuracy}%`} />
             <Orb halo="card-halo-blue" label="Correct" value={`${result.correctChars}`} />
             <Orb halo="card-halo-pink" label={result.mistakes === 1 ? 'Mistake' : 'Mistakes'} value={`${result.mistakes}`} />
-            {result.streak > 0 && (
-              <Orb halo="card-halo-orange" label="Day streak" value={`${result.streak}`} icon={<Flame className="w-3 h-3" aria-hidden="true" />} />
-            )}
           </div>
 
-          {result.accuracy < 95 && (
+          {result.missedKeys.length > 0 && (
+            <div className="rounded-2xl border border-rose-500/25 bg-rose-500/10 p-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
+              <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                Keys to practise:{' '}
+                {result.missedKeys.map((k) => (
+                  <kbd key={k} className="mx-0.5 inline-block min-w-7 px-2 py-0.5 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-center font-mono font-black">
+                    {k.toUpperCase()}
+                  </kbd>
+                ))}
+              </p>
+              <button
+                type="button"
+                onClick={() => reset(duration, result.missedKeys)}
+                className="inline-flex items-center justify-center min-h-11 px-5 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-sm font-black whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-400"
+              >
+                Drill these keys
+              </button>
+            </div>
+          )}
+
+          {result.accuracy < 95 && result.accuracy >= 50 && (
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-              Accuracy under 95%: slow down a little. Fixing mistakes costs more time than typing carefully.
+              Accuracy under 95%: fixing mistakes costs more time than typing carefully.
             </p>
           )}
 
@@ -411,7 +459,7 @@ export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = 
         <div className="flex flex-wrap gap-3">
           <button
             type="button"
-            onClick={() => reset()}
+            onClick={() => reset(duration, focusKeys)}
             className="inline-flex items-center gap-2 min-h-11 px-5 rounded-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-black transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500"
           >
             <RotateCcw className="w-4 h-4" aria-hidden="true" />

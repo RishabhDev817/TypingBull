@@ -72,6 +72,9 @@ export const DashboardPage: React.FC = () => {
   const totalStars = getTotalStars();
   const completedLessons = getCompletedLessonCount();
   const recentSessions = sessions.slice(0, 4);
+  // Panels that need history only appear once there is some, so a first visit is not a wall of empty boxes
+  const hasHistory = sessions.length > 0;
+  const showWeakKeys = sessions.length >= 5;
   const [tutorOpen, setTutorOpen] = useState(false);
   const [backupOpen, setBackupOpen] = useState(false);
 
@@ -233,43 +236,8 @@ export const DashboardPage: React.FC = () => {
               </motion.button>
             </motion.div>
 
-            {/* 2b. Classroom: the feature teachers come for */}
-            <motion.div
-              variants={itemVariants}
-              className="card-game card-halo-blue relative px-4 py-3 sm:px-5 sm:py-3.5 mb-3.5 flex flex-col md:flex-row md:items-center gap-3 md:gap-4"
-            >
-              <div className="flex items-center gap-3 min-w-0 flex-1">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: 'var(--color-badge-bg-blue)', border: '1px solid var(--color-badge-border-blue)' }}
-                  aria-hidden="true"
-                >
-                  <School className="w-5 h-5 text-sky-blue" />
-                </div>
-                <div className="min-w-0">
-                  <h2 className="text-sm font-extrabold text-ink leading-tight">{classroomCopy.title}</h2>
-                  <p className="text-xs text-body font-semibold leading-snug mt-0.5">{classroomCopy.body}</p>
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-2 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => { soundEngine.playPop(); navigate('/classroom/create'); }}
-                  className="min-h-11 px-4 inline-flex items-center gap-2 rounded-full bg-sky-500 text-slate-950 text-sm font-black cursor-pointer hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-                >
-                  <School className="w-4 h-4" /> {classroomCopy.create}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { soundEngine.playPop(); navigate('/classroom/join'); }}
-                  className="min-h-11 px-4 inline-flex items-center gap-2 rounded-full border border-hairline-strong text-ink text-sm font-extrabold cursor-pointer hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-                >
-                  {classroomCopy.join}
-                </button>
-              </div>
-            </motion.div>
-
             {/* 3. Bottom Analytics Row: Recent Sessions (Left) & Weak-Key Analysis (Right) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-stretch flex-1 min-h-[240px]">
+            <div className={`grid grid-cols-1 ${showWeakKeys ? 'md:grid-cols-2' : ''} gap-4 sm:gap-6 items-stretch flex-1 min-h-[240px] mb-3.5`}>
               {/* Recent Sessions Card */}
               <motion.div variants={itemVariants} className="card-game card-halo-gold p-4 sm:p-5 flex flex-col justify-between h-full flex-1 min-h-[220px]">
                 <div className="flex-1 flex flex-col min-h-0">
@@ -318,7 +286,8 @@ export const DashboardPage: React.FC = () => {
                 </div>
               </motion.div>
 
-              {/* Weak Key Panel */}
+              {/* Weak Key Panel: only once there is enough history to say something useful */}
+              {showWeakKeys && (
               <motion.div variants={itemVariants} className="h-full flex-1 flex flex-col">
                 <WeakKeyPanel
                   onStartMission={(content, targetKeys) => {
@@ -326,7 +295,43 @@ export const DashboardPage: React.FC = () => {
                   }}
                 />
               </motion.div>
+              )}
             </div>
+
+            {/* 2b. Classroom: the feature teachers come for */}
+            <motion.div
+              variants={itemVariants}
+              className="card-game card-halo-blue relative px-4 py-3 sm:px-5 sm:py-3.5 flex flex-col md:flex-row md:items-center gap-3 md:gap-4"
+            >
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ background: 'var(--color-badge-bg-blue)', border: '1px solid var(--color-badge-border-blue)' }}
+                  aria-hidden="true"
+                >
+                  <School className="w-5 h-5 text-sky-blue" />
+                </div>
+                <div className="min-w-0">
+                  <h2 className="text-sm font-extrabold text-ink leading-tight">{classroomCopy.title}</h2>
+                  <p className="text-xs text-body font-semibold leading-snug mt-0.5">{classroomCopy.body}</p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => { soundEngine.playPop(); navigate('/classroom/create'); }}
+                  className="min-h-11 px-4 inline-flex items-center gap-2 rounded-full bg-sky-500 text-slate-950 text-sm font-black cursor-pointer hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                >
+                  <School className="w-4 h-4" /> {classroomCopy.create}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { soundEngine.playPop(); navigate('/classroom/join'); }}
+                  className="min-h-11 px-4 inline-flex items-center gap-2 rounded-full border border-hairline-strong text-ink text-sm font-extrabold cursor-pointer hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                >
+                  {classroomCopy.join}
+                </button>
+              </div>
+            </motion.div>
           </div>
 
           {/* Right Sidebar: Clean Stat Overview Rail */}
@@ -336,6 +341,8 @@ export const DashboardPage: React.FC = () => {
               <FloatingControls showLabel={false} showLanguageSwitcher={true} />
             </div>
 
+            {hasHistory ? (
+              <>
             {/* Unified Stat Overview Header Label */}
             <div className="text-center text-[13px] font-black text-direct uppercase tracking-widest mt-1 mb-3.5">
               {t('dash.statOverview')}
@@ -426,11 +433,17 @@ export const DashboardPage: React.FC = () => {
                 </div>
               </motion.div>
             </div>
+              </>
+            ) : (
+              <p className="text-center text-xs font-bold text-body px-2 mt-2 flex-1">
+                Your streak, stars and lessons will show up here after your first session.
+              </p>
+            )}
 
             <button
               type="button"
               onClick={() => { soundEngine.playPop(); setBackupOpen(true); }}
-              className="mt-4 min-h-11 px-3 inline-flex items-center justify-center gap-1.5 rounded-full border border-hairline text-[12px] font-extrabold text-body hover:text-ink hover:bg-white/10 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300"
+              className="mt-4 xl:mb-16 min-h-11 px-3 inline-flex items-center justify-center gap-1.5 rounded-full border border-hairline text-[12px] font-extrabold text-body hover:text-ink hover:bg-white/10 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300"
               title="Save your progress as a code, or restore it on this device"
             >
               <Save className="w-3.5 h-3.5" /> Save / restore progress

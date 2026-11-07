@@ -37,3 +37,7 @@ test('every band has an encouraging result line and no band reads as a put-down'
     assert.ok(!/hunting|poor|bad|slow\b/i.test(b.encourage), b.id);
   }
 });
+
+test('result headline favours accuracy only through copy, never changing the speed band', () => {
+  assert.equal(bandForWpm(18).title, 'Warming up');
+});
