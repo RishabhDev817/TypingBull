@@ -1,4 +1,5 @@
 import type { SupportedLocale } from './ui';
+import { fingerSourceKey, keyForSentence } from '../engine/keyLabels';
 
 export interface RegionTranslation {
   label: string;
@@ -838,10 +839,18 @@ export function getLocalizedWeakKeyMessage(
   const { significantWeakKeys, significantBigrams, hesitationKeys, hasSessions, latestAccuracy } = data;
 
   if (significantWeakKeys.length > 0) {
-    const keyList = significantWeakKeys.map((k) => k.key.toUpperCase()).join(', ');
+    const keyList = significantWeakKeys.map((k) => keyForSentence(k.key)).join(', ');
     const fingerDict = TUTOR_FINGER_NAMES[lang] || TUTOR_FINGER_NAMES.en;
-    const fingerSet = new Set(significantWeakKeys.map((k) => fingerDict[k.key] || 'unknown').filter(Boolean));
-    const fingers = Array.from(fingerSet).join(' & ');
+    const fingerSet = new Set(
+      significantWeakKeys
+        .map((k) => {
+          const src = fingerSourceKey(k.key);
+          return src ? fingerDict[src] : undefined;
+        })
+        .filter((f): f is string => Boolean(f))
+    );
+    // Every common key has a finger now; for anything exotic fall back to the index fingers rather than the word "unknown"
+    const fingers = fingerSet.size > 0 ? Array.from(fingerSet).join(' & ') : `${fingerDict.f} & ${fingerDict.j}`;
     const duration = Math.max(3, significantWeakKeys.length);
 
     if (lang === 'es') {

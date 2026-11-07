@@ -23,6 +23,7 @@ import { FloatingControls } from '../components/navigation/FloatingControls';
 import { useI18n } from '../context/I18nContext';
 import { HomeSEOContent } from '../components/HomeSEOContent';
 import { usePageSEO } from '../hooks/usePageSEO';
+import { drillableKeys } from '../engine/keyLabels';
 import { ProgressBackup } from '../components/ProgressBackup';
 
 const FIRST_TEST_CTA: Record<string, string> = {
@@ -290,8 +291,13 @@ export const DashboardPage: React.FC = () => {
               {showWeakKeys && (
               <motion.div variants={itemVariants} className="h-full flex-1 flex flex-col">
                 <WeakKeyPanel
-                  onStartMission={(content, targetKeys) => {
-                    navigate('/practice', { state: { missionContent: content, missionKeys: targetKeys } });
+                  onStartMission={(content, targetKeys, allWeakKeys) => {
+                    // The mission opens the typing test as a key drill for the weak letters; punctuation-only
+                    // weak spots go to Practice, whose passages contain punctuation.
+                    void content;
+                    const letters = drillableKeys([...targetKeys, ...allWeakKeys]);
+                    if (letters.length > 0) navigate('/typing-test', { state: { drillKeys: letters, seconds: 180 } });
+                    else navigate('/practice');
                   }}
                 />
               </motion.div>

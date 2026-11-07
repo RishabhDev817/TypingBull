@@ -1,12 +1,14 @@
 import React, { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { RotateCcw, Timer, Target, Zap, Share2, ArrowRight } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { SpeedGauge } from './SpeedGauge';
 import { STANDARD_WORDS, getRandomWords } from '../utils/words';
+import { DRILL_WORDS } from '../data/drillWords';
 import { PASTE_GUARD_PROPS, isBulkInsert } from '../utils/typingGuard';
 import { calcAccuracy, calcWpm, bandForWpm } from '../seo/typingStats';
+import { drillableKeys } from '../engine/keyLabels';
 import { getSessions, getStreakData, saveSession } from '../engine/sessionStore';
 
 // The share dialog (image card, X / WhatsApp / LinkedIn, download) loads only when someone opens it
@@ -60,23 +62,27 @@ interface Result {
 
 /** Random common words; with `keys`, only words that contain at least one of those keys (for a key drill). */
 const makeText = (words = 120, keys: string[] = []) => {
-  const pool = keys.length ? STANDARD_WORDS.filter((w) => keys.some((k) => w.includes(k))) : STANDARD_WORDS;
-  return getRandomWords(pool.length >= 12 ? pool : STANDARD_WORDS, words).join(' ') + ' ';
+  const pool = keys.length ? DRILL_WORDS.filter((w) => keys.some((k) => w.includes(k))) : STANDARD_WORDS;
+  return getRandomWords(pool.length >= 8 ? pool : STANDARD_WORDS, words).join(' ') + ' ';
 };
 
 /** A self-contained timed typing test. Net WPM = correct characters / 5 per minute. */
 export const TypingTest: React.FC<{ onPhaseChange?: (phase: Phase) => void }> = ({ onPhaseChange }) => {
-  const [duration, setDuration] = useState<number>(60);
-  const [text, setText] = useState<string>(() => makeText());
+  // The dashboard's weak-key mission opens this page already set up as a key drill
+  const startState = useLocation().state as { drillKeys?: unknown; seconds?: unknown } | null;
+  const startKeys = drillableKeys(Array.isArray(startState?.drillKeys) ? (startState.drillKeys as unknown[]).filter((k): k is string => typeof k === 'string') : []);
+  const startSeconds = DURATIONS.find((d) => d.seconds === startState?.seconds)?.seconds ?? 60;
+  const [duration, setDuration] = useState<number>(startSeconds);
+  const [text, setText] = useState<string>(() => makeText(120, startKeys));
   const [typed, setTyped] = useState('');
   const [phase, setPhase] = useState<Phase>('idle');
-  const [remaining, setRemaining] = useState<number>(60);
+  const [remaining, setRemaining] = useState<number>(startSeconds);
   // null until enough time has passed for a meaningful number (early WPM spikes are noise)
   const [liveWpm, setLiveWpm] = useState<number | null>(null);
   const [liveAcc, setLiveAcc] = useState(100);
   const [result, setResult] = useState<Result | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
-  const [focusKeys, setFocusKeys] = useState<string[]>([]);
+  const [focusKeys, setFocusKeys] = useState<string[]>(startKeys);
   const [isTouch] = useState(() => typeof window !== 'undefined' && !!window.matchMedia?.('(pointer: coarse)').matches);
   const errorsRef = useRef<Record<string, number>>({});
   const totalsRef = useRef<Record<string, number>>({});

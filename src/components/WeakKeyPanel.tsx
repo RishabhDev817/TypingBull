@@ -8,7 +8,8 @@ import { WEAK_KEY_UI_I18N } from '../i18n/tutorTranslations';
 
 interface WeakKeyPanelProps {
   className?: string;
-  onStartMission?: (content: string, targetKeys: string[]) => void;
+  /** `allWeakKeys` lists every weak key shown on the card, so callers can fall back to letters when the mission keys are punctuation. */
+  onStartMission?: (content: string, targetKeys: string[], allWeakKeys: string[]) => void;
 }
 
 export const WeakKeyPanel: React.FC<WeakKeyPanelProps> = ({
@@ -53,10 +54,10 @@ export const WeakKeyPanel: React.FC<WeakKeyPanelProps> = ({
               .slice(0, 4)
               .map(({ key, errorRate }) => (
                 <div key={key} className="flex items-center gap-2">
-                  <span className="w-6 h-6 flex items-center justify-center text-[11px] font-extrabold rounded-lg text-white shrink-0"
+                  <span className={`w-6 h-6 flex items-center justify-center ${/^[a-z]$/i.test(key) ? 'text-[11px]' : 'text-base leading-none'} font-extrabold rounded-lg text-white shrink-0`}
                     style={{ background: 'linear-gradient(135deg, #FF9800, #F57C00)' }}
                   >
-                    {key.toUpperCase()}
+                    {/^[a-z]$/i.test(key) ? key.toUpperCase() : key}
                   </span>
                   <div className="flex-1 h-2 rounded-full overflow-hidden"
                     style={{ background: 'var(--color-badge-bg-orange)', border: '1px solid var(--color-badge-border-orange)' }}
@@ -120,7 +121,7 @@ export const WeakKeyPanel: React.FC<WeakKeyPanelProps> = ({
           onClick={() => {
             soundEngine.playPop();
             const m = recommendation.mission!;
-            onStartMission(m.content, m.targetKeys);
+            onStartMission(m.content, m.targetKeys, recommendation.weakKeys.filter((k) => k.errorRate > 0.05).map((k) => k.key));
           }}
           className="w-full btn-chunky btn-chunky-orange text-xs py-2 cursor-pointer mt-1.5 shrink-0"
         >
